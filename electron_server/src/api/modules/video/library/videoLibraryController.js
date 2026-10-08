@@ -1,0 +1,73 @@
+const ResponseUtil = require('../../../apiUtils/responseUtil');
+const VideoLibraryService = require('./videoLibraryService');
+
+class VideoLibraryController {
+  /**
+   * 影视库列表（所有登录用户可读，左侧栏需要）
+   * 返回每个库的条目统计
+   */
+  async listLibraries(req, res) {
+    try {
+      const service = new VideoLibraryService(req.dbVideo);
+      const list = await service.listLibrariesWithCounts(req.user);
+      return ResponseUtil.success(req, res, list, 'video.VIDEO_LIBRARY_LIST_SUCCESS', 200);
+    } catch (err) {
+      return ResponseUtil.error(req, res, 'video.VIDEO_LIBRARY_LIST_FAILED', 500);
+    }
+  }
+
+  /**
+   * 新建影视库（管理员）
+   * body: { name: string, lib_type: "movie" | "tv" | "image" | "mixed" }
+   */
+  async addLibrary(req, res) {
+    try {
+      const service = new VideoLibraryService(req.dbVideo);
+      const row = await service.addLibrary(req.body || {});
+      return ResponseUtil.success(req, res, row, 'video.VIDEO_LIBRARY_ADD_SUCCESS', 201);
+    } catch (err) {
+      const msgKey = err && err.message ? err.message : 'common.ERROR';
+      const statusCode = msgKey === 'video.VIDEO_LIBRARY_NAME_EXISTS' ? 409 : 400;
+      return ResponseUtil.error(req, res, msgKey, statusCode);
+    }
+  }
+
+  /**
+   * 重命名影视库（管理员）
+   * 类型创建后不可修改，此接口只改名字
+   * params: id
+   * body: { name: string }
+   */
+  async renameLibrary(req, res) {
+    try {
+      const service = new VideoLibraryService(req.dbVideo);
+      const id = req.params && req.params.id;
+      const row = await service.renameLibrary(id, req.body || {});
+      return ResponseUtil.success(req, res, row, 'video.VIDEO_LIBRARY_UPDATE_SUCCESS', 200);
+    } catch (err) {
+      const msgKey = err && err.message ? err.message : 'common.ERROR';
+      const statusCode = msgKey === 'common.NOT_FOUND' ? 404 : msgKey === 'video.VIDEO_LIBRARY_NAME_EXISTS' ? 409 : 400;
+      return ResponseUtil.error(req, res, msgKey, statusCode);
+    }
+  }
+
+  /**
+   * 删除影视库（管理员）
+   * 内置库不可删除；库内仍有来源时拒绝删除
+   * params: id
+   */
+  async deleteLibrary(req, res) {
+    try {
+      const service = new VideoLibraryService(req.dbVideo);
+      const id = req.params && req.params.id;
+      const result = await service.deleteLibrary(id);
+      return ResponseUtil.success(req, res, result, 'video.VIDEO_LIBRARY_DELETE_SUCCESS', 200);
+    } catch (err) {
+      const msgKey = err && err.message ? err.message : 'common.ERROR';
+      const statusCode = msgKey === 'common.NOT_FOUND' ? 404 : 400;
+      return ResponseUtil.error(req, res, msgKey, statusCode);
+    }
+  }
+}
+
+module.exports = new VideoLibraryController();

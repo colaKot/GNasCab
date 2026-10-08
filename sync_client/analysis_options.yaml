@@ -1,0 +1,7 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 与主客户端保持一致：允许 print 用于同步过程日志
+    avoid_print: false
+    prefer_const_constructors: false

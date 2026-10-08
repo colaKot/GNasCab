@@ -1,0 +1,49 @@
+name: nascab_sync
+description: "GNasCab 目录同步客户端 —— 电脑 <-> NAS 目录同步的 Windows 独立程序"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 状态管理（同步引擎使用 Rx 类型）
+  get: ^4.7.2
+  # API 请求（同步接口）
+  http: ^1.6.0
+  # 分块上传（同步上传走 /api/file/upload/*）
+  dio: ^5.9.0
+  # 上传会话哈希
+  crypto: ^3.0.3
+  # 路径处理（Windows 需 p.join / p.basename）
+  path: ^1.9.0
+  # 本地配置目录（基线库 sync.db 落盘位置）
+  path_provider: ^2.1.5
+  # 登录态与用户偏好持久化
+  shared_preferences: ^2.5.3
+  # 同步基线本地库
+  sqflite_common_ffi: ^2.3.7
+  # sqflite_common_ffi 在 Windows 上依赖 sqlite3 动态库，
+  # 少了这组依赖基线库会打不开（同步退化为「无基线」，删除传播失效）
+  sqlite3: ^2.9.4
+  sqlite3_flutter_libs: ">=0.5.41 <0.6.0"
+  # 选择本地同步目录
+  file_picker: ^10.3.7
+  # 桌面窗口（关窗进托盘、单实例）
+  window_manager: ^0.5.1
+  # 系统托盘常驻
+  tray_manager: ^0.5.2
+  # 目录同步核心：与 PC 主客户端（flutter_client）共用同一份实现
+  nascab_sync_core:
+    path: ../packages/nascab_sync_core
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

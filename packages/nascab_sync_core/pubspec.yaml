@@ -1,0 +1,22 @@
+name: nascab_sync_core
+description: >-
+  GNasCab 目录同步核心：模型 / 本地扫描 / 基线库 / 调度器 / 同步引擎 / 协议定义。
+  由 PC 主客户端（flutter_client）与 Windows 独立同步客户端（sync_client）共用。
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  crypto: ^3.0.3
+  dio: ^5.9.0
+  get: ^4.7.2
+  http: ^1.5.0
+  path: ^1.9.0
+  path_provider: ^2.1.5
+  sqflite_common_ffi: ^2.3.7
+  sqlite3: ^2.9.4
+
+dev_dependencies:
+  lints: ^6.0.0

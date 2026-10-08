@@ -1,0 +1,84 @@
+# ========== 依赖 ==========
+node_modules/
+yarn.lock
+*.lock
+
+# ========== 服务端：运行时二进制与数据 ==========
+# 这些体积较大，不纳入源码仓库；可用 tool/fetch_nascab_assets.py 从官方资源清单重新下载。
+electron_server/libs/sftpgo/
+electron_server/libs/openlist/
+electron_server/libs/ffmpeg/
+electron_server/libs/ffprobe/
+electron_server/libs/rclone/
+electron_server/libs/transmission/
+electron_server/libs/sharp/win/x64/node_modules/
+electron_server/libs/sharp/win/x64/src/build/
+electron_server/onnx_models/
+electron_server/database/*.sqlite
+electron_server/test/**/*
+
+# ========== 本地数据 / 日志 ==========
+.devdata/
+*.log
+logs/
+logs/**/*
+test.db
+*.db
+*.db-shm
+*.db-wal
+.env
+.DS_Store
+Thumbs.db
+
+# ========== Flutter 客户端 ==========
+flutter_client/.dart_tool/
+flutter_client/build/
+flutter_client/.flutter-plugins
+flutter_client/.flutter-plugins-dependencies
+flutter_client/android/.gradle/
+flutter_client/android/build/
+flutter_client/android/app/build/
+flutter_client/android/local.properties
+flutter_client/ios/Flutter/ephemeral/
+flutter_client/ios/Pods/
+flutter_client/ios/.symlinks/
+flutter_client/macos/Flutter/ephemeral/
+flutter_client/macos/Pods/
+flutter_client/windows/flutter/ephemeral/
+flutter_client/linux/flutter/ephemeral/
+flutter_client/android/nascabos-pwd-nascab.jks
+
+# ========== Dart 同步共享包 / 独立同步端 ==========
+packages/nascab_sync_core/.dart_tool/
+packages/nascab_sync_core/build/
+sync_client/.dart_tool/
+sync_client/build/
+
+# ========== 鸿蒙客户端 ==========
+harmony_client/oh_modules/
+harmony_client/.hvigor/
+harmony_client/build/
+harmony_client/entry/build/
+harmony_client/entry/oh_modules/
+harmony_client/local.properties
+
+# ========== Android TV ==========
+tv_android/.gradle/
+tv_android/build/
+tv_android/app/build/
+tv_android/local.properties
+
+# ========== iOS / tvOS ==========
+tv_apple/Pods/
+tv_apple/build/
+tv_apple/DerivedData/
+tv_apple/*.xcodeproj/xcuserdata/
+tv_apple/*.xcworkspace/xcuserdata/
+*.xcuserstate
+
+# ========== IDE / 系统 ==========
+.idea/
+.vscode/
+.vs/
+__pycache__/
+*.py[cod]
