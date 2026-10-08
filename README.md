@@ -64,7 +64,7 @@ If GNasCab is helpful to you, we welcome your support:
 
 <div align="center">
 
-<img src="qrcode-wx.webp" width="200" alt="WeChat donation QR code" />
+<img src="qrcode-wechat.webp" width="200" alt="WeChat donation QR code" />
 
 </div>
 

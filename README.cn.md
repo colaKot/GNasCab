@@ -64,7 +64,7 @@ flutter run -d win/ios/android/mac
 
 <div align="center">
 
-<img src="qrcode-wx.webp" width="200" alt="微信捐助二维码" />
+<img src="qrcode-wechat.webp" width="200" alt="微信捐助二维码" />
 
 </div>
 
