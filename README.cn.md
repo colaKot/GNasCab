@@ -7,6 +7,19 @@ GNasCab 是一款跨平台 NAS 软件，支持远程管理照片、影音、音�
 官方网站：<https://nas.cab>
 
 
+## 本仓库改动说明
+
+> 本仓库是 [NasCabOS](https://github.com/nascab/NasCabOS) 的**修改版**，依据 GPL-3.0 发布。
+> 以下为相对上游的改动（变更时间：2026-10，详见提交记录）。
+
+- **项目更名**：项目名与各端显示名统一改为 **GNasCab**（Windows 服务端显示为 GNasCabServer，TV 端为 GNasCab TV）；Flutter 包名由 `NasCabOS` 改为 `GNasCab`。
+- **保持兼容**：`applicationId`、iOS Bundle ID、鸿蒙 `bundleName` 等应用标识**保持不变**，已安装用户可正常覆盖升级；网络协议、设备指纹与加密数据格式均未改动。
+- **新增多端目录同步**：新增 Windows 独立同步客户端 `sync_client` 与共享核心包 `packages/nascab_sync_core`，PC 主客户端与独立同步端共用同一套同步引擎与传输协议。
+- **新增子账号权限体系**：新增应用级访问白名单（`appAccessGuard`）与路径级细粒度权限，可按用户限定可访问目录与操作范围，详见 `docs/子账号权限方案.md`。
+- **影视库支持多库**：新增 `video_library` 实体，可分别建立电影 / 电视剧 / 图片 / 混合媒体库。
+- **仓库精简**：不再随仓库提供第三方运行时二进制（sftpgo、openlist、ffmpeg、ffprobe、rclone、transmission）与 AI 模型（`onnx_models`）、地名库；可运行 `tool/fetch_nascab_assets.py` 从官方资源清单获取。
+- **联系与捐助**：更新为本仓库维护者的微信收款二维码与邮箱。
+
 ## 项目结构
 
 本代码包含主要以下几个项目：
