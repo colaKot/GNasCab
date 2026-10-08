@@ -6,6 +6,43 @@ GNasCab is a cross-platform NAS software that lets you remotely manage your phot
 
 Official website: <https://nas.cab>
 
+## Built-in Apps
+
+Every feature in GNasCab is a **standalone app**: its own icon, its own page stack and its own
+server-side API namespace, and on desktop it can be opened in a separate window apart from the
+main shell. The default app list is served by the backend (`defaultApps` in
+`electron_server/src/config/config.js`); users can hide or reorder apps in Settings.
+
+| App | key | Description |
+| --- | --- | --- |
+| Files | `folder` | Browse, upload/download and share files |
+| Photos | `photo` | Timeline, albums, smart albums, collections, face & scene recognition, similar-photo grouping, GPS geotagging, footprint map, "On this day", trash |
+| Movies | `movie` | Movies and TV shows, common video formats, multiple libraries (movie / TV / photo / mixed) |
+| Books | `book` | E-book reader supporting EPUB / MOBI / AZW3 / PDF / TXT |
+| Music | `music` | Songs, albums, artists, playlists, collections and favorites, with a built-in full-screen player (dynamic lyrics, disc animation, background playback) |
+| Notes | `note` | Rich-text notes |
+| Encrypted | `encrypted` | AES-encrypted storage; the password is stored encrypted in the local database |
+| Media Tool | `media_tool` | Batch image compression and video conversion |
+| Sync | `sync` | Folder sync between your computer and the NAS: two-way / download-only / upload-only, with filter rules |
+| Terminal | `terminal` | Remote terminal with sensitive commands (rm, unlink, ...) blocked |
+| Transmission | `transmission` | BitTorrent download management |
+| Docker | `docker` | Images, containers and tasks on the host |
+| Backup | `backup` | Phone photo and file backup |
+| Mounts | `mounts` | Mount network disks into server directories |
+| Share | `share` | Share disks over WebDAV / FTP / SFTP |
+| Monitor | `monitor` | Real-time hardware usage |
+| Task Center | `task_center` | Background jobs |
+| Security | `security` | Login and security settings |
+| Users | `user` | Users and permissions |
+| Process | `process` | Process viewer |
+| Service | `nascab_service` | Server status and account |
+| Settings | `setting` | Global settings |
+
+> `transmission`, `terminal`, `user`, `mounts`, `docker`, `nascab_service`, `monitor` and `process`
+> are hidden from regular users by default and visible only to administrators. If an app is missing
+> from the home screen, it is most likely filtered out by the "hidden apps" setting — restore it in
+> Settings.
+
 ## Changes From Upstream
 
 > This repository is a **modified version** of [NasCabOS](https://github.com/nascab/NasCabOS),

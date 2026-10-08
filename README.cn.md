@@ -7,6 +7,41 @@ GNasCab 是一款跨平台 NAS 软件，支持远程管理照片、影音、音�
 官方网站：<https://nas.cab>
 
 
+## 内置应用
+
+GNasCab 的每一项功能都是**独立的 App**：有自己的图标、独立页面栈和独立的服务端 API 命名空间，
+PC 端还可以从主窗口单独打开。默认应用列表由服务端下发（见 `electron_server/src/config/config.js`
+的 `defaultApps`），用户可在设置中隐藏或重新排序。
+
+| 应用 | key | 说明 |
+| --- | --- | --- |
+| 文件管理 | `folder` | 文件浏览、上传下载、分享 |
+| 照片管理 | `photo` | 时间线、自建相册、智能相册、照片合集、人脸/场景识别、相似照片、GPS 补录、足迹地图、那年今日、回收站 |
+| 影视库 | `movie` | 电影与电视剧管理，支持常见视频格式，可建电影/电视剧/图片/混合多库 |
+| 图书馆 | `book` | 电子书阅读，支持 EPUB / MOBI / AZW3 / PDF / TXT 等格式 |
+| 音乐库 | `music` | 歌曲、专辑、歌手、播放列表、合集、收藏，内置全屏播放器（动态歌词、唱片动效、后台播放） |
+| 笔记 | `note` | 富文本笔记 |
+| 加密空间 | `encrypted` | AES 加密保存文件，密码加密后存于本机数据库 |
+| 媒体工具 | `media_tool` | 批量压缩图片、视频转换 |
+| 同步管理 | `sync` | 电脑文件夹与 NAS 目录同步，支持双向 / 仅下载 / 仅上传与过滤规则 |
+| 终端 | `terminal` | 远程终端，屏蔽 rm、unlink 等敏感命令 |
+| Transmission | `transmission` | BT 下载管理 |
+| Docker | `docker` | 宿主机镜像、容器、任务管理 |
+| 备份 | `backup` | 手机相册与文件备份 |
+| 远程挂载 | `mounts` | 把网络磁盘挂载到服务器目录 |
+| 分享管理 | `share` | 通过 WebDAV / FTP / SFTP 等协议分享磁盘 |
+| 系统监控 | `monitor` | 实时查看服务器硬件使用情况 |
+| 任务中心 | `task_center` | 后台任务查看 |
+| 安全中心 | `security` | 登录与安全设置 |
+| 用户管理 | `user` | 用户与权限管理 |
+| 进程 | `process` | 进程查看 |
+| 服务 | `nascab_service` | 服务端状态与账户 |
+| 配置中心 | `setting` | 全局设置 |
+
+> `transmission`、`terminal`、`user`、`mounts`、`docker`、`nascab_service`、`monitor`、`process`
+> 默认对普通用户隐藏，仅管理员可见。若首页看不到某个应用，多半是被「隐藏应用」挡住了，
+> 在设置里恢复即可。
+
 ## 本仓库改动说明
 
 > 本仓库是 [NasCabOS](https://github.com/nascab/NasCabOS) 的**修改版**，依据 GPL-3.0 发布。
