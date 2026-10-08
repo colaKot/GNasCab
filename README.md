@@ -57,7 +57,7 @@ If GNasCab is helpful to you, we welcome your support:
 
 </div>
 
-Business cooperation / Contact us: ypptec@126.com / ypptec@gmail.com
+Business cooperation / Contact us: cola23@126.com
 
 ## License
 

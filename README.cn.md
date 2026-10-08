@@ -57,7 +57,7 @@ flutter run -d win/ios/android/mac
 
 </div>
 
-商务合作/联系我们：ypptec@126.com / ypptec@gmail.com
+商务合作/联系我们：cola23@126.com
 
 ## 许可证
 

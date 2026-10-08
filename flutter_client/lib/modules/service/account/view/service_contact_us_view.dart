@@ -55,7 +55,7 @@ class ServiceContactUsView extends StatelessWidget {
               style: const TextStyle(fontSize: 15, height: 1.6),
             ),
             GestureDetector(
-              onTap: () => _copyEmail('ypptec@gmail.com'),
+              onTap: () => _copyEmail('cola23@126.com'),
               child: Container(
                 decoration: BoxDecoration(
                   color: Get.theme.primaryColor.withValues(alpha: 0.1),
@@ -68,7 +68,7 @@ class ServiceContactUsView extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'ypptec@gmail.com',
+                      'cola23@126.com',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
