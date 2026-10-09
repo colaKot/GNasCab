@@ -1148,7 +1148,8 @@ python tool/bridge_cli.py run --cwd "G:\work\nascab\electron_server" --timeout 3
    `git ls-files web/` 只有 61 条（`quickshare/*` + `wallpaper/*.webp`）；
    `git log -- web/main` 为空（**从未提交**）；上游 `nascab/NasCabOS` 的 `electron_server/web/`
    同样**只有** `quickshare` + `wallpaper`（已用 GitHub contents API 核对）。
-7. ⭐ **它从哪来 —— `README.cn.md:90-94`**：
+7. ⭐ **它从哪来 —— `README.md:100-104`**（2026-10-09 起中文版是默认 README，
+   原 `README.cn.md` 已并入 `README.md`）：
    > 如何把网页端编译后放到服务端下，实现静态网页端的访问：
    > `将flutter打包web端后放入electron_server/web/main目录下`
    ⇒ **`web/main` = `flutter build web` 的产物**，官方打包前手动放进去的；本仓库从没跑过这一步。

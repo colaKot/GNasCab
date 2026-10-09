@@ -1,124 +1,119 @@
 # GNasCab
 
-> [简体中文](README.cn.md) | **English**
+> **简体中文** | [English](README.en.md)
 
-GNasCab is a cross-platform NAS software that lets you remotely manage your photos, videos, music, books, and files. It also supports file sharing, Transmission downloads, Docker management, remote terminal, multi-device folder sync, and more.
+GNasCab 是一款跨平台 NAS 软件，支持远程管理照片、影音、音乐、图书和文件，还支持文件分享、Transmission 下载、Docker 管理、远程终端、多端目录同步等功能。
 
-Official website: <https://nas.cab>
+官方网站：<https://nas.cab>
 
-## Changes From Upstream
+## 本仓库改动说明
 
-> This repository is a **modified version** of [NasCabOS](https://github.com/nascab/NasCabOS),
-> released under GPL-3.0. Listed below are the changes relative to upstream (2026-10; see the commit history).
-> Feature-level changes come first, followed by project-wide housekeeping.
+> 本仓库是 [NasCabOS](https://github.com/nascab/NasCabOS) 的**修改版**，依据 GPL-3.0 发布。
+> 以下为相对上游的改动（变更时间：2026-10，详见提交记录）。功能类改动在前，全局性调整在后。
 
-### Features
+### 功能改动
 
-- **Multi-device folder sync**: a standalone Windows sync client (`sync_client`) plus a shared core package (`packages/nascab_sync_core`), so the desktop client and the standalone client run the same sync engine and transfer protocol. The backend gains a dedicated `/api/sync` namespace and two new tables (`tableSyncTask`, `tableSyncRecord`).
-- **Sub-account permission system**: an app-level access policy (`appAccessGuard`) together with fine-grained path permissions, letting you restrict each user's accessible folders and operations (`/api/user/access-policy`). See `docs/子账号权限方案.md`.
-- **Multi-library media support**: a new `video_library` entity allows separate movie / TV / photo / mixed libraries, each with its own "show on home" switch; image and mixed libraries get their own grid + full-screen browser. Existing rows are backfilled by `media_type` on upgrade.
-- **Standalone Photos / Music clients**: `photo_client` and `music_client` build `NasCabPhoto.exe` / `NasCabMusic.exe`. They depend on the main client by path and add **zero duplicated business code** — `main.dart` is three lines that set a launch mode (`AppLaunchMode.photo` / `.music`), so each app boots straight into Photos or Music with its own icon and title.
-- **Theme system**: 26 named color schemes selectable at runtime (Settings → Theme), plus a design-token layer (`app_tokens.dart`) that centralizes spacing / corner-radius / control sizes previously scattered as hard-coded numbers.
-- **Content-level dedup for photo backup**: backup now compares size **and content MD5** against the NAS, so re-uploading an unchanged file is skipped instead of transferred again.
+- **多端目录同步**：新增 Windows 独立同步客户端 `sync_client` 与共享核心包 `packages/nascab_sync_core`，PC 主客户端与独立同步端共用同一套同步引擎与传输协议；服务端新增 `/api/sync` 命名空间与`tableSyncTask`、`tableSyncRecord` 两张表。
+- **子账号权限体系**：新增应用级访问白名单（`appAccessGuard`）与路径级细粒度权限，可按用户限定可访问目录与操作范围（`/api/user/access-policy`），详见 `docs/子账号权限方案.md`。
+- **影视库支持多库**：新增 `video_library` 实体，可分别建立电影 / 电视剧 / 图片 / 混合媒体库，每个库带独立的「在主页显示」开关；图片库与混合库另有自己的网格浏览与全屏查看页。升级时按 `media_type` 自动回填老数据。
+- **相册 / 音乐独立客户端**：新增 `photo_client` 与 `music_client`，产出 `NasCabPhoto.exe`、`NasCabMusic.exe`。两者以 path 依赖复用主客户端，**不复制任何业务代码**——`main.dart` 只有三行，设置启动模式（`AppLaunchMode.photo` / `.music`）后即直达相册或音乐，图标与窗口标题各自独立。
+- **主题系统**：新增 26 套可在运行时切换的配色方案（设置 → 主题），并抽出设计 token 层（`app_tokens.dart`），把原先散落全项目的间距 / 圆角 / 控件尺寸硬编码数字收成命名常量。
+- **相册备份内容级去重**：备份前先比对 NAS 端的**大小 + 内容 MD5**，内容一致直接跳过，不再重复传输未变更的文件。
 
-### Project-wide
+### 全局性调整
 
-- **Renamed**: the project and every client display name is now **GNasCab** (GNasCabServer for the Windows server, GNasCab TV for the TV clients); the Flutter package name changed from `NasCabOS` to `GNasCab`.
-- **Backward compatible**: application identifiers such as `applicationId`, the iOS Bundle ID and the HarmonyOS `bundleName` are **left unchanged**, so existing installs can upgrade in place; network protocols, device fingerprints and encrypted data formats are untouched.
-- **Slimmed repository**: third-party runtime binaries (sftpgo, openlist, ffmpeg, ffprobe, rclone, transmission), AI models (`onnx_models`), CocoaPods trees and the geonames database are no longer bundled; run `tool/fetch_nascab_assets.py` to fetch them from the official manifest.
-- **Contact & donations**: updated to the maintainer's QR code and email.
+- **项目更名**：项目名与各端显示名统一改为 **GNasCab**（Windows 服务端显示为 GNasCabServer，TV 端为 GNasCab TV）；Flutter 包名由 `NasCabOS` 改为 `GNasCab`。
+- **保持兼容**：`applicationId`、iOS Bundle ID、鸿蒙 `bundleName` 等应用标识**保持不变**，已安装用户可正常覆盖升级；网络协议、设备指纹与加密数据格式均未改动。
+- **仓库精简**：不再随仓库提供第三方运行时二进制（sftpgo、openlist、ffmpeg、ffprobe、rclone、transmission）与 AI 模型（`onnx_models`）、CocoaPods 依赖树、地名库；可运行 `tool/fetch_nascab_assets.py` 从官方资源清单获取。
+- **联系与捐助**：更新为本仓库维护者的微信收款二维码与邮箱。
 
-## Built-in Apps
+## 内置应用
 
-Every feature in GNasCab is a **standalone app**: its own icon, its own page stack and its own
-server-side API namespace, and on desktop it can be opened in a separate window apart from the
-main shell. The default app list is served by the backend (`defaultApps` in
-`electron_server/src/config/config.js`); users can hide or reorder apps in Settings.
+GNasCab 的每一项功能都是**独立的 App**：有自己的图标、独立页面栈和独立的服务端 API 命名空间，
+PC 端还可以从主窗口单独打开。默认应用列表由服务端下发（见 `electron_server/src/config/config.js`
+的 `defaultApps`），用户可在设置中隐藏或重新排序。
 
-| App | key | Description |
+| 应用 | key | 说明 |
 | --- | --- | --- |
-| Files | `folder` | Browse, upload/download and share files |
-| Photos | `photo` | Timeline, albums, smart albums, collections, face & scene recognition, similar-photo grouping, GPS geotagging, footprint map, "On this day", trash |
-| Movies | `movie` | Movies and TV shows, common video formats, multiple libraries (movie / TV / photo / mixed) |
-| Books | `book` | E-book reader supporting EPUB / MOBI / AZW3 / PDF / TXT |
-| Music | `music` | Songs, albums, artists, playlists, collections and favorites, with a built-in full-screen player (dynamic lyrics, disc animation, background playback) |
-| Notes | `note` | Rich-text notes |
-| Encrypted | `encrypted` | AES-encrypted storage; the password is stored encrypted in the local database |
-| Media Tool | `media_tool` | Batch image compression and video conversion |
-| Sync | `sync` | Folder sync between your computer and the NAS: two-way / download-only / upload-only, with filter rules |
-| Terminal | `terminal` | Remote terminal with sensitive commands (rm, unlink, ...) blocked |
-| Transmission | `transmission` | BitTorrent download management |
-| Docker | `docker` | Images, containers and tasks on the host |
-| Backup | `backup` | Phone photo and file backup |
-| Mounts | `mounts` | Mount network disks into server directories |
-| Share | `share` | Share disks over WebDAV / FTP / SFTP |
-| Monitor | `monitor` | Real-time hardware usage |
-| Task Center | `task_center` | Background jobs |
-| Security | `security` | Login and security settings |
-| Users | `user` | Users and permissions |
-| Process | `process` | Process viewer |
-| Service | `nascab_service` | Server status and account |
-| Settings | `setting` | Global settings |
+| 文件管理 | `folder` | 文件浏览、上传下载、分享 |
+| 照片管理 | `photo` | 时间线、自建相册、智能相册、照片合集、人脸/场景识别、相似照片、GPS 补录、足迹地图、那年今日、回收站 |
+| 影视库 | `movie` | 电影与电视剧管理，支持常见视频格式，可建电影/电视剧/图片/混合多库 |
+| 图书馆 | `book` | 电子书阅读，支持 EPUB / MOBI / AZW3 / PDF / TXT 等格式 |
+| 音乐库 | `music` | 歌曲、专辑、歌手、播放列表、合集、收藏，内置全屏播放器（动态歌词、唱片动效、后台播放） |
+| 笔记 | `note` | 富文本笔记 |
+| 加密空间 | `encrypted` | AES 加密保存文件，密码加密后存于本机数据库 |
+| 媒体工具 | `media_tool` | 批量压缩图片、视频转换 |
+| 同步管理 | `sync` | 电脑文件夹与 NAS 目录同步，支持双向 / 仅下载 / 仅上传与过滤规则 |
+| 终端 | `terminal` | 远程终端，屏蔽 rm、unlink 等敏感命令 |
+| Transmission | `transmission` | BT 下载管理 |
+| Docker | `docker` | 宿主机镜像、容器、任务管理 |
+| 备份 | `backup` | 手机相册与文件备份 |
+| 远程挂载 | `mounts` | 把网络磁盘挂载到服务器目录 |
+| 分享管理 | `share` | 通过 WebDAV / FTP / SFTP 等协议分享磁盘 |
+| 系统监控 | `monitor` | 实时查看服务器硬件使用情况 |
+| 任务中心 | `task_center` | 后台任务查看 |
+| 安全中心 | `security` | 登录与安全设置 |
+| 用户管理 | `user` | 用户与权限管理 |
+| 进程 | `process` | 进程查看 |
+| 服务 | `nascab_service` | 服务端状态与账户 |
+| 配置中心 | `setting` | 全局设置 |
 
-> `transmission`, `terminal`, `user`, `mounts`, `docker`, `nascab_service`, `monitor` and `process`
-> are hidden from regular users by default and visible only to administrators. If an app is missing
-> from the home screen, it is most likely filtered out by the "hidden apps" setting — restore it in
-> Settings.
+> `transmission`、`terminal`、`user`、`mounts`、`docker`、`nascab_service`、`monitor`、`process`
+> 默认对普通用户隐藏，仅管理员可见。若首页看不到某个应用，多半是被「隐藏应用」挡住了，
+> 在设置里恢复即可。
 
-## Project Structure
+## 项目结构
 
-This repository contains the following projects:
+本代码包含主要以下几个项目：
 
-| Project | Description |
+| 项目 | 说明 |
 | --- | --- |
-| electron_server | Backend, uses electron + express to provide local services |
-| flutter_client | Android + iOS + Windows + Mac clients, built with flutter for cross-platform support |
-| harmony_client | HarmonyOS client, in development |
-| tv_android | Android TV client |
-| tv_apple | Apple TV client |
-| sync_client | Standalone Windows sync client |
-| photo_client | Standalone Windows Photos client (reuses `flutter_client` by path) |
-| music_client | Standalone Windows Music client (reuses `flutter_client` by path) |
-| packages/nascab_sync_core | Shared sync core package used by the PC client and the standalone sync client |
-| tool | Development environment scripts and static self-check scripts |
+| electron_server | 后端，使用 electron + express 实现本地服务功能 |
+| flutter_client | Android + iOS + Windows + Mac 客户端，使用 flutter 实现跨平台客户端 |
+| harmony_client | 鸿蒙端，开发中 |
+| tv_android | Android TV 端 |
+| tv_apple | Apple TV 端 |
+| sync_client | Windows 独立同步客户端 |
+| photo_client | Windows 相册独立客户端（以 path 依赖复用 `flutter_client`） |
+| music_client | Windows 音乐独立客户端（以 path 依赖复用 `flutter_client`） |
+| packages/nascab_sync_core | 目录同步核心共享包，PC 主客户端与独立同步端共用 |
+| tool | 开发环境脚本与静态自检脚本 |
 
-## Running
+## 运行方式
 
-Server:
-
-First, download the dependency libraries and plugins provided in the releases (<https://github.com/colaKot/GNasCab/releases>), then extract the `libs` and `onnx_models` of the corresponding platform to the root directory of `electron_server`. `libs` contains third-party plugins, and `onnx_models` contains OCR model files used for image recognition.
+服务端运行方式：
+先要将 releases 中提供的依赖库和插件（https://github.com/colaKot/GNasCab/releases）下载到本地，然后将对应平台的 libs 以及 onnx_models 解压缩后放到 electron_server 根目录下，libs 中是第三方相关插件，onnx_models 中是 ocr 相关模型文件，用于图像识别
 
 ```bash
 npm i;
 npm start;
 ```
 
-Client:
+客户端运行方式：
 
 ```bash
 flutter pub get;
 flutter run -d win/ios/android/mac
 ```
 
-To serve the compiled web client from the server (static web access):
+如何把网页端编译后放到服务端下，实现静态网页端的访问：
 
 ```bash
-Build the flutter web version and place it under the electron_server/web/main directory.
+将flutter打包web端后放入electron_server/web/main目录下
 ```
 
-## Donations
+## 捐助支持
 
-If GNasCab is helpful to you, we welcome your support:
+如果 GNasCab 对您有帮助，欢迎捐助支持我们：
 
 <div align="center">
 
-<img src="qrcode-wechat.webp" width="200" alt="WeChat donation QR code" />
+<img src="qrcode-wechat.webp" width="200" alt="微信捐助二维码" />
 
 </div>
 
-Business cooperation / Contact us: cola23@126.com
+商务合作/联系我们：cola23@126.com
 
-## License
+## 许可证
 
-Released under the [GNU General Public License v3.0](LICENSE).
-Copyright (C) Beijing Yunpiao Piao Technology Co., Ltd.
+本项目以 [GNU General Public License v3.0](LICENSE) 发布，版权归 Beijing Yunpiao Piao Technology Co., Ltd. 所有。
