@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_tokens.dart';
 
 /// 自定义按钮组件
 /// 提供统一的按钮样式，支持PC和App的通用性
@@ -31,8 +32,13 @@ class CustomButton extends StatelessWidget {
       disabledBackgroundColor: Colors.grey.withValues(alpha: 0.12),
       // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       textStyle: const TextStyle(fontWeight: FontWeight.w500),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      minimumSize: Size(width ?? 80, height ?? 40),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.item),
+      ),
+      minimumSize: Size(
+        width ?? AppSize.buttonMinWidth,
+        height ?? AppSize.buttonHeight,
+      ),
     );
 
     return SizedBox(

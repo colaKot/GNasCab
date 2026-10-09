@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../base/components/custom_no_data.dart';
 import '../../base/beans/video_item_bean.dart';
+import '../../library_setting/models/video_library.dart';
 import '../../video_main/controller/video_main_controller.dart';
 import '../../list/view/video_list_page.dart';
 import '../controller/video_home_page_controller.dart';
+import '../service/video_home_api_service.dart';
 import 'parts/video_recommend_section.dart';
 import 'parts/video_recent_add_section.dart';
 import 'parts/video_recent_play_section.dart';
@@ -29,6 +31,18 @@ class _VideoHomePageState extends State<VideoHomePage> {
     }
   }
 
+  /// 库标题：服务端给的是 name_key（改名后为空），复用左侧栏的显示规则
+  String _resolveLibTitle(VideoHomeLibraryGroup group) {
+    if (Get.isRegistered<VideoMainController>()) {
+      final lib = Get.find<VideoMainController>().libraryById(group.libraryId);
+      if (lib != null) return lib.displayName;
+    }
+    final raw = group.libraryName.trim();
+    if (raw.isEmpty) return libTypeLabelKey(group.libType).tr;
+    final translated = raw.tr;
+    return translated == raw ? raw : translated;
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -43,8 +57,20 @@ class _VideoHomePageState extends State<VideoHomePage> {
         void handleDeleted(VideoHomeItemBean deleted) {
           ctrl.recommend.removeWhere((e) => e.id == deleted.id);
           ctrl.recentPlay.removeWhere((e) => e.id == deleted.id);
-          ctrl.recentAddMovie.removeWhere((e) => e.id == deleted.id);
-          ctrl.recentAddTv.removeWhere((e) => e.id == deleted.id);
+          // 分组是 immutable 的，要重建才能反映删除
+          ctrl.recentAddByLib.assignAll(
+            ctrl.recentAddByLib
+                .map(
+                  (g) => VideoHomeLibraryGroup(
+                    libraryId: g.libraryId,
+                    libraryName: g.libraryName,
+                    libType: g.libType,
+                    items: g.items.where((e) => e.id != deleted.id).toList(),
+                  ),
+                )
+                .where((g) => g.items.isNotEmpty)
+                .toList(),
+          );
         }
 
         return Column(
@@ -55,8 +81,7 @@ class _VideoHomePageState extends State<VideoHomePage> {
                 final noData =
                     ctrl.recommend.isEmpty &&
                     ctrl.recentPlay.isEmpty &&
-                    ctrl.recentAddMovie.isEmpty &&
-                    ctrl.recentAddTv.isEmpty;
+                    ctrl.recentAddByLib.isEmpty;
 
                 if (noData) {
                   if (ctrl.loading.value) {
@@ -82,24 +107,17 @@ class _VideoHomePageState extends State<VideoHomePage> {
                           onTap: () => _openLibrary('library.history'),
                           onDeleted: handleDeleted,
                         ),
-                        VideoRecentAddSection(
-                          items: ctrl.recentAddMovie.toList(),
-                          title: 'video_home_recent_add_movie'.tr,
-                          onTap: () => _openLibrary(
-                            'library.movie',
-                            fallbackMediaType: 'movie',
+                        // 按影视库分类：只显示勾了「主页显示」的库，顺序与左侧栏一致
+                        for (final g in ctrl.recentAddByLib)
+                          VideoRecentAddSection(
+                            key: ValueKey('home_lib_${g.libraryId}'),
+                            items: g.items,
+                            title: _resolveLibTitle(g),
+                            onTap: () => _openLibrary(
+                              VideoMainController.libraryKeyOf(g.libraryId),
+                            ),
+                            onDeleted: handleDeleted,
                           ),
-                          onDeleted: handleDeleted,
-                        ),
-                        VideoRecentAddSection(
-                          items: ctrl.recentAddTv.toList(),
-                          title: 'video_home_recent_add_tv'.tr,
-                          onTap: () => _openLibrary(
-                            'library.tv',
-                            fallbackMediaType: 'tv',
-                          ),
-                          onDeleted: handleDeleted,
-                        ),
                       ],
                     ),
                   ),

@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Không lấy được danh sách thư viện media",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Đã tạo thư viện media",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Đã cập nhật thư viện media",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Không thể cập nhật thư viện video",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Đã xóa thư viện media",
       "VIDEO_LIBRARY_NAME_EXISTS": "Đã tồn tại thư viện media cùng tên",
       "VIDEO_LIBRARY_NOT_FOUND": "Không tìm thấy thư viện media",

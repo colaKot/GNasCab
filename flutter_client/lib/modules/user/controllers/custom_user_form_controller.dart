@@ -45,12 +45,15 @@ class CustomUserFormController extends GetxController {
     return (v == null || v.isEmpty) ? 'input_please'.tr : null;
   }
 
+  /// 子账号密码不做强度校验（与服务端 /user/create、/user/update 规则保持一致）：
+  /// 密码强度要求只对超级管理员账号生效，普通子账号可以是简单密码、也可以多个账号用同一个密码。
+  /// 新建时仅要求非空；编辑时留空表示不修改密码。
   String? validatePassword(String? v) {
     final isEdit = user != null;
     if (isEdit && (v == null || v.isEmpty)) {
       return null;
     }
-    return ((v == null || v.length < 6) ? 'auth_password_too_short'.tr : null);
+    return ((v == null || v.isEmpty) ? 'input_please'.tr : null);
   }
 
   String? validatePhone(String? v) {

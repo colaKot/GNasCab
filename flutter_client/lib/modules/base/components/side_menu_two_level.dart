@@ -1,3 +1,4 @@
+import 'package:GNasCab/core/theme/app_tokens.dart';
 import 'package:GNasCab/core/theme/custom_colors.dart';
 import 'package:GNasCab/modules/base/components.dart';
 import 'package:GNasCab/modules/home/views/pc_components/pc_app_window.dart';
@@ -65,17 +66,17 @@ class _CollapsedMenuItemState extends State<_CollapsedMenuItem> {
             );
 
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpace.sm, vertical: AppSpace.xxs),
         child: Container(
-          height: 40,
+          height: AppSize.sideItemHeight,
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.item),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.item),
               onTap: () => widget.onSelect(widget.item.key),
               onHover: (v) => setState(() => _hovered = v),
               child: Center(child: Icon(widget.item.icon, size: 20, color: fg)),
@@ -129,12 +130,12 @@ class _SubMenuTileState extends State<_SubMenuTile> {
         child: Container(
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.item),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.item),
               onTap: () => widget.onSelect(widget.itemKey),
               onHover: (v) => setState(() => _hovered = v),
               child: Padding(
@@ -219,7 +220,7 @@ class TwoLevelSideMenu extends StatelessWidget {
         children: [
           SizedBox(height: topPlaceholderHeight),
           SizedBox(
-            height: 40,
+            height: AppSize.sideItemHeight,
             child: Center(
               child: Row(
                 children: [
@@ -235,7 +236,7 @@ class TwoLevelSideMenu extends StatelessWidget {
                     ),
                   ),
                   if (!collapsed) ...[
-                    const SizedBox(width: 6),
+                    const SizedBox(width: AppSpace.sm),
                     if (headerTrailing != null)
                       Expanded(child: headerTrailing!),
                   ],
@@ -259,7 +260,7 @@ class TwoLevelSideMenu extends StatelessWidget {
                         expanded: g.expanded,
                         items: g.items,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpace.md),
                     ],
                   ),
               ],
@@ -285,9 +286,9 @@ class TwoLevelSideMenu extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
             child: InkWell(
               onTap: () => expanded.value = !expanded.value,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppSpace.xs),
                 child: Row(
                   children: [
                     // Icon(icon, size: 18, color: theme.colorScheme.onSurface),
@@ -329,7 +330,7 @@ class TwoLevelSideMenu extends StatelessWidget {
                 .toList(),
           );
         }),
-        SizedBox(height: 4),
+        SizedBox(height: AppSpace.xs),
         CustomDivider(color: theme.dividerColor.withValues(alpha: 0.1)),
       ],
     );

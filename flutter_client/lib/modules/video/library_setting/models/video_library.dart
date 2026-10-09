@@ -11,6 +11,9 @@ class VideoLibrary {
   final String nameKey;
   final String libType;
   final bool isDefault;
+
+  /// 是否在影视主页显示该库分类（只有内置电影/电视剧默认开启）
+  final bool showInHome;
   final int sort;
   final int sourceCount;
   final int movieCount;
@@ -24,6 +27,7 @@ class VideoLibrary {
     required this.nameKey,
     required this.libType,
     required this.isDefault,
+    required this.showInHome,
     required this.sort,
     required this.sourceCount,
     required this.movieCount,
@@ -54,6 +58,41 @@ class VideoLibrary {
 
   bool get isVideoLib => libType == 'movie' || libType == 'tv';
 
+  /// ⭐ 局部更新（2026-10-09）。
+  ///
+  /// ⛔ 不要手写 `libraries[idx] = VideoLibrary(id: …, name: …)` 来改单个字段 ——
+  /// 字段多起来必漏，而且漏一个就是静默 bug（用户已踩过：切「主页显示」
+  /// 只改 showInHome，结果整条记录被清空）。
+  VideoLibrary copyWith({
+    int? id,
+    String? name,
+    String? nameKey,
+    String? libType,
+    bool? isDefault,
+    bool? showInHome,
+    int? sort,
+    int? sourceCount,
+    int? movieCount,
+    int? tvCount,
+    int? imageCount,
+    int? totalCount,
+  }) {
+    return VideoLibrary(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      nameKey: nameKey ?? this.nameKey,
+      libType: libType ?? this.libType,
+      isDefault: isDefault ?? this.isDefault,
+      showInHome: showInHome ?? this.showInHome,
+      sort: sort ?? this.sort,
+      sourceCount: sourceCount ?? this.sourceCount,
+      movieCount: movieCount ?? this.movieCount,
+      tvCount: tvCount ?? this.tvCount,
+      imageCount: imageCount ?? this.imageCount,
+      totalCount: totalCount ?? this.totalCount,
+    );
+  }
+
   factory VideoLibrary.fromJson(Map<String, dynamic> json) {
     final countsRaw = json['counts'];
     final counts = countsRaw is Map
@@ -66,12 +105,18 @@ class VideoLibrary {
     final isDefault =
         isDefaultRaw == true || isDefaultRaw == 1 || isDefaultRaw == '1';
 
+    final showInHomeRaw = json['show_in_home'];
+    final showInHome = showInHomeRaw == true ||
+        showInHomeRaw == 1 ||
+        showInHomeRaw == '1';
+
     return VideoLibrary(
       id: asInt(json['id']),
       name: (json['name']?.toString() ?? '').trim(),
       nameKey: (json['name_key']?.toString() ?? '').trim(),
       libType: (json['lib_type']?.toString() ?? 'movie').trim(),
       isDefault: isDefault,
+      showInHome: showInHome,
       sort: asInt(json['sort']),
       sourceCount: asInt(json['source_count']),
       movieCount: asInt(counts['movie']),

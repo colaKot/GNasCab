@@ -1,0 +1,45 @@
+# ========== 默认：文本文件按仓库 LF 存储，检出时转为 CRLF ==========
+* text=auto eol=crlf
+
+# ========== 二进制：一律不做行尾符转换 ==========
+# 缺这一段时，Windows 上 core.autocrlf 会把 jpg/jar/framework 里的字节也换掉，
+# 表现为「文件明明没改，git 却显示二进制变更」——图片、jar 包会被悄悄写坏。
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.bmp binary
+*.webm binary
+*.mp4 binary
+*.mp3 binary
+*.wav binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+*.jar binary
+*.zip binary
+*.gz binary
+*.7z binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.a binary
+*.framework binary
+*.xcframework binary
+*.keystore binary
+*.jks binary
+
+# ========== 明确不转换的代码/配置 ==========
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf

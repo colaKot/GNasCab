@@ -29,7 +29,7 @@ class PhotoBackupStorage {
     _db = await factory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 2,
+        version: 3,
         onCreate: (db, _) async {
           await db.execute(
             'CREATE TABLE IF NOT EXISTS photo_backup_task ('
@@ -88,6 +88,18 @@ class PhotoBackupStorage {
             'FOREIGN KEY(task_id) REFERENCES photo_backup_task(id) ON DELETE CASCADE'
             ')',
           );
+          // 内容 MD5 缓存：key = (source_unique_id, size, mtime_ms)。
+          // 用于相册备份的内容级去重，避免每次运行都对同一张图重新计算 MD5。
+          await db.execute(
+            'CREATE TABLE IF NOT EXISTS photo_backup_hash_cache ('
+            'source_unique_id TEXT NOT NULL,'
+            'size INTEGER NOT NULL,'
+            'mtime_ms INTEGER NOT NULL,'
+            'md5 TEXT NOT NULL,'
+            'updated_at_ms INTEGER NOT NULL,'
+            'PRIMARY KEY (source_unique_id, size, mtime_ms)'
+            ')',
+          );
           await db.execute(
             'CREATE INDEX IF NOT EXISTS idx_photo_backup_task_updated '
             'ON photo_backup_task(updated_at_ms DESC)',
@@ -116,6 +128,18 @@ class PhotoBackupStorage {
             await db.execute(
               'CREATE INDEX IF NOT EXISTS idx_photo_backup_task_owner '
               'ON photo_backup_task(server_id, user_id, updated_at_ms DESC)',
+            );
+          }
+          if (oldVersion < 3) {
+            await db.execute(
+              'CREATE TABLE IF NOT EXISTS photo_backup_hash_cache ('
+              'source_unique_id TEXT NOT NULL,'
+              'size INTEGER NOT NULL,'
+              'mtime_ms INTEGER NOT NULL,'
+              'md5 TEXT NOT NULL,'
+              'updated_at_ms INTEGER NOT NULL,'
+              'PRIMARY KEY (source_unique_id, size, mtime_ms)'
+              ')',
             );
           }
         },
@@ -350,6 +374,45 @@ class PhotoBackupStorage {
       'last_created_at_ms': lastCreatedAtMs,
       'last_unique_id': lastUniqueId,
       'updated_at_ms': now,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  /// 读取内容 MD5 缓存。key = (source_unique_id, size, mtime_ms)，三者任一变化即视为失效。
+  /// 命中返回 MD5（十六进制小写），未命中返回 null。
+  Future<String?> loadHashCache({
+    required String sourceUniqueId,
+    required int size,
+    required int mtimeMs,
+  }) async {
+    final db = await _openDb();
+    final rows = await db.query(
+      'photo_backup_hash_cache',
+      columns: ['md5'],
+      where: 'source_unique_id = ? AND size = ? AND mtime_ms = ?',
+      whereArgs: [sourceUniqueId, size, mtimeMs],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    final value = rows.first['md5']?.toString().trim() ?? '';
+    return value.isEmpty ? null : value;
+  }
+
+  /// 写入内容 MD5 缓存（同 key 覆盖）。
+  Future<void> upsertHashCache({
+    required String sourceUniqueId,
+    required int size,
+    required int mtimeMs,
+    required String md5,
+  }) async {
+    final value = md5.trim();
+    if (value.isEmpty) return;
+    final db = await _openDb();
+    await db.insert('photo_backup_hash_cache', {
+      'source_unique_id': sourceUniqueId,
+      'size': size,
+      'mtime_ms': mtimeMs,
+      'md5': value,
+      'updated_at_ms': DateTime.now().millisecondsSinceEpoch,
     }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 }

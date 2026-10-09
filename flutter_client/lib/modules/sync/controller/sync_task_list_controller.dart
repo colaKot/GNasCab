@@ -206,7 +206,7 @@ class SyncTaskListController extends GetxController {
     SyncScheduler.instance.markRan(task.id);
     try {
       final result = await engine.run(task);
-      if (!mounted) return;
+      if (isClosed) return;
       if (result.ok) {
         if (result.uploadCount == 0 &&
             result.downloadCount == 0 &&

@@ -52,6 +52,24 @@ class VideoLibraryController {
   }
 
   /**
+   * 切换「是否在主页显示该库分类」（管理员）
+   * params: id
+   * body: { show_in_home: 0 | 1 }
+   */
+  async setShowInHome(req, res) {
+    try {
+      const service = new VideoLibraryService(req.dbVideo);
+      const id = req.params && req.params.id;
+      const row = await service.setShowInHome(id, req.body || {});
+      return ResponseUtil.success(req, res, row, 'video.VIDEO_LIBRARY_UPDATE_SUCCESS', 200);
+    } catch (err) {
+      const msgKey = err && err.message ? err.message : 'common.ERROR';
+      const statusCode = msgKey === 'common.NOT_FOUND' ? 404 : 400;
+      return ResponseUtil.error(req, res, msgKey, statusCode);
+    }
+  }
+
+  /**
    * 删除影视库（管理员）
    * 内置库不可删除；库内仍有来源时拒绝删除
    * params: id

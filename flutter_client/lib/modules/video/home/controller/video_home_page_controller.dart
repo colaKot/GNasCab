@@ -18,8 +18,10 @@ class VideoHomePageController extends GetxController {
 
   final RxList<VideoHomeItemBean> recommend = <VideoHomeItemBean>[].obs;
   final RxList<VideoHomeItemBean> recentPlay = <VideoHomeItemBean>[].obs;
-  final RxList<VideoHomeItemBean> recentAddMovie = <VideoHomeItemBean>[].obs;
-  final RxList<VideoHomeItemBean> recentAddTv = <VideoHomeItemBean>[].obs;
+
+  /// 按影视库分类的最近添加（只含勾了「主页显示」的库）
+  final RxList<VideoHomeLibraryGroup> recentAddByLib =
+      <VideoHomeLibraryGroup>[].obs;
 
   final RxBool loading = false.obs;
   bool _sourceEmptyDialogShown = false;
@@ -106,8 +108,10 @@ class VideoHomePageController extends GetxController {
       final data = res.data!;
       recommend.assignAll(data.recommend);
       recentPlay.assignAll(data.recentPlay);
-      recentAddMovie.assignAll(data.recentAddMovie);
-      recentAddTv.assignAll(data.recentAddTv);
+      // ⭐ 兜底过滤没开「主页显示」的库（服务端已过滤，防缓存/竞态）
+      recentAddByLib.assignAll(
+        VideoHomeLibraryGroup.filterHomeVisible(data.recentAddByLib),
+      );
 
       _checkUnavailableSources(data.sourceList);
 
@@ -151,7 +155,20 @@ class VideoHomePageController extends GetxController {
     if (indexId <= 0) return;
     recommend.removeWhere((e) => e.id == indexId);
     recentPlay.removeWhere((e) => e.id == indexId);
-    recentAddMovie.removeWhere((e) => e.id == indexId);
-    recentAddTv.removeWhere((e) => e.id == indexId);
+    // 分组是 immutable 的 list，要重建才能反映删除
+    recentAddByLib.assignAll(
+      recentAddByLib
+          .map(
+            (g) => VideoHomeLibraryGroup(
+              libraryId: g.libraryId,
+              libraryName: g.libraryName,
+              libType: g.libType,
+              items: g.items.where((e) => e.id != indexId).toList(),
+              showInHome: g.showInHome,
+            ),
+          )
+          .where((g) => g.items.isNotEmpty)
+          .toList(),
+    );
   }
 }

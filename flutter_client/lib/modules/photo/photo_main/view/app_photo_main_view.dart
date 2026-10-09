@@ -154,16 +154,23 @@ class _AppPhotoMainViewState extends State<AppPhotoMainView> {
             onTap: () => Get.back(),
           ),
           const SizedBox(width: 8),
-          Expanded(
-            child: CustomExpandableSearchBar(
-              hintText: 'photo_timeline_search_hint'.tr,
-              controller: _timelineCtrl.searchController,
-              onChanged: (val) {
-                _ensureSearchContext();
-                _timelineCtrl.onSearchChanged(val);
-              },
-              onClear: _timelineCtrl.clearSearch,
-              defaultExpanded: true,
+          // 搜索栏定宽靠右：原先用 Expanded 会贪婪占满整行，把右侧按钮挤到重叠
+          Flexible(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 220),
+                child: CustomExpandableSearchBar(
+                  hintText: 'photo_timeline_search_hint'.tr,
+                  controller: _timelineCtrl.searchController,
+                  onChanged: (val) {
+                    _ensureSearchContext();
+                    _timelineCtrl.onSearchChanged(val);
+                  },
+                  onClear: _timelineCtrl.clearSearch,
+                  defaultExpanded: true,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),

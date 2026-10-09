@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Gagal mengambil daftar pustaka media",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Pustaka media berhasil dibuat",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Pustaka media berhasil diperbarui",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Gagal memperbarui pustaka video",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Pustaka media berhasil dihapus",
       "VIDEO_LIBRARY_NAME_EXISTS": "Pustaka dengan nama ini sudah ada",
       "VIDEO_LIBRARY_NOT_FOUND": "Pustaka media tidak ditemukan",

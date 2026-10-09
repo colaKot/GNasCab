@@ -1,6 +1,21 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  exclude:
+    # INERT for audio_service/*: that tree has its own
+    # packages/audio_service/analysis_options.yaml (nearest config wins).
+    # The real exclude lives there; these entries only cover a future in
+    # which that nested file goes away.
+    - packages/audio_service/example/**
+    - packages/audio_service/test/**
+    - packages/video_player_web_hls/test/**
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   errors:
     deprecated_member_use: ignore
     experimental_member_use: ignore

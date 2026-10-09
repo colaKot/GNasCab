@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Medienbibliotheken konnten nicht geladen werden",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Medienbibliothek erstellt",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Medienbibliothek aktualisiert",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Videothek konnte nicht aktualisiert werden",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Medienbibliothek gelöscht",
       "VIDEO_LIBRARY_NAME_EXISTS": "Eine Medienbibliothek mit diesem Namen existiert bereits",
       "VIDEO_LIBRARY_NOT_FOUND": "Medienbibliothek nicht gefunden",

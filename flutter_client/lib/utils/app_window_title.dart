@@ -1,3 +1,4 @@
+import '../core/bootstrap/app_launch.dart';
 import 'app_window_title_impl_stub.dart'
     if (dart.library.html) 'app_window_title_impl_web.dart'
     if (dart.library.io) 'app_window_title_impl_io.dart'
@@ -7,7 +8,8 @@ import 'app_window_title_impl_stub.dart'
 class AppWindowTitle {
   AppWindowTitle._();
 
-  static const String defaultTitle = 'GNasCab';
+  /// 默认标题：完整版为 `GNasCab`，独立端为 `GNasCab 相册` / `GNasCab 音乐`。
+  static String get defaultTitle => AppLaunch.appTitle;
 
   static void setTitle(String title) {
     app_window_title_impl.appWindowTitleSetImpl(title);

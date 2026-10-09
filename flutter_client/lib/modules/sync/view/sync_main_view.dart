@@ -1,3 +1,4 @@
+import '../../home/views/pc_components/pc_app_window.dart';
 import 'package:GNasCab/modules/base/components/custom_glass_card.dart';
 import 'package:GNasCab/modules/base/components/custom_no_data.dart';
 import 'package:flutter/material.dart';

@@ -191,6 +191,65 @@ class VideoHomeService {
     this.uid = user && user.id ? Number(user.id) : 0;
   }
 
+  /**
+   * ⭐ 只保留「勾选了在主页显示」的库所拥有的来源路径（2026-10-09）。
+   *
+   * 主页的推荐轮播 / 最近播放原先直接吃 validPaths（= 全部可见来源路径），
+   * 完全绕过影视库维度 ⇒ 关了开关的库内容照样出现在主页顶部。
+   * 这里把路径集收窄到「show_in_home=1 的库」的路径，
+   * 再交给 _getRecommend / _getRecentPlay 用。
+   *
+   * ⚠️ 依赖：video_source.library_id。若该列为空（老库未迁移），
+   * 退化为返回 validPaths 原样，避免整站主页空白。
+   */
+  async _getHomeVisibleSourcePaths(validPaths) {
+    const paths = Array.isArray(validPaths) ? validPaths : [];
+    if (paths.length === 0) return paths;
+
+    const libs = await this.knex('video_library')
+      .where('show_in_home', 1)
+      .select('id')
+      .catch(() => null);
+
+    // 表/列不存在或读失败 ⇒ 不做过滤，保持旧行为（宁可多显示，不要整页空白）
+    if (!Array.isArray(libs) || libs.length === 0) return paths;
+
+    const visibleLibIds = new Set(
+      (libs || []).map(l => Number(l && l.id) || 0).filter(v => v > 0),
+    );
+    if (visibleLibIds.size === 0) return paths;
+
+    const sources = await this.knex('video_source')
+      .select('path', 'library_id')
+      .catch(() => null);
+    // 拿不到 library_id（老库未迁移）⇒ 同样退化为不过滤
+    if (!Array.isArray(sources)) return paths;
+
+    const out = [];
+    for (const s of sources) {
+      const p = s && s.path ? String(s.path) : '';
+      const libId = Number(s && s.library_id) || 0;
+      if (!p || !libId) continue;
+      if (!visibleLibIds.has(libId)) continue;
+      out.push(p);
+    }
+    if (out.length === 0) return paths;
+
+    // 与 validPaths 求交集，保持「用户可见路径」这个安全边界
+    const visibleSet = new Set(paths.map(p => String(p)));
+    const sep = path.sep;
+    const result = out.filter(p => {
+      if (visibleSet.has(p)) return true;
+      const pPrefix = p.endsWith(sep) ? p : `${p}${sep}`;
+      for (const a of paths) {
+        const aPrefix = a.endsWith(sep) ? a : `${a}${sep}`;
+        if (p.startsWith(aPrefix) || a.startsWith(pPrefix)) return true;
+      }
+      return false;
+    });
+    return result.length > 0 ? result : paths;
+  }
+
   async getHomeData({ recommendLimit = 11, recentPlayLimit = 20, recentAddLimit = 20 } = {}) {
     const recLimit = Math.max(1, Math.min(11, Number(recommendLimit || 0) || 11));
     const playLimit = Math.max(1, Math.min(20, Number(recentPlayLimit || 0) || 20));
@@ -201,20 +260,32 @@ class VideoHomeService {
     const validPaths = await sourceService.getValidPaths(this.user).catch(() => []);
     const sourceList = await _enrichSourcesWithAvailability(_filterSourceListByValidPaths(allSources, validPaths));
 
-    const recommend = await this._getRecommend({ limit: recLimit, validPaths });
-    const recentPlay = await this._getRecentPlay({ limit: playLimit, validPaths });
-    const recentAddMovie = await this._getRecentAdd({ limit: addLimit, validPaths, mediaType: 'movie' });
-    const recentAddTv = await this._getRecentAdd({ limit: addLimit, validPaths, mediaType: 'tv' });
+    // ⭐ 2026-10-09：推荐轮播 / 最近播放也要遵守「在主页显示」开关。
+    // 这两个区块原先直接用 validPaths（全部来源路径）取数，绕过了影视库维度，
+    // 于是没开开关的库内容照样出现在主页顶部轮播里。
+    const homeVisiblePaths = await this._getHomeVisibleSourcePaths(validPaths);
+
+    const recommend = await this._getRecommend({
+      limit: recLimit,
+      validPaths: homeVisiblePaths,
+    });
+    const recentPlay = await this._getRecentPlay({
+      limit: playLimit,
+      validPaths: homeVisiblePaths,
+    });
+    // 按影视库分类的最近添加：只返回勾选了「主页显示」的库
+    const recentAddByLib = await this._getRecentAddByLibrary({ limit: addLimit, validPaths });
 
     await _fillFavoriteStateForLists({
       knex: this.knex,
       uid: this.uid,
-      lists: [recommend, recentPlay, recentAddMovie, recentAddTv],
+      lists: [recommend, recentPlay, ...recentAddByLib.map(g => g.items)],
     });
     await _fillFirstFilePathForTvRows({ knex: this.knex, rows: recommend });
     await _fillFirstFilePathForTvRows({ knex: this.knex, rows: recentPlay });
-    await _fillFirstFilePathForTvRows({ knex: this.knex, rows: recentAddMovie });
-    await _fillFirstFilePathForTvRows({ knex: this.knex, rows: recentAddTv });
+    for (const g of recentAddByLib) {
+      await _fillFirstFilePathForTvRows({ knex: this.knex, rows: g.items });
+    }
 
     if (recentPlay.length > 0) {
       recentPlay.forEach(row => {
@@ -230,7 +301,95 @@ class VideoHomeService {
         }
       });
     }
-    return { sourceList, recommend, recentPlay, recentAddMovie, recentAddTv };
+    return { sourceList, recommend, recentPlay, recentAddByLib };
+  }
+
+  /**
+   * 按影视库分组的最近添加：只取勾选了 show_in_home 的库
+   * 每个分组 { libraryId, libraryName, libType, items }
+   */
+  async _getRecentAddByLibrary({ limit, validPaths }) {
+    const out = [];
+    if (!validPaths || validPaths.length === 0) return out;
+
+    const validSet = new Set(validPaths.map(p => String(p)));
+    const sources = await this.knex('video_source')
+      .select('path', 'library_id')
+      .catch(() => []);
+
+    const pathsByLib = new Map();
+    for (const s of sources || []) {
+      const p = s && s.path ? String(s.path) : '';
+      const libId = Number(s && s.library_id) || 0;
+      if (!p || !libId) continue;
+      // 来源必须在用户可见路径内
+      const visible = validSet.has(p) || (() => {
+        const sep = path.sep;
+        const pPrefix = p.endsWith(sep) ? p : `${p}${sep}`;
+        for (const a of validPaths) {
+          const aPrefix = a.endsWith(sep) ? a : `${a}${sep}`;
+          if (a.startsWith(pPrefix) || p.startsWith(aPrefix)) return true;
+        }
+        return false;
+      })();
+      if (!visible) continue;
+      if (!pathsByLib.has(libId)) pathsByLib.set(libId, []);
+      pathsByLib.get(libId).push(p);
+    }
+
+    const libs = await this.knex('video_library')
+      .where('show_in_home', 1)
+      .orderBy('sort', 'asc')
+      .orderBy('id', 'asc')
+      .catch(() => []);
+
+    for (const lib of libs || []) {
+      const libId = Number(lib && lib.id) || 0;
+      if (!libId) continue;
+      const libPaths = pathsByLib.get(libId) || [];
+      if (libPaths.length === 0) continue;
+
+      const mediaTypes =
+        lib.lib_type === 'movie'
+          ? ['movie', 'bdmv', 'video_ts']
+          : lib.lib_type === 'image'
+            ? ['image']
+            : [lib.lib_type];
+
+      const items = await this.knex('video_index as v')
+        .whereIn('v.media_type', mediaTypes)
+        .modify(qb => _applyVideoIndexPathPrefixFilter(qb, libPaths, 'v'))
+        .select(
+          'v.id',
+          'v.media_type',
+          'v.path',
+          'v.filename',
+          'v.nfo_name',
+          'v.nfo_year',
+          'v.nfo_score',
+          'v.nfo_regions',
+          'v.nfo_genres',
+          'v.poster_path',
+          'v.fanart_path',
+          'v.logo_path',
+          'v.play_rel_path',
+          'v.view_time',
+          'v.create_time'
+        )
+        .orderBy('v.id', 'desc')
+        .limit(limit)
+        .catch(() => []);
+
+      if ((items || []).length === 0) continue;
+      out.push({
+        libraryId: libId,
+        libraryName: lib.name_key ? String(lib.name_key) : String(lib.name || ''),
+        libType: lib.lib_type ? String(lib.lib_type) : 'movie',
+        items: _normalizeHomeRows(items),
+      });
+    }
+
+    return out;
   }
 
   async _getRecommend({ limit, validPaths }) {
@@ -479,42 +638,6 @@ class VideoHomeService {
     }
 
     return _normalizeHomeRows(out);
-  }
-
-  async _getRecentAdd({ limit, validPaths, mediaType }) {
-    const rows = await this.knex('video_index as v')
-      .modify(qb => {
-        if (mediaType === 'movie') qb.whereIn('v.media_type', ['movie', 'bdmv', 'video_ts']);
-        else qb.where('v.media_type', mediaType);
-      })
-      .modify(qb => {
-        if (!validPaths || validPaths.length === 0) {
-          qb.whereRaw('1 = 0');
-        } else {
-          _applyVideoIndexPathPrefixFilter(qb, validPaths, 'v');
-        }
-      })
-      .select(
-        'v.id',
-        'v.media_type',
-        'v.path',
-        'v.filename',
-        'v.nfo_name',
-        'v.nfo_year',
-        'v.nfo_score',
-        'v.nfo_regions',
-        'v.nfo_genres',
-        'v.poster_path',
-        'v.fanart_path',
-        'v.logo_path',
-        'v.play_rel_path',
-        'v.view_time',
-        'v.create_time'
-      )
-      .orderBy('v.id', 'desc')
-      .limit(limit)
-      .catch(() => []);
-    return _normalizeHomeRows(rows);
   }
 }
 

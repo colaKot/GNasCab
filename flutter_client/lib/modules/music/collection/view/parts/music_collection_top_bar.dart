@@ -1,4 +1,5 @@
 import 'package:GNasCab/core/theme/custom_colors.dart';
+import '../../../../home/views/pc_components/pc_app_window.dart';
 import 'package:GNasCab/modules/base/components.dart';
 import 'package:GNasCab/utils/popup_menu_util.dart';
 import 'package:flutter/material.dart';
@@ -142,8 +143,10 @@ class AppMusicCollectionTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.only(left: 12, right: 12 + ctrlW),
       child: SizedBox(
         height: 60,
         child: Row(

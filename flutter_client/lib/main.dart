@@ -8,12 +8,12 @@ import 'utils/cache_manager.dart';
 import 'core/theme/theme_manager.dart';
 import 'utils/device_utils.dart';
 import 'core/languages/language_service.dart';
-import 'core/theme/light_theme.dart'; // 导入浅色主题
-import 'core/theme/dark_theme.dart'; // 导入深色主题
+import 'core/theme/theme_apply_service.dart'; // ⭐ 统一的主题应用入口（含配色切换）
 import 'package:get/get.dart';
 import 'core/routes/app_routes.dart';
 import 'core/api/api_controller.dart';
 import 'core/api/io_self_signed_http_overrides.dart';
+import 'core/bootstrap/app_launch.dart';
 import 'core/notification/transfer_work_notification_hub.dart';
 import 'modules/auth/service/auth_api_service.dart';
 import 'modules/home/service/appearance_api_service.dart';
@@ -62,7 +62,18 @@ WidgetStateProperty<Color> _scrollbarTrackColorState(Color base) {
 }
 
 // 设备信息检测工具类
-Future<void> main() async {
+Future<void> main() => runGNasCabApp();
+
+/// 共享启动入口。
+///
+/// 主客户端（GNasCab 完整版）走 `main()`（等价于 `full`）；
+/// 派生的独立程序（photo_client / music_client）通过 `path:` 依赖本工程，
+/// 在各自的 `main()` 里调用 `runGNasCabApp(launchMode: ...)` 即可，
+/// **不复制任何业务代码**。
+Future<void> runGNasCabApp({
+  AppLaunchMode launchMode = AppLaunchMode.full,
+}) async {
+  AppLaunch.mode = launchMode;
   // 确保Flutter绑定已初始化
   WidgetsFlutterBinding.ensureInitialized();
   applyIoSelfSignedHttpOverridesIfNeeded();
@@ -158,24 +169,21 @@ void _runNasCabApp({
   required ThemeMode initialThemeMode,
   required String initialRoute,
 }) {
+  // ⭐ 配色方案也从持久化读取（2026-10-08 支持设置页切配色）。
+  // 启动与设置页切换走同一个 ThemeApplyService，避免两处逻辑不一致。
+  final persisted = ThemeApplyService.instance.readPersisted();
+  // 滚动条粗细沿用用户设置（静态成员，只能类名访问）
+  ThemeApplyService.scrollbarThicknessProvider = () =>
+      _scrollbarThicknessState;
+
   runApp(
     GetMaterialApp(
       navigatorKey: Get.key,
-      title: 'GNasCab',
-      theme: lightTheme.copyWith(
-        scrollbarTheme: lightTheme.scrollbarTheme.copyWith(
-          thickness: _scrollbarThicknessState,
-          thumbColor: _scrollbarThumbColorState(Colors.grey.shade400),
-          trackColor: _scrollbarTrackColorState(Colors.grey.shade200),
-        ),
-      ),
-      darkTheme: darkTheme.copyWith(
-        scrollbarTheme: darkTheme.scrollbarTheme.copyWith(
-          thickness: _scrollbarThicknessState,
-          thumbColor: _scrollbarThumbColorState(Colors.grey.shade600),
-          trackColor: _scrollbarTrackColorState(Colors.grey.shade800),
-        ),
-      ),
+      title: AppLaunch.appTitle,
+      // 亮/暗两套都按当前配色现场构建；滚动条底色取主题 outline（换配色自动跟随），
+      // 粗细与悬停态仍由用户设置控制（功能，不是风格）。
+      theme: ThemeApplyService.instance.lightFor(persisted.scheme),
+      darkTheme: ThemeApplyService.instance.darkFor(persisted.scheme),
       themeMode: initialThemeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

@@ -1,3 +1,4 @@
+import '../../../../home/views/pc_components/pc_app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';
@@ -17,9 +18,12 @@ class PhotoTimelineControlBar extends GetView<PhotoTimelineController> {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）。搜索栏被Expanded/Align 推到最右，
+    // 不让位会被窗口按钮压住。
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Container(
       height: 48,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      padding: EdgeInsets.fromLTRB(16, 0, 16 + ctrlW, 0),
       child: Row(
         children: [
           Obx(

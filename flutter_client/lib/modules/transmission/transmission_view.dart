@@ -1,3 +1,4 @@
+import '../home/views/pc_components/pc_app_window.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -426,9 +427,12 @@ class _TorrentsTab extends StatelessWidget {
       final theme = Theme.of(context);
       return Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-            child: Row(
+          // ⭐ 右侧给窗口按钮组让位（2026-10-09）
+          Builder(builder: (ctx) {
+            final ctrlW = PcWindowScope.of(ctx)?.titleBarControlsWidth ?? 0;
+            return Padding(
+              padding: EdgeInsets.fromLTRB(12, 12, 12 + ctrlW, 8),
+              child: Row(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
@@ -483,8 +487,9 @@ class _TorrentsTab extends StatelessWidget {
                   ),
                 ],
               ],
-            ),
-          ),
+              ),
+            );
+          }),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
             child: Row(

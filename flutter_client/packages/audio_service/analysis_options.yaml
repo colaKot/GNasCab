@@ -1,6 +1,15 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  # example/ is a separate package (audio_service_example) that this repo
+  # never runs pub get for, so package:audio_service_example/... cannot be
+  # resolved. flutter analyze walks into it anyway; exclude it so only real
+  # app issues are reported. NOTE: this file is the nearest analysis config
+  # for these files, so an exclude in flutter_client/analysis_options.yaml
+  # does NOT reach them.
+  exclude:
+    - example/**
+    - test/**
   language:
     strict-casts: true
     strict-inference: true

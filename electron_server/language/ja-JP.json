@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "メディアライブラリの取得に失敗しました",
       "VIDEO_LIBRARY_ADD_SUCCESS": "メディアライブラリを作成しました",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "メディアライブラリを更新しました",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "映像ライブラリの更新に失敗しました",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "メディアライブラリを削除しました",
       "VIDEO_LIBRARY_NAME_EXISTS": "同じ名前のメディアライブラリが既に存在します",
       "VIDEO_LIBRARY_NOT_FOUND": "メディアライブラリが見つかりません",

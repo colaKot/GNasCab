@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Falha ao obter as bibliotecas de mídia",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Biblioteca de mídia criada",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Biblioteca de mídia atualizada",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Falha ao atualizar a videoteca",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Biblioteca de mídia excluída",
       "VIDEO_LIBRARY_NAME_EXISTS": "Já existe uma biblioteca com esse nome",
       "VIDEO_LIBRARY_NOT_FOUND": "Biblioteca de mídia não encontrada",

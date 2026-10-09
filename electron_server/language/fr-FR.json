@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Échec de la récupération des bibliothèques multimédia",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Bibliothèque multimédia créée",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Bibliothèque multimédia mise à jour",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Échec de la mise à jour de la vidéothèque",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Bibliothèque multimédia supprimée",
       "VIDEO_LIBRARY_NAME_EXISTS": "Une bibliothèque portant ce nom existe déjà",
       "VIDEO_LIBRARY_NOT_FOUND": "Bibliothèque multimédia introuvable",

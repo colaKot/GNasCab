@@ -28,6 +28,7 @@ class tableVideoLibrary {
         table.string('name_key').defaultTo(''); // 内置库的多语言 key，用户改名后置空
         table.string('lib_type').notNullable(); // movie | tv | image | mixed
         table.integer('is_default').notNullable().defaultTo(0); // 1 = 内置，不可删除
+        table.integer('show_in_home').notNullable().defaultTo(0); // 1 = 主页显示该库分类
         table.integer('sort').notNullable().defaultTo(0);
         table.timestamp('create_time').defaultTo(knex.fn.now());
       });
@@ -40,9 +41,22 @@ class tableVideoLibrary {
         await knex.raw(`ALTER TABLE ${this.tableName} ADD COLUMN name_key TEXT DEFAULT ''`).catch(() => {});
         Logger.info(`✅ Added name_key column to table ${this.tableName}`);
       }
+      if (!colNames.has('show_in_home')) {
+        await knex.raw(`ALTER TABLE ${this.tableName} ADD COLUMN show_in_home INTEGER NOT NULL DEFAULT 0`).catch(() => {});
+        Logger.info(`✅ Added show_in_home column to table ${this.tableName}`);
+      }
     }
 
     await this.ensureDefaultLibraries(knex);
+    await this.migrateShowInHome(knex);
+  }
+
+  // 老库迁移：内置电影/电视剧默认在主页显示，其余库默认不显示
+  async migrateShowInHome(knex) {
+    await knex(this.tableName)
+      .where({ is_default: 1 })
+      .update({ show_in_home: 1 })
+      .catch(() => {});
   }
 
   // 幂等写入内置影视库：仅在表为空时写入
@@ -59,6 +73,7 @@ class tableVideoLibrary {
       name_key: item.name_key,
       lib_type: item.lib_type,
       is_default: item.is_default,
+      show_in_home: item.is_default,
       sort: item.sort,
       create_time: new Date(),
     }));

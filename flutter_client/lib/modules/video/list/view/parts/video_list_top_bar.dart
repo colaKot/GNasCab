@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../home/views/pc_components/pc_app_window.dart';
 import 'package:get/get.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';
 import '../../../../base/components/custom_bordered_icon_button.dart';
@@ -112,8 +113,10 @@ class _VideoListTopBarState extends State<VideoListTopBar> {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.only(left: 16, right: 16 + ctrlW),
       child: SizedBox(
         height: 50,
         child: Row(

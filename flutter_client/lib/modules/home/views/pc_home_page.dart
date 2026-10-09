@@ -6,6 +6,7 @@ import 'package:flutter_context_menu/flutter_context_menu.dart';
 import 'pc_components/pc_app_window.dart';
 import '../../../core/user/current_user_controller.dart';
 import '../../../core/api/api_controller.dart';
+import '../../../core/bootstrap/app_launch.dart';
 import '../../../core/routes/app_routes.dart';
 import 'pc_components/pc_dock_bar.dart';
 import 'pc_components/pc_desktop_icon.dart';
@@ -344,6 +345,18 @@ class PcHomePage extends GetView<PcHomeController> {
     }
     final theme = Theme.of(context);
     final ctrl = PcHomeController.instance;
+
+    // 独立端（photo_client / music_client）：不进桌面、不显示启动器，
+    // 整屏直接渲染目标应用。完整版（AppLaunchMode.full）下 autoOpenAppKey 恒为 null，
+    // 此分支不会生效，桌面行为完全不变。
+    final standaloneAppKey = AppLaunch.autoOpenAppKey;
+    if (standaloneAppKey != null) {
+      return Scaffold(
+        backgroundColor: theme.colorScheme.surface,
+        body: Builder(builder: ctrl.builtinAppViewBuilder(standaloneAppKey)),
+      );
+    }
+
     final viewportSize = MediaQuery.of(context).size;
     final virtualWidth = viewportSize.width < (ctrl.dockOuterWidthPc + 600)
         ? (ctrl.dockOuterWidthPc + 600)

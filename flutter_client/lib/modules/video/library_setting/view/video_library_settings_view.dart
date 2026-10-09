@@ -1,6 +1,7 @@
 import 'package:GNasCab/core/theme/custom_colors.dart';
 import 'package:GNasCab/modules/base/components/custom_bordered_icon_button.dart';
 import 'package:GNasCab/modules/base/components/custom_glass_card.dart';
+import 'package:GNasCab/modules/base/components/custom_switch.dart';
 import 'package:GNasCab/utils/device_utils.dart';
 import 'package:GNasCab/utils/dialog_util.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +9,8 @@ import 'package:get/get.dart';
 import 'package:GNasCab/modules/video/library_setting/controller/video_library_settings_controller.dart';
 import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
 
-const double _kBaseCardWidth = 360;
-const double _kCardHeight = 210;
-
 /// 「影视库」管理页：每个影视库对应左侧栏的一个栏目
+///紧凑布局：一个库一行，横向排布图标 / 名称 / 类型 / 计数 / 操作
 class VideoLibrarySettingsView extends StatelessWidget {
   const VideoLibrarySettingsView({super.key});
 
@@ -48,7 +47,7 @@ class VideoLibrarySettingsView extends StatelessWidget {
                       const SizedBox(height: 12),
                       for (final lib in items) ...[
                         _LibraryCard(library: lib),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                       ],
                       _MobileAddLibraryCard(
                         onTap: () => _showAddDialog(context, ctrl),
@@ -85,40 +84,15 @@ class VideoLibrarySettingsView extends StatelessWidget {
                     Expanded(
                       child: Obx(() {
                         final items = ctrl.libraries.toList();
-                        return LayoutBuilder(
-                          builder: (context, constraints) {
-                            const paddingX = 16.0;
-                            const spacing = 8.0;
-                            final availableWidth =
-                                (constraints.maxWidth - paddingX * 2).clamp(
-                                  0,
-                                  99999,
-                                );
-                            final count =
-                                (((availableWidth + spacing) /
-                                            (_kBaseCardWidth + spacing))
-                                        .floor())
-                                    .clamp(1, 99);
-
-                            return GridView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: count,
-                                    crossAxisSpacing: spacing,
-                                    mainAxisSpacing: spacing,
-                                    mainAxisExtent: _kCardHeight,
-                                  ),
-                              itemCount: items.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index < items.length) {
-                                  return _LibraryCard(library: items[index]);
-                                }
-                                return _AddLibraryCard(
-                                  onTap: () => _showAddDialog(context, ctrl),
-                                );
-                              },
-                            );
+                        return ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          itemCount: items.length + 1,
+                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            if (index < items.length) {
+                              return _LibraryCard(library: items[index]);
+                            }
+                            return _AddLibraryRow(onTap: () => _showAddDialog(context, ctrl));
                           },
                         );
                       }),
@@ -248,59 +222,59 @@ class _MobileAddLibraryCard extends StatelessWidget {
     final theme = Theme.of(context);
     return CustomGlassCard(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.add_circle_outline,
-              size: 20,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(width: 8),
-            Text('video_library_add'.tr, style: theme.textTheme.titleSmall),
-          ],
-        ),
+      borderRadius: 10.0,
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_circle_outline,
+            size: 18,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'video_library_add'.tr,
+            style: theme.textTheme.titleSmall?.copyWith(fontSize: 13),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _AddLibraryCard extends StatelessWidget {
+class _AddLibraryRow extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _AddLibraryCard({required this.onTap});
+  const _AddLibraryRow({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return CustomGlassCard(
       onTap: onTap,
-      child: SizedBox.expand(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.add_circle_outline,
-                size: 38,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'video_library_add'.tr,
-                style: theme.textTheme.titleSmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      borderRadius: 10.0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_circle_outline,
+            size: 18,
+            color: theme.colorScheme.primary,
           ),
-        ),
+          const SizedBox(width: 6),
+          Text(
+            'video_library_add'.tr,
+            style: theme.textTheme.titleSmall?.copyWith(fontSize: 13),
+          ),
+        ],
       ),
     );
   }
 }
 
+/// 单行紧凑卡片：图标 + 名称/类型 + 计数 + 改名/删除
 class _LibraryCard extends StatelessWidget {
   final VideoLibrary library;
 
@@ -310,84 +284,107 @@ class _LibraryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ctrl = Get.find<VideoLibrarySettingsController>();
-    final sourceLabel =
-        '${'video_library_source_count'.tr} ${library.sourceCount} · '
-        '${library.totalCount} ${'video_library_item_count'.tr}';
+    final faint = theme.colorScheme.onSurface.withValues(alpha: 0.5);
 
     return CustomGlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+      borderRadius: 10.0,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(
-                libTypeIcon(library.libType),
-                size: 22,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  library.displayName,
+          Icon(
+            libTypeIcon(library.libType),
+            size: 20,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        library.displayName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (library.isDefault) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'video_library_builtin'.tr,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  '${libTypeLabelKey(library.libType).tr} · '
+                  '${'video_library_source_count'.tr} ${library.sourceCount} · '
+                  '${library.totalCount} ${'video_library_item_count'.tr}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: faint,
+                    fontSize: 11,
                   ),
-                ),
-              ),
-              if (library.isDefault)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'video_library_builtin'.tr,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            libTypeLabelKey(library.libType).tr,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            sourceLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-            ),
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              CustomBorderedIconButton(
-                icon: Icons.edit_outlined,
-                tooltip: 'video_library_rename_title'.tr,
-                onTap: () => _showRenameDialog(ctrl, library),
-              ),
-              if (!library.isDefault) ...[
-                const SizedBox(width: 8),
-                CustomBorderedIconButton(
-                  icon: Icons.delete_outline,
-                  tooltip: 'delete'.tr,
-                  onTap: () => ctrl.deleteLibrary(library),
                 ),
               ],
-            ],
+            ),
           ),
+          CustomBorderedIconButton(
+            icon: Icons.edit_outlined,
+            tooltip: 'video_library_rename_title'.tr,
+            onTap: () => _showRenameDialog(ctrl, library),
+          ),
+          if (!library.isDefault) ...[
+            const SizedBox(width: 6),
+            CustomBorderedIconButton(
+              icon: Icons.delete_outline,
+              tooltip: 'delete'.tr,
+              onTap: () => ctrl.deleteLibrary(library),
+            ),
+          ],
+          const SizedBox(width: 10),
+          // 是否在影视主页显示该库分类：内置电影/电视剧默认开启，新建库默认关闭
+          Tooltip(
+            message: 'video_library_show_in_home'.tr,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.home_outlined,
+                  size: 14,
+                  color: faint,
+                ),
+                const SizedBox(width: 4),
+                CustomSwitch(
+                  value: library.showInHome,
+                  onChanged: (v) => ctrl.setShowInHome(library, v),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 4),
         ],
       ),
     );

@@ -17,8 +17,10 @@ class AppVideoHomePageController extends GetxController {
 
   final RxList<VideoHomeItemBean> recommend = <VideoHomeItemBean>[].obs;
   final RxList<VideoHomeItemBean> recentPlay = <VideoHomeItemBean>[].obs;
-  final RxList<VideoHomeItemBean> recentAddMovie = <VideoHomeItemBean>[].obs;
-  final RxList<VideoHomeItemBean> recentAddTv = <VideoHomeItemBean>[].obs;
+
+  /// 按影视库分类的最近添加（只含勾了「主页显示」的库）
+  final RxList<VideoHomeLibraryGroup> recentAddByLib =
+      <VideoHomeLibraryGroup>[].obs;
 
   final RxBool loading = false.obs;
   bool _sourceEmptyDialogShown = false;
@@ -43,8 +45,10 @@ class AppVideoHomePageController extends GetxController {
       final data = res.data!;
       recommend.assignAll(data.recommend);
       recentPlay.assignAll(data.recentPlay);
-      recentAddMovie.assignAll(data.recentAddMovie);
-      recentAddTv.assignAll(data.recentAddTv);
+      // ⭐ 兜底过滤没开「主页显示」的库（服务端已过滤，防缓存/竞态）
+      recentAddByLib.assignAll(
+        VideoHomeLibraryGroup.filterHomeVisible(data.recentAddByLib),
+      );
 
       // 仅当接口成功且未设置来源时提示，避免网络失败时误弹
       if (data.sourceList.isEmpty && CurrentUserController.instance.isAdmin) {
@@ -92,7 +96,19 @@ class AppVideoHomePageController extends GetxController {
     if (indexId <= 0) return;
     recommend.removeWhere((e) => e.id == indexId);
     recentPlay.removeWhere((e) => e.id == indexId);
-    recentAddMovie.removeWhere((e) => e.id == indexId);
-    recentAddTv.removeWhere((e) => e.id == indexId);
+    recentAddByLib.assignAll(
+      recentAddByLib
+          .map(
+            (g) => VideoHomeLibraryGroup(
+              libraryId: g.libraryId,
+              libraryName: g.libraryName,
+              libType: g.libType,
+              items: g.items.where((e) => e.id != indexId).toList(),
+              showInHome: g.showInHome,
+            ),
+          )
+          .where((g) => g.items.isNotEmpty)
+          .toList(),
+    );
   }
 }

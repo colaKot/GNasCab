@@ -66,8 +66,9 @@ class _ProcessListLoadedView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ⭐ 标题原为Alignment.centerRight，会撞右上角窗口按钮（2026-10-09）⇒ 左对齐
               Align(
-                alignment: Alignment.centerRight,
+                alignment: Alignment.centerLeft,
                 child: Text(
                   'process.title'.tr,
                   style: theme.textTheme.titleLarge?.copyWith(
@@ -83,7 +84,7 @@ class _ProcessListLoadedView extends StatelessWidget {
                   'count': '${items.length}',
                 });
                 return Align(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.centerLeft,
                   child: Text(
                     countStr,
                     style: theme.textTheme.bodySmall?.copyWith(

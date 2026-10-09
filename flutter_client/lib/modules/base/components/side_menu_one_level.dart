@@ -1,6 +1,7 @@
 import 'package:GNasCab/core/theme/custom_colors.dart';
 import 'package:GNasCab/modules/home/views/pc_components/pc_app_window.dart';
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_tokens.dart';
 import 'package:get/get.dart';
 
 class OneLevelSideMenuItem {
@@ -52,15 +53,15 @@ class _CollapsedMenuItemState extends State<_CollapsedMenuItem> {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Container(
-          height: 40,
+          height: AppSize.sideItemHeight,
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.item),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.item),
               onTap: () => widget.onSelect(widget.item.key),
               onHover: (v) => setState(() => _hovered = v),
               child: Center(child: Icon(widget.item.icon, size: 20, color: fg)),
@@ -110,12 +111,12 @@ class _MenuTileState extends State<_MenuTile> {
         child: Container(
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.item),
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.item),
               onTap: () => widget.onSelect(widget.item.key),
               onHover: (v) => setState(() => _hovered = v),
               child: Padding(
@@ -209,7 +210,7 @@ class OneLevelSideMenu extends StatelessWidget {
           SizedBox(height: topPlaceholderHeight),
           if (showHeader)
             SizedBox(
-              height: 40,
+              height: AppSize.sideItemHeight,
               child: Center(
                 child: Row(
                   children: [
@@ -226,7 +227,7 @@ class OneLevelSideMenu extends StatelessWidget {
                         ),
                       ),
                     if (!collapsed) ...[
-                      if (showCollapseToggle) const SizedBox(width: 6),
+                      if (showCollapseToggle) const SizedBox(width: AppSpace.sm),
                       if (headerTrailing != null)
                         Expanded(child: headerTrailing!),
                     ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_tokens.dart';
 import '../../../core/theme/custom_colors.dart';
 import '../../../../../utils/device_utils.dart';
 
@@ -25,7 +26,7 @@ class CustomBorderedIconButton extends StatefulWidget {
     this.tooltip,
     this.size = 32,
     this.iconSize = 16,
-    this.borderRadius = 10,
+    this.borderRadius = AppRadius.item,
     this.borderColor,
     this.iconColor,
     this.hoverColor,
@@ -47,8 +48,8 @@ class _CustomBorderedIconButtonState extends State<CustomBorderedIconButton> {
     final isApp = DeviceUtils.isMobile || DeviceUtils.isPhone(context);
     double size = widget.size;
     double iconSize = widget.iconSize;
-    //app上默认大一些
-    if (isApp) size += 4;
+    //app 上默认大一些
+    if (isApp) size += AppSpace.sm;
     if (isApp) iconSize += 2;
     final theme = Theme.of(context);
     final customColors = theme.extension<CustomColors>();

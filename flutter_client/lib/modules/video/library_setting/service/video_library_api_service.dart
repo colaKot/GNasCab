@@ -51,6 +51,19 @@ class VideoLibraryApiService extends BaseApiService {
     );
   }
 
+  /// 切换「是否在主页显示该库分类」
+  Future<ApiResponse<Map<String, dynamic>>> setShowInHome(
+    int id,
+    bool showInHome, {
+    bool showLoading = true,
+  }) {
+    return apiPost<Map<String, dynamic>>(
+      '/api/video/library/show_in_home/$id',
+      body: {'show_in_home': showInHome ? 1 : 0},
+      showLoading: showLoading,
+    );
+  }
+
   /// 删除影视库：内置库与仍有来源的库会被服务端拒绝
   Future<ApiResponse<Map<String, dynamic>>> deleteLibrary(
     int id, {

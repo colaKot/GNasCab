@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/user/current_user_controller.dart';
 import '../service/apps_api_service.dart';
 import '../../../core/api/api_controller.dart';
+import '../../../core/bootstrap/app_launch.dart';
 import '../../auth/beans/server_info_bean.dart';
 import '../../auth/service/server_storage_service.dart';
 import '../../../core/routes/app_routes.dart';
@@ -50,6 +51,7 @@ class AppHomeController extends GetxController {
 
   List<String> get showApps {
     return _allApps
+        .where((e) => AppLaunch.isAppAllowed(e))
         .where((e) => !_hideApps.contains(e))
         .where((e) => isAdmin || e != 'backup')
         .where((e) => isAdmin || e != 'process')
@@ -71,6 +73,17 @@ class AppHomeController extends GetxController {
     _initApps();
     _loadServerInfo();
     _loadHomeConfig();
+    _maybeAutoOpenLaunchApp();
+  }
+
+  /// 独立端（photo_client / music_client）启动后自动进入目标应用；完整版不做任何事。
+  void _maybeAutoOpenLaunchApp() {
+    final key = AppLaunch.autoOpenAppKey;
+    if (key == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!Get.isRegistered<AppHomeController>()) return;
+      openApp(key);
+    });
   }
 
   @override

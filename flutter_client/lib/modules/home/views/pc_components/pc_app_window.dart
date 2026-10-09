@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import '../pc_home_controller.dart';
+import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/theme/dark_theme.dart';
 import '../../../base/components/custom_inset_border_shell.dart';
 
 class PcWindowScope extends InheritedWidget {
   final String windowId;
 
+  /// ⭐⭐ 窗口按钮组在标题栏右侧占用的总宽度（2026-10-09）。
+  ///
+  /// 各 app 的顶栏若右侧有元素（搜索栏 / 图标按钮 / 下拉），必须用它做
+  /// **水平让位**，否则会被窗口按钮压住：
+  /// ```dart
+  /// final cw = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
+  /// Padding(padding: EdgeInsets.only(right: cw))
+  /// ```
+  /// ⛔ 不要写死数字 —— 按钮尺寸改了这里要跟着变。
+  final double titleBarControlsWidth;
+
   const PcWindowScope({
     super.key,
     required this.windowId,
+    this.titleBarControlsWidth = 0,
     required super.child,
   });
 
@@ -19,7 +33,8 @@ class PcWindowScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(PcWindowScope oldWidget) =>
-      windowId != oldWidget.windowId;
+      windowId != oldWidget.windowId ||
+      titleBarControlsWidth != oldWidget.titleBarControlsWidth;
 }
 
 class PcAppWindow extends StatefulWidget {
@@ -37,6 +52,13 @@ class PcAppWindow extends StatefulWidget {
 
   static const double titleBarHeight = 40;
   static const double _topResizeStripHeight = 4;
+
+  /// ⭐⭐ 窗口按钮组占用宽度（2026-10-09）。
+  /// 顶部有元素、且该元素要靠右的 app 顶栏，必须用这个值做水平让位。
+  /// ⚠️ 这是一个**兜底常量**；app 视图内部优先用
+  /// `PcWindowScope.of(context)?.titleBarControlsWidth`（能跟随实例）。
+  static double get titleBarControlsWidth =>
+      _TrafficLightButtonsState.totalWidth;
 
   @override
   State<PcAppWindow> createState() => _PcAppWindowState();
@@ -91,6 +113,8 @@ class _PcAppWindowState extends State<PcAppWindow> {
 
     final appContent = PcWindowScope(
       windowId: widget.windowId,
+      // ⭐ 让子树能读到按钮组宽度，右侧元素据此让位
+      titleBarControlsWidth: _TrafficLightButtonsState.totalWidth,
       child: widget.viewBuilder(context),
     );
 
@@ -156,12 +180,12 @@ class _PcAppWindowState extends State<PcAppWindow> {
                     ),
                   ),
                 ),
-                // 顶层：红绿灯按钮
+                // 顶层：窗口控制按钮（右上角，Windows 习惯）
                 Positioned(
-                  left: 12,
+                  right: 12,
                   top:
                       (PcAppWindow.titleBarHeight -
-                          _TrafficLightButtonsState._dotSize) /
+                          _TrafficLightButtonsState._btnHeight) /
                       2,
                   child: _TrafficLightButtons(
                     windowId: widget.windowId,
@@ -169,9 +193,10 @@ class _PcAppWindowState extends State<PcAppWindow> {
                     canMaximize: ctrl.windowCanMaximize(widget.windowId),
                   ),
                 ),
+                // 右上角已让给窗口控制按钮，角标换到左上角与左下角标呼应
                 if (canResize)
                   Positioned(
-                    right: 1.6,
+                    left: 1.6,
                     top: 1.6,
                     child: Tooltip(
                       message: '',
@@ -420,55 +445,100 @@ class _TrafficLightButtons extends StatefulWidget {
 class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
   bool _isHovering = false;
 
-  static const double _dotSize = 12.0;
-  static const double _spacing = 8.0;
-  static const double _iconSize = 9.0;
+  /// ⭐ 扁平化按钮尺寸（2026-10-09）。
+  /// 原先是 12×12 圆点 + 8 间距，在40px 标题栏里又小又圆，视觉上像三个小点。
+  /// 现在改成 **24×16 圆角矩形**，宽扁造型更贴Windows 11 / macOS 现代窗口。
+  static const double _btnWidth = 24.0;
+  static const double _btnHeight = 16.0;
+  static const double _spacing = 4.0;
+  static const double _iconSize = 11.0;
+
+  /// ⭐⭐ 按钮组在标题栏里占的总宽度（含间距 + 右侧留白）。
+  /// 各 app 的顶栏要靠它做**水平让位**，否则右侧元素会被按钮压住。
+  /// 用 `PcWindowScope.of(context)?.titleBarControlsWidth` 取，不要写死数字。
+  static double get totalWidth => _btnWidth * 3 + _spacing * 2 + 12;
 
   bool get _isFocused =>
       PcHomeController.instance.topmostApp == widget.windowId;
 
-  Color _dotColor(int index) {
+  /// ⭐ 语义色仍保留 macOS 红/黄/绿的身份识别（这是功能约定，不是风格），
+  /// 但**从主题派生明暗变体**：暗色模式下用更亮的色，亮色模式下用更沉的色，
+  /// 保证在任何配色/亮暗下都有足够对比度。
+  static const Color _closeBase = Color(0xFFFF5F57);
+  static const Color _minimizeBase = Color(0xFFFFBD2E);
+  static const Color _maximizeBase = Color(0xFF28CA41);
+
+  /// 窗口未聚焦时统一压成中性灰（保留一点原色相，避免三个点糊成一团）
+  Color _dotColor(Color activeColor, Brightness brightness) {
+    final cs = Theme.of(context).colorScheme;
     if (!_isFocused) {
-      return const Color(0xFF7A7A7A);
+      return brightness == Brightness.dark
+          ? cs.onSurface.withValues(alpha: 0.28)
+          : cs.onSurface.withValues(alpha: 0.32);
     }
-    switch (index) {
-      case 0:
-        return const Color(0xFFFF5F57); // red - close
-      case 1:
-        return const Color(0xFFFFBD2E); // yellow - minimize
-      case 2:
-        return const Color(0xFF28CA41); // green - maximize
-      default:
-        return Colors.grey;
-    }
+    // 暗色模式提亮、亮色模式压深，保证按钮在两种背景下都"跳"出来
+    return brightness == Brightness.dark
+        ? Color.lerp(activeColor, Colors.white, 0.22)!
+        : Color.lerp(activeColor, Colors.black, 0.06)!;
   }
 
-  Widget _buildDot(int index, VoidCallback? onTap, IconData icon) {
-    final dotColor = _dotColor(index);
-    final showIcon = _isHovering && _isFocused;
+  /// ⭐ hover 时加深底色并显图标，替代原先"hover 变灰"的割裂感
+  Color _hoverColor(Color activeColor, Brightness brightness) {
+    return brightness == Brightness.dark
+        ? Color.lerp(activeColor, Colors.white, 0.42)!
+        : Color.lerp(activeColor, Colors.black, 0.14)!;
+  }
 
-    return GestureDetector(
-      onTap: () {
-        PcHomeController.instance.focusWindow(widget.windowId);
-        onTap?.call();
-      },
-      child: Container(
-        width: _dotSize,
-        height: _dotSize,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
-        alignment: Alignment.center,
-        child: showIcon
-            ? Text(
-                String.fromCharCode(icon.codePoint),
-                style: TextStyle(
-                  fontSize: _iconSize,
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0x99000000),
-                  fontFamily: 'MaterialIcons',
-                  height: 1.0,
-                ),
-              )
-            : null,
+  Widget _buildButton({
+    required Color activeColor,
+    required VoidCallback? onTap,
+    required IconData icon,
+    required String tooltip,
+  }) {
+    final theme = Theme.of(context);
+    final brightness = theme.brightness;
+    final showIcon = _isHovering && _isFocused;
+    final color = _dotColor(activeColor, brightness);
+
+    final child = AnimatedContainer(
+      duration: const Duration(milliseconds: 120),
+      width: _btnWidth,
+      height: _btnHeight,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        // ⭐ 扁平化：圆角只留 4px，不再是圆形
+        borderRadius: BorderRadius.circular(AppRadius.control),
+        color: showIcon ? _hoverColor(activeColor, brightness) : color,
+      ),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 120),
+        opacity: showIcon ? 1 : 0,
+        child: Icon(
+          icon,
+          size: _iconSize,
+          color: brightness == Brightness.dark
+              ? const Color(0xFF1A1A1A)
+              : const Color(0xFFFFFFFF),
+        ),
+      ),
+    );
+
+    return Tooltip(
+      message: tooltip,
+      waitDuration: const Duration(milliseconds: 500),
+      child: MouseRegion(
+        cursor: onTap == null
+            ? SystemMouseCursors.basic
+            : SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: onTap == null
+              ? null
+              : () {
+                  PcHomeController.instance.focusWindow(widget.windowId);
+                  onTap();
+                },
+          child: child,
+        ),
       ),
     );
   }
@@ -478,27 +548,41 @@ class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
     final ctrl = PcHomeController.instance;
     final isMaximized = ctrl.isMaximized(widget.windowId);
     final maximizeIcon = widget.canMaximize && isMaximized
-        ? Icons.fullscreen_exit
+        ? Icons.close_fullscreen
         : Icons.open_in_full;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
+      // Windows 习惯：左 → 右 依次为 最小化、最大化、关闭（关闭贴最右）
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildDot(0, () => ctrl.closeApp(widget.windowId), Icons.close),
-          SizedBox(width: _spacing),
-          _buildDot(
-            1,
-            widget.canMinimize ? () => ctrl.minimizeApp(widget.windowId) : null,
-            Icons.remove,
+          _buildButton(
+            activeColor: _minimizeBase,
+            onTap: widget.canMinimize
+                ? () => ctrl.minimizeApp(widget.windowId)
+                : null,
+            icon: Icons.remove,
+            tooltip: 'home_window_min'.tr,
           ),
           SizedBox(width: _spacing),
-          _buildDot(
-            2,
-            widget.canMaximize ? () => ctrl.maximizeApp(widget.windowId) : null,
-            maximizeIcon,
+          _buildButton(
+            activeColor: _maximizeBase,
+            onTap: widget.canMaximize
+                ? () => ctrl.maximizeApp(widget.windowId)
+                : null,
+            icon: maximizeIcon,
+            tooltip: (widget.canMaximize && isMaximized)
+                ? 'home_window_restore'.tr
+                : 'home_window_max'.tr,
+          ),
+          SizedBox(width: _spacing),
+          _buildButton(
+            activeColor: _closeBase,
+            onTap: () => ctrl.closeApp(widget.windowId),
+            icon: Icons.close,
+            tooltip: 'home_window_close'.tr,
           ),
         ],
       ),

@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "فشل جلب مكتبات الوسائط",
       "VIDEO_LIBRARY_ADD_SUCCESS": "تم إنشاء مكتبة الوسائط",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "تم تحديث مكتبة الوسائط",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "فشل تحديث مكتبة الفيديو",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "تم حذف مكتبة الوسائط",
       "VIDEO_LIBRARY_NAME_EXISTS": "توجد مكتبة وسائط بالاسم نفسه",
       "VIDEO_LIBRARY_NOT_FOUND": "مكتبة الوسائط غير موجودة",

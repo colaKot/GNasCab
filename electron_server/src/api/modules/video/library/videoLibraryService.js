@@ -67,6 +67,7 @@ class VideoLibraryService {
         name_key: '',
         lib_type: libType,
         is_default: 0,
+        show_in_home: 0,
         sort,
         create_time: new Date(),
       });
@@ -92,6 +93,31 @@ class VideoLibraryService {
       .where({ id })
       .update({ name, name_key: '' })
       .catch(() => 0);
+    return await this.getLibraryById(id);
+  }
+
+  // 切换「是否在主页显示该库分类」
+  async setShowInHome(rawId, payload = {}) {
+    const id = Number(rawId || 0) || 0;
+    if (!id) throw new Error('validation.VALIDATION_ERROR');
+
+    const lib = await this.getLibraryById(id);
+    if (!lib) throw new Error('common.NOT_FOUND');
+
+    const raw = payload.show_in_home ?? payload.showInHome;
+    const showInHome =
+      raw === true || raw === 1 || raw === '1' || raw === 'true' ? 1 : 0;
+
+    // ⚠️ 2026-10-09：原来这里 `.catch(() => 0)`把写入异常吞掉了，
+    // 表不存在/列缺失时接口照样返回 200，前端只能看到一个「改了没反应」的死开关，
+    // 排查时完全没有线索。写失败必须抛出去，让前端提示「操作失败」。
+    const affected = await this.knex(this.tableName)
+      .where({ id })
+      .update({ show_in_home: showInHome });
+    if (!Number(affected)) {
+      throw new Error('video.VIDEO_LIBRARY_UPDATE_FAILED');
+    }
+
     return await this.getLibraryById(id);
   }
 
@@ -188,6 +214,7 @@ class VideoLibraryService {
         name_key: lib.name_key ? String(lib.name_key) : '',
         lib_type: lib.lib_type ? String(lib.lib_type) : 'movie',
         is_default: Number(lib.is_default || 0),
+        show_in_home: Number(lib.show_in_home || 0),
         sort: Number(lib.sort || 0),
         source_count: libPaths.length,
         counts,

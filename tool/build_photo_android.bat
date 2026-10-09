@@ -1,0 +1,54 @@
+@echo off
+rem Build the Android app for the photo client (2026-10-09).
+rem Scope requested by Tie Zhu: the photo client ships as a phone app only;
+rem its desktop executable is deliberately NOT built.
+rem
+rem The Android SDK/JDK live under G:\work\_toolchain (zero-download pool),
+rem so they are exported here instead of relying on the caller's PATH.
+rem
+rem --no-tree-shake-icons is what keeps the kernel from stalling on this project
+rem (verified 2026-10-09: without it the same build hangs with an idle dartvm).
+setlocal
+
+set FLUTTER=G:\work\_toolchain\flutter-sdk\flutter\bin\flutter.bat
+set ANDROID_HOME=G:\work\_toolchain\android-sdk
+set ANDROID_SDK_ROOT=G:\work\_toolchain\android-sdk
+REM NOTE: the JDK folder has an extra version directory inside it.
+REM G:\work\_toolchain\jdk17 is the parent; the actual JDK 17.0.20.1 lives one level
+REM deeper. JAVA_HOME must point at the inner directory.
+set JAVA_HOME=G:\work\_toolchain\jdk17\jdk-17.0.20.1+1
+set PATH=%JAVA_HOME%\bin;%PATH%
+set PUB_HOSTED_URL=https://pub.flutter-io.cn
+set FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
+set LOG=G:\work\_patch_backup\logs\build_photo_android.log
+
+cd /d G:\work\nascab\photo_client
+echo ==== photo android start %DATE% %TIME% ====
+> "%LOG%" echo ==== photo android %DATE% %TIME% ====
+REM Gradle 8.12 rejects Java 25 and the machine default is 25.0.3, which fails with
+REM "Gradle build failed due to Java/Gradle incompatibility". JAVA_HOME alone is not
+REM enough because Flutter prefers its own configured JDK, so pin it explicitly.
+call "%FLUTTER%" config --jdk-dir="%JAVA_HOME%" >> "%LOG%" 2>&1
+REM Gradle 8.12 (the version pinned in android/gradle/wrapper, copied from the main
+REM client) is below Flutter 3.47.5's minimum of 8.14. Upgrading the wrapper would
+REM need a download, and this machine is on the zero-download resource pool where
+REM only gradle-8.12-all is cached. Skip the dependency-validation check instead.
+REM Note the main client's android/gradle has the same 8.12 pin, so any future
+REM apk build hits this too.
+call "%FLUTTER%" build apk --release --no-tree-shake-icons --no-pub ^
+  --android-skip-build-dependency-validation >> "%LOG%" 2>&1
+REM  Do NOT name this variable RC. Windows treats RC as the resource compiler
+REM path and CMake/Gradle reads it, so setting RC to an exit code makes the build
+REM fail with "Could not find the compiler specified in the environment variable RC".
+REM Same trap as using EXITCODE after & in a cmd chain. Pick a name nobody claims.
+REM  Avoid parentheses in REM lines too: an unescaped ( or ) here aborts the whole
+REM batch file with ". was unexpected at this time", even inside a comment.
+set BUILD_RC=%ERRORLEVEL%
+if "%BUILD_RC%"=="0" (
+  >> "%LOG%" echo BUILD_OK photo android
+  echo BUILD_OK photo android
+) else (
+  >> "%LOG%" echo BUILD_FAIL photo android rc=%BUILD_RC%
+  echo BUILD_FAIL photo android rc=%BUILD_RC%
+)
+exit /b 0

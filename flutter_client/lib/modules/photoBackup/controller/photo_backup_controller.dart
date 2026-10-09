@@ -79,6 +79,9 @@ class PhotoBackupController extends GetxController {
   final RxBool loading = false.obs;
   final Map<int, PhotoBackupRuntime> _runtime = {};
   final Map<int, dio.CancelToken> _cancelTokens = {};
+
+  /// 进程内 MD5 记忆缓存（key = uniqueId|size|mtime），避免同一次运行内重复计算。
+  final Map<String, String> _md5MemoryCache = {};
   int _wakelockRefCount = 0;
   String _lastIdentityKey = '';
   String _lastAutoTriggerIdentityKey = '';
@@ -375,34 +378,13 @@ class PhotoBackupController extends GetxController {
             String status = 'success';
             String error = '';
             try {
-              final fileHash = sha256
-                  .convert(
-                    utf8.encode(
-                      '${item.sourceUniqueId}|${item.size}|${item.fileMtimeMs}',
-                    ),
-                  )
-                  .toString();
-              final relPath = p.posix.join(task.sourceName, item.relativePath);
-              await UploadCore.processFile(
-                dioClient: _dio,
+              await _uploadEntry(
+                task: task,
+                item: item,
                 baseUrl: baseUrl,
                 token: token,
-                fileRef: XFile(item.localPath, name: item.displayName),
-                fileName: item.displayName,
-                fileSize: item.size,
-                remotePath: task.targetDir,
-                nameStrategy: task.nameStrategy,
-                saveType: task.saveType.isEmpty ? null : task.saveType,
-                fileHash: fileHash,
                 cancelToken: cancelToken,
-                relativePath: relPath,
-                fileMtimeMs: item.fileMtimeMs,
-                fileBirthtimeMs: item.orderMs > 0 ? item.orderMs : null,
-                onProgress: (increment) {
-                  runtime.doneBytes.value += increment;
-                  _syncBackupWorkNotification(runtime);
-                },
-                onCompleted: (_) {},
+                runtime: runtime,
               );
               successCount += 1;
               consumedBytes += item.size;
@@ -509,34 +491,13 @@ class PhotoBackupController extends GetxController {
             String status = 'success';
             String error = '';
             try {
-              final fileHash = sha256
-                  .convert(
-                    utf8.encode(
-                      '${item.sourceUniqueId}|${item.size}|${item.fileMtimeMs}',
-                    ),
-                  )
-                  .toString();
-              final relPath = p.posix.join(task.sourceName, item.relativePath);
-              await UploadCore.processFile(
-                dioClient: _dio,
+              await _uploadEntry(
+                task: task,
+                item: item,
                 baseUrl: baseUrl,
                 token: token,
-                fileRef: XFile(item.localPath, name: item.displayName),
-                fileName: item.displayName,
-                fileSize: item.size,
-                remotePath: task.targetDir,
-                nameStrategy: task.nameStrategy,
-                saveType: task.saveType.isEmpty ? null : task.saveType,
-                fileHash: fileHash,
                 cancelToken: cancelToken,
-                relativePath: relPath,
-                fileMtimeMs: item.fileMtimeMs,
-                fileBirthtimeMs: item.orderMs > 0 ? item.orderMs : null,
-                onProgress: (increment) {
-                  runtime.doneBytes.value += increment;
-                  _syncBackupWorkNotification(runtime);
-                },
-                onCompleted: (_) {},
+                runtime: runtime,
               );
               successCount += 1;
               consumedBytes += item.size;
@@ -662,34 +623,13 @@ class PhotoBackupController extends GetxController {
         String status = 'success';
         String error = '';
         try {
-          final fileHash = sha256
-              .convert(
-                utf8.encode(
-                  '${item.sourceUniqueId}|${item.size}|${item.fileMtimeMs}',
-                ),
-              )
-              .toString();
-          final relPath = p.posix.join(task.sourceName, item.relativePath);
-          await UploadCore.processFile(
-            dioClient: _dio,
+          await _uploadEntry(
+            task: task,
+            item: item,
             baseUrl: baseUrl,
             token: token,
-            fileRef: XFile(item.localPath, name: item.displayName),
-            fileName: item.displayName,
-            fileSize: item.size,
-            remotePath: task.targetDir,
-            nameStrategy: task.nameStrategy,
-            saveType: task.saveType.isEmpty ? null : task.saveType,
-            fileHash: fileHash,
             cancelToken: cancelToken,
-            relativePath: relPath,
-            fileMtimeMs: item.fileMtimeMs,
-            fileBirthtimeMs: item.orderMs > 0 ? item.orderMs : null,
-            onProgress: (increment) {
-              runtime.doneBytes.value += increment;
-              _syncBackupWorkNotification(runtime);
-            },
-            onCompleted: (_) {},
+            runtime: runtime,
           );
           successCount += 1;
           consumedBytes += item.size;
@@ -774,6 +714,183 @@ class PhotoBackupController extends GetxController {
       }
       _photoBackupLog('_run total', '${runTotal.elapsedMilliseconds}ms');
     }
+  }
+
+  /// 上传一个条目：先做内容级去重，命中则直接跳过（视为成功），否则按任务策略上传。
+  /// 三处上传循环共用本方法，避免逻辑分叉。
+  Future<void> _uploadEntry({
+    required PhotoBackupTask task,
+    required _SourceEntry item,
+    required String baseUrl,
+    required String token,
+    required dio.CancelToken cancelToken,
+    required PhotoBackupRuntime runtime,
+  }) async {
+    final fileHash = sha256
+        .convert(
+          utf8.encode('${item.sourceUniqueId}|${item.size}|${item.fileMtimeMs}'),
+        )
+        .toString();
+    final relPath = p.posix.join(task.sourceName, item.relativePath);
+    final skipByContentMd5 = await _shouldSkipExistingContent(
+      task: task,
+      item: item,
+      relPath: relPath,
+      baseUrl: baseUrl,
+      token: token,
+      cancelToken: cancelToken,
+    );
+    if (skipByContentMd5) {
+      _photoBackupLog('skip(upload): 内容 MD5 一致', relPath);
+      return;
+    }
+    await UploadCore.processFile(
+      dioClient: _dio,
+      baseUrl: baseUrl,
+      token: token,
+      fileRef: XFile(item.localPath, name: item.displayName),
+      fileName: item.displayName,
+      fileSize: item.size,
+      remotePath: task.targetDir,
+      nameStrategy: task.nameStrategy,
+      saveType: task.saveType.isEmpty ? null : task.saveType,
+      fileHash: fileHash,
+      cancelToken: cancelToken,
+      relativePath: relPath,
+      fileMtimeMs: item.fileMtimeMs,
+      fileBirthtimeMs: item.orderMs > 0 ? item.orderMs : null,
+      onProgress: (increment) {
+        runtime.doneBytes.value += increment;
+        _syncBackupWorkNotification(runtime);
+      },
+      onCompleted: (_) {},
+    );
+  }
+
+  /// 内容级去重（P0）：目标端已存在同名且 **大小 + 内容 MD5** 都相同的文件时返回 true。
+  ///
+  /// 判定链：`/api/file/attributes/resolve` 取远端同名文件 -> 大小一致 ->
+  /// 本地算 MD5（带缓存）与 `/api/file/md5` 的远端 MD5 比对 -> 相同则跳过。
+  ///
+  /// 只在任务未开启「按年月日归档(saveType)」时生效：归档模式下最终路径由服务端依据
+  /// EXIF 拍摄时间计算，客户端无法可靠复现，此时代码回退到原有的「服务端同名 409 跳过」行为。
+  ///
+  /// 任何异常（网络、无 view 权限、读取失败）一律返回 false —— 宁可多传一次，不可漏传。
+  Future<bool> _shouldSkipExistingContent({
+    required PhotoBackupTask task,
+    required _SourceEntry item,
+    required String relPath,
+    required String baseUrl,
+    required String token,
+    required dio.CancelToken cancelToken,
+  }) async {
+    if (task.saveType.trim().isNotEmpty) return false;
+    if (item.size <= 0) return false;
+
+    try {
+      final resolved = await _getJson(
+        '$baseUrl/api/file/attributes/resolve',
+        queryParameters: {'targetDir': task.targetDir, 'relativePath': relPath},
+        token: token,
+        cancelToken: cancelToken,
+      );
+      if (resolved == null || resolved['success'] != true) return false;
+      final data = resolved['data'];
+      if (data is! Map) return false;
+      if (data['isFile'] != true) return false;
+      if (_asIntOrNull(data['size']) != item.size) return false;
+
+      final remotePath = data['path']?.toString().trim() ?? '';
+      if (remotePath.isEmpty) return false;
+
+      final localMd5 = await _computeLocalMd5(item: item);
+      if (localMd5.isEmpty) return false;
+
+      final md5Resp = await _getJson(
+        '$baseUrl/api/file/md5',
+        queryParameters: {'path': remotePath},
+        token: token,
+        cancelToken: cancelToken,
+      );
+      if (md5Resp == null || md5Resp['success'] != true) return false;
+      final md5Data = md5Resp['data'];
+      if (md5Data is! Map) return false;
+      final remoteMd5 = md5Data['md5']?.toString().trim() ?? '';
+      if (remoteMd5.isEmpty) return false;
+
+      return remoteMd5 == localMd5;
+    } catch (e) {
+      _photoBackupLog('content dedup probe failed', '$relPath -> $e');
+      return false;
+    }
+  }
+
+  /// 本地文件内容 MD5：进程内缓存 -> sqlite 缓存 -> 实算并回写。
+  /// 算法与服务端 `GET /api/file/md5` 保持一致（<50MB 全量；>=50MB 取头/尾各 1MB）。
+  Future<String> _computeLocalMd5({
+    required _SourceEntry item,
+  }) async {
+    final key = '${item.sourceUniqueId}|${item.size}|${item.fileMtimeMs}';
+    final memo = _md5MemoryCache[key];
+    if (memo != null && memo.isNotEmpty) return memo;
+
+    final cached = await _storage.loadHashCache(
+      sourceUniqueId: item.sourceUniqueId,
+      size: item.size,
+      mtimeMs: item.fileMtimeMs,
+    );
+    if (cached != null && cached.isNotEmpty) {
+      _rememberMd5(key, cached);
+      return cached;
+    }
+
+    String value;
+    try {
+      value = await UploadTransferHelper.computeFileMd5(
+        item.localPath,
+        fileSize: item.size,
+      );
+    } catch (e) {
+      _photoBackupLog('computeFileMd5 failed', '$key -> $e');
+      return '';
+    }
+    if (value.isEmpty) return '';
+    _rememberMd5(key, value);
+    await _storage.upsertHashCache(
+      sourceUniqueId: item.sourceUniqueId,
+      size: item.size,
+      mtimeMs: item.fileMtimeMs,
+      md5: value,
+    );
+    return value;
+  }
+
+  void _rememberMd5(String key, String value) {
+    if (_md5MemoryCache.length > 20000) _md5MemoryCache.clear();
+    _md5MemoryCache[key] = value;
+  }
+
+  /// 统一的 GET JSON 请求（附带 Bearer，异常交给调用方处理）。
+  Future<Map?> _getJson(
+    String url, {
+    required Map<String, dynamic> queryParameters,
+    required String token,
+    required dio.CancelToken cancelToken,
+  }) async {
+    final resp = await _dio.get<dynamic>(
+      url,
+      queryParameters: queryParameters,
+      options: dio.Options(headers: {'Authorization': 'Bearer $token'}),
+      cancelToken: cancelToken,
+    );
+    final body = resp.data;
+    return body is Map ? body.cast<String, dynamic>() : null;
+  }
+
+  static int? _asIntOrNull(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
   }
 
   String _triggerValue(PhotoBackupRunTrigger trigger) {

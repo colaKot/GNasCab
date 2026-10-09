@@ -1,0 +1,53 @@
+name: nascab_photo
+description: "GNasCab Photo —— 复用主客户端（GNasCab）代码的独立客户端"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # 复用主客户端的全部业务代码（相册/音乐模块、鉴权、i18n、主题、分块上传等），
+  # 不复制任何源码；独立端只通过 AppLaunchMode 收敛可见应用范围。
+  GNasCab:
+    path: ../flutter_client
+
+# ⚠️ 依赖方**不会继承**主客户端的 dependency_overrides，必须各自声明一遍。
+# audio_service 这条是主客户端打过补丁的本地包（修复桌面 MediaSession.onPlayPause
+# 不转发导致的播放/暂停键无响应）；少了它就会退回 pub 版。
+dependency_overrides:
+  audio_service:
+    path: ../flutter_client/packages/audio_service
+  dchs_motion_sensors:
+    path: ../flutter_client/packages/dchs_motion_sensors
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # ⚠️ 依赖方也**不会继承**主客户端的 assets 声明，这里是各自复制过来的子集。
+  # Flutter 的目录条目不递归，子目录必须逐条列出。
+  # book / web(reader) 两个模块在相册端不可达，未打包。
+  assets:
+    - assets/app/home/
+    - assets/app_icons/
+    - assets/home/
+    - assets/icons/
+    - assets/icons/home/
+    - assets/icons/file/
+    - assets/icons/book/
+    - assets/icons/video/
+    - assets/icons/vip/
+    - assets/icons/encrypted/
+    - assets/fonts/
+    - assets/app_icon.ico
+    - assets/tray_icon_round.ico
+    - assets/subfont.ttf
+  fonts:
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Regular.ttf

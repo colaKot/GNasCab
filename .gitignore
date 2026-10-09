@@ -82,3 +82,43 @@ tv_apple/*.xcworkspace/xcuserdata/
 .vs/
 __pycache__/
 *.py[cod]
+
+# ========== 本地临时产物 ==========
+.workbuddy/
+.backup_sync_*/
+.flutter_breakaway.txt
+storage.googleapis.com
+tool/.build_bridge_token
+
+# ========== 一次性排查脚本 ==========
+# 这些是为排查某个具体问题临时写的探针（进程/ABI/管道/软链/密码校验等），
+# 问题定位后已完成使命，不纳入仓库，避免后人误当成正式工具。
+tool/_asar_ui_check.js
+tool/_bat_parse_probe.py
+tool/_dart_spawn_probe.dart
+tool/_dart_spawn_probe2.py
+tool/_kill_proc.py
+tool/_native_abi_probe.js
+tool/_proc_detail.py
+tool/_proc_path.py
+tool/_proc_probe.py
+tool/_pw_probe.js
+tool/_symlink_probe.py
+tool/_probe_music_verbose.bat
+
+# ========== 一次性补丁脚本 ==========
+# 补丁已合入源码本体，脚本本身不再需要（保留会造成"再跑一次就坏"的隐患）。
+tool/_patch_analysis_options.py
+tool/_patch_analyzer_exclude.py
+tool/_patch_app_build_config.py
+tool/_patch_bat_analyze_note.py
+tool/_patch_photo_backup_md5.py
+tool/_add_show_in_home_key.py
+tool/_add_video_library_menu_key.py
+
+# ========== 硬编码本机绝对路径的脚本 ==========
+tool/_check_standalone_android.py
+tool/_check_standalone_assets.py
+tool/_check_standalone_pubspec.py
+tool/_gen_standalone_android.py
+tool/_gen_standalone_apps.py

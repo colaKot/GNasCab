@@ -1,12 +1,23 @@
 //
 //  Generated file. Do not edit.
 //
-// 本文件由 `flutter pub get` 自动生成，构建前先执行一次 pub get 即可填好。
-// 这里先留空实现，保证即便尚未生成也能通过编译（插件未注册会在运行时体现为
-// MissingPluginException，届时重新执行 pub get 后重构即可）。
-//
+
+// clang-format off
 
 #include "generated_plugin_registrant.h"
 
+#include <screen_retriever_windows/screen_retriever_windows_plugin_c_api.h>
+#include <sqlite3_flutter_libs/sqlite3_flutter_libs_plugin.h>
+#include <tray_manager/tray_manager_plugin.h>
+#include <window_manager/window_manager_plugin.h>
+
 void RegisterPlugins(flutter::PluginRegistry* registry) {
+  ScreenRetrieverWindowsPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("ScreenRetrieverWindowsPluginCApi"));
+  Sqlite3FlutterLibsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("Sqlite3FlutterLibsPlugin"));
+  TrayManagerPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("TrayManagerPlugin"));
+  WindowManagerPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("WindowManagerPlugin"));
 }

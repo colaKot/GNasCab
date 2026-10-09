@@ -1,24 +1,5 @@
 const { body, query, param, validationResult } = require('express-validator');
 const { getLocalizedMessage } = require('../../../utils/i18nUtil');
-const jwtUtil = require('../../../utils/jwtUtil');
-
-function isAllSameChar(text) {
-  return typeof text === 'string' && text.length > 1 && /^(.)\1+$/.test(text);
-}
-
-function isConsecutiveDigits(text) {
-  if (typeof text !== 'string') return false;
-  if (text.length < 3) return false;
-  if (!/^\d+$/.test(text)) return false;
-  let dir = 0;
-  for (let i = 1; i < text.length; i += 1) {
-    const diff = Number(text[i]) - Number(text[i - 1]);
-    if (diff !== 1 && diff !== -1) return false;
-    if (dir === 0) dir = diff;
-    else if (diff !== dir) return false;
-  }
-  return true;
-}
 
 function isAnyOrStringArray(value) {
   if (value === undefined || value === null) return true;
@@ -52,19 +33,13 @@ const UserValidation = {
   validateCreateUser() {
     return [
       body('username').isString().isLength({ min: 3, max: 20 }).withMessage('validation.USERNAME_LENGTH_INVALID'),
+      // 子账号密码不做复杂度校验：密码强度要求只对超级管理员账号生效。
+      // 管理员可以给不同子账号设置相同或简单密码，这里仅保证密码非空。
       body('password')
         .isString()
-        .isLength({ min: 6 })
-        .withMessage('validation.PASSWORD_TOO_SHORT')
-        .custom((value, { req }) => {
-          const passwordPlain = jwtUtil.decodeClientPassword(value);
-          if (passwordPlain.length < 6) throw new Error('validation.PASSWORD_TOO_SHORT');
-          if (isAllSameChar(passwordPlain)) throw new Error('validation.PASSWORD_REPEATED_CHAR');
-          if (isConsecutiveDigits(passwordPlain)) throw new Error('validation.PASSWORD_CONSECUTIVE_NUMBERS');
-          const username = req.body && req.body.username !== undefined ? String(req.body.username) : '';
-          if (username && passwordPlain === username) throw new Error('validation.PASSWORD_SAME_AS_USERNAME');
-          return true;
-        }),
+        .withMessage('validation.PASSWORD_REQUIRED')
+        .notEmpty()
+        .withMessage('validation.PASSWORD_REQUIRED'),
       body('user_remark').optional({ nullable: true }).isString().isLength({ max: 500 }).withMessage('validation.VALIDATION_ERROR'),
       body('phone').optional({ nullable: true }).isString().isLength({ max: 32 }).withMessage('validation.VALIDATION_ERROR'),
     ];
@@ -74,28 +49,11 @@ const UserValidation = {
     return [
       param('id').isInt({ min: 1 }).withMessage('validation.ID_INVALID'),
       body('username').optional().isString().isLength({ min: 3, max: 20 }).withMessage('validation.USERNAME_LENGTH_INVALID'),
+      // 同创建：子账号改密不做复杂度校验，留空表示不修改密码
       body('password')
         .optional()
         .isString()
-        .isLength({ min: 6 })
-        .withMessage('validation.PASSWORD_TOO_SHORT')
-        .custom(async (value, { req }) => {
-          const passwordPlain = jwtUtil.decodeClientPassword(value);
-          if (passwordPlain.length < 6) throw new Error('validation.PASSWORD_TOO_SHORT');
-          if (isAllSameChar(passwordPlain)) throw new Error('validation.PASSWORD_REPEATED_CHAR');
-          if (isConsecutiveDigits(passwordPlain)) throw new Error('validation.PASSWORD_CONSECUTIVE_NUMBERS');
-
-          let username = req.body && req.body.username !== undefined ? String(req.body.username) : '';
-          if (!username) {
-            const id = Number(req.params && req.params.id);
-            if (req.dbMain && Number.isFinite(id) && id > 0) {
-              const user = await req.dbMain('user').where({ id }).select('username').first();
-              username = user && user.username ? String(user.username) : '';
-            }
-          }
-          if (username && passwordPlain === username) throw new Error('validation.PASSWORD_SAME_AS_USERNAME');
-          return true;
-        }),
+        .withMessage('validation.PASSWORD_REQUIRED'),
       body('user_remark').optional({ nullable: true }).isString().isLength({ max: 500 }).withMessage('validation.VALIDATION_ERROR'),
       body('phone').optional({ nullable: true }).isString().isLength({ max: 32 }).withMessage('validation.VALIDATION_ERROR'),
       body('is_active').optional().isBoolean().withMessage('validation.VALIDATION_ERROR'),

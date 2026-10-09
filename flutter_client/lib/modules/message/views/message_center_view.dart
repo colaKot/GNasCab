@@ -1,3 +1,4 @@
+import '../../home/views/pc_components/pc_app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../base/components/custom_button.dart';
@@ -173,15 +174,14 @@ class _MessageCenterViewState extends State<MessageCenterView> {
       ),
       child: Column(
         children: [
+          // ⭐ 标题原为右对齐（textAlign.right），会撞右上角窗口按钮（2026-10-09）
+          // ⇒ 改为左对齐。下方一行仍靠 Spacer 推「清除」到最右，那行已单独让位。
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  'message_center'.tr,
-                  textAlign: TextAlign.right,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              Text(
+                'message_center'.tr,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -192,7 +192,13 @@ class _MessageCenterViewState extends State<MessageCenterView> {
               const SizedBox.shrink(),
               _buildLevelFilter(context, controller, theme),
               const Spacer(),
-              _buildClearButton(context, controller, theme),
+              // ⭐「清除」按钮让位窗口按钮组
+              Padding(
+                padding: EdgeInsets.only(
+                  right: PcWindowScope.of(context)?.titleBarControlsWidth ?? 0,
+                ),
+                child: _buildClearButton(context, controller, theme),
+              ),
             ],
           ),
         ],

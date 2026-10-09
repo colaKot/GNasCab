@@ -1,3 +1,4 @@
+import '../../home/views/pc_components/pc_app_window.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -192,10 +193,12 @@ class _DockerTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(20, topPadding, 20, 14),
+        padding: EdgeInsets.fromLTRB(20, topPadding, 20 + ctrlW, 14),
         child: Align(
           alignment: Alignment.centerRight,
           child: Wrap(

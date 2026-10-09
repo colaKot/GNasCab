@@ -284,6 +284,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "获取影视库列表失败",
       "VIDEO_LIBRARY_ADD_SUCCESS": "创建影视库成功",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "更新影视库成功",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "更新影视库失败",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "删除影视库成功",
       "VIDEO_LIBRARY_NAME_EXISTS": "已存在同名影视库",
       "VIDEO_LIBRARY_NOT_FOUND": "影视库不存在",

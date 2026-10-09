@@ -30,6 +30,7 @@ class VideoLeftMenu extends StatelessWidget {
           key: 'library.home',
           icon: Icons.home_outlined,
         ),
+        // ⭐ 左侧栏显示**全部**影视库，不按「主页显示」过滤（2026-10-09 铁柱纠正）
         for (final lib in controller.libraries)
           TwoLevelSideMenuItem(
             title: lib.displayName,
@@ -88,6 +89,11 @@ class VideoLeftMenu extends StatelessWidget {
             icon: Icons.settings_outlined,
             expanded: controller.isSettingsExpanded,
             items: [
+              TwoLevelSideMenuItem(
+                title: 'settings_video_library'.tr,
+                key: 'settings.library',
+                icon: Icons.video_library_outlined,
+              ),
               TwoLevelSideMenuItem(
                 title: 'settings_source'.tr,
                 key: 'settings.source',

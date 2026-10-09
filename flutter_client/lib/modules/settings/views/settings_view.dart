@@ -5,6 +5,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/languages/language_service.dart';
 import '../../../core/theme/theme_manager.dart';
+import '../../../core/theme/theme_apply_service.dart'; // ⭐ 运行时切配色/切亮暗
+import 'color_scheme_grid.dart'; // 配色方案网格
 import '../../../core/api/base_api_service.dart';
 import '../../../core/api/api_controller.dart';
 import '../../../core/user/current_user_controller.dart';
@@ -12,7 +14,6 @@ import '../../base/components/custom_container.dart';
 import '../../base/components/custom_divider.dart';
 import '../../base/components/custom_extended_image.dart';
 import '../../base/views/app_base_page.dart';
-import 'package:GNasCab/modules/video/library_setting/view/video_library_settings_view.dart';
 import '../../../utils/toast_util.dart';
 import '../../../utils/device_utils.dart';
 import '../../../utils/update_check_helper.dart';
@@ -312,8 +313,6 @@ class _SettingsViewState extends State<SettingsView> {
             if (isAdmin) const SizedBox(height: 16),
             if (isAdmin) _buildPersonalizationCard(context),
             if (isAdmin) const SizedBox(height: 16),
-            if (isAdmin) _buildMediaLibraryCard(context),
-            if (isAdmin) const SizedBox(height: 16),
             CustomContainer(
               child: Column(
                 children: [
@@ -435,23 +434,6 @@ class _SettingsViewState extends State<SettingsView> {
             Expanded(child: content),
           ],
         ),
-      ),
-    );
-  }
-
-  /// 全局设置里的「影视库」入口：进入后增删影视库，每个库对应影视模块左侧栏的一个栏目
-  Widget _buildMediaLibraryCard(BuildContext context) {
-    return CustomContainer(
-      child: Column(
-        children: [
-          _buildSettingsItem(
-            context,
-            'video_library_manage_title'.tr,
-            'video_library_manage_desc'.tr,
-            Icons.video_library_outlined,
-            () => Get.to(() => const VideoLibrarySettingsView()),
-          ),
-        ],
       ),
     );
   }
@@ -669,50 +651,106 @@ class _SettingsViewState extends State<SettingsView> {
     showDialog(
       context: context,
       builder: (context) {
-        final currentThemeMode = ThemeManager().getThemeMode();
-        return AlertDialog(
-          title: Text('settings_theme_title'.tr),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.light_mode_outlined),
-                title: Text('settings_theme_light_mode'.tr),
-                trailing: currentThemeMode == ThemeMode.light
-                    ? const Icon(Icons.check_outlined)
-                    : null,
-                onTap: () async {
-                  Get.changeThemeMode(ThemeMode.light);
-                  await ThemeManager().saveThemeMode(ThemeMode.light);
-                  Get.back();
-                },
+        // ⭐ StatefulBuilder：弹窗内容自己重建，选中勾才能实时更新
+        //（用外层 setState 无效——那是 SettingsView 的 State）
+        return StatefulBuilder(
+          builder: (dialogCtx, setDialogState) {
+            // ⚠️ 每次重建都重新读：applyMode/applyScheme 已写入 SharedPreferences
+            final currentThemeMode = ThemeManager().getThemeMode();
+            return AlertDialog(
+              title: Text('settings_theme_title'.tr),
+              content: SizedBox(
+                width: 560,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── 亮/暗/跟随系统 ──
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.light_mode_outlined),
+                        title: Text('settings_theme_light_mode'.tr),
+                        trailing: currentThemeMode == ThemeMode.light
+                            ? const Icon(Icons.check_outlined)
+                            : null,
+                        onTap: () async {
+                          await ThemeApplyService.instance.applyMode(
+                            ThemeMode.light,
+                          );
+                          setDialogState(() {});
+                        },
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.dark_mode_outlined),
+                        title: Text('settings_theme_dark_mode'.tr),
+                        trailing: currentThemeMode == ThemeMode.dark
+                            ? const Icon(Icons.check_outlined)
+                            : null,
+                        onTap: () async {
+                          await ThemeApplyService.instance.applyMode(
+                            ThemeMode.dark,
+                          );
+                          setDialogState(() {});
+                        },
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.phone_android_outlined),
+                        title: Text('settings_theme_system_mode'.tr),
+                        trailing: currentThemeMode == ThemeMode.system
+                            ? const Icon(Icons.check_outlined)
+                            : null,
+                        onTap: () async {
+                          await ThemeApplyService.instance.applyMode(
+                            ThemeMode.system,
+                          );
+                          setDialogState(() {});
+                        },
+                      ),
+
+                      // ── 配色方案（2026-10-08 新增，24 套 flex 内置配色）──
+                      const Divider(height: 24),
+                      Row(
+                        children: [
+                          const Icon(Icons.palette_outlined, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            'settings_theme_color_scheme'.tr,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'settings_theme_color_scheme_desc'.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(
+                            dialogCtx,
+                          ).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      // 点选即时生效，**不关弹窗** —— 让用户直接看到效果再决定。
+                      ThemeSchemeGrid(
+                        closeAfterPick: false,
+                        onPicked: () => setDialogState(() {}),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              ListTile(
-                leading: const Icon(Icons.dark_mode_outlined),
-                title: Text('settings_theme_dark_mode'.tr),
-                trailing: currentThemeMode == ThemeMode.dark
-                    ? const Icon(Icons.check_outlined)
-                    : null,
-                onTap: () async {
-                  Get.changeThemeMode(ThemeMode.dark);
-                  await ThemeManager().saveThemeMode(ThemeMode.dark);
-                  Get.back();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.phone_android_outlined),
-                title: Text('settings_theme_system_mode'.tr),
-                trailing: currentThemeMode == ThemeMode.system
-                    ? const Icon(Icons.check_outlined)
-                    : null,
-                onTap: () async {
-                  Get.changeThemeMode(ThemeMode.system);
-                  await ThemeManager().saveThemeMode(ThemeMode.system);
-                  Get.back();
-                },
-              ),
-            ],
-          ),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text('confirm'.tr),
+                ),
+              ],
+            );
+          },
         );
       },
     );

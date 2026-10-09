@@ -97,6 +97,61 @@ class VideoLibrarySettingsController extends GetxController {
     }
   }
 
+  /// 切换「是否在主页显示」：乐观更新，失败回滚
+  ///
+  /// ⚠️ 必须用 [RxList.refresh] 让 UI 重建（2026-10-09）：
+  /// 只做 `libraries[idx] = ...` 时RxList **不会**通知监听者，
+  /// 开关看起来纹丝不动；失败回滚同样不生效。
+  /// ⚠️ 成功后必须 [_notifySidebar] —— 左侧栏栏目和主页分组都按
+  /// `show_in_home` 过滤，不刷新就会与开关状态不一致（用户报的第二个问题）。
+  Future<void> setShowInHome(VideoLibrary library, bool value) async {
+    final idx = libraries.indexWhere((e) => e.id == library.id);
+    if (idx < 0) return;
+
+    final before = libraries[idx];
+    if (before.showInHome == value) return;
+
+    // 乐观更新：立刻反映到 UI
+    libraries[idx] = before.copyWith(showInHome: value);
+    libraries.refresh();
+
+    try {
+      final res = await VideoLibraryApiService.instance.setShowInHome(
+        library.id,
+        value,
+        showLoading: false,
+      );
+      if (!res.success) {
+        _rollback(before, idx);
+        ToastUtil.show(res.message ?? 'operation_failed'.tr);
+        return;
+      }
+      // 成功：把服务端返回的最新记录写回，并同步左侧栏/主页分组
+      final dynamic updated = res.data;
+      if (updated is Map) {
+        final map = updated.cast<String, dynamic>();
+        if (map.isNotEmpty) {
+          final parsed = VideoLibrary.fromJson(map);
+          // ⚠️ 服务端返回的记录若缺字段会退化成 id=0，别把正常数据覆盖坏
+          if (parsed.id > 0) {
+            libraries[idx] = parsed;
+            libraries.refresh();
+          }
+        }
+      }
+      _notifySidebar();
+    } catch (_) {
+      _rollback(before, idx);
+      ToastUtil.show('operation_failed'.tr);
+    }
+  }
+
+  void _rollback(VideoLibrary before, int idx) {
+    if (idx < 0 || idx >= libraries.length) return;
+    libraries[idx] = before;
+    libraries.refresh();
+  }
+
   /// 内置库、仍有来源的库由服务端拦截，这里只负责把失败原因透出
   Future<void> deleteLibrary(VideoLibrary library) async {
     final confirmed = await DialogUtil.showConfirmDialog(

@@ -365,7 +365,7 @@ class SyncPlan {
 
   bool get isEmpty => totalActions == 0;
 
-  int get count(String key) {
+  int count(String key) {
     final v = summary[key];
     if (v is num) return v.toInt();
     return int.tryParse(v?.toString() ?? '') ?? 0;

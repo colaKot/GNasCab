@@ -517,7 +517,7 @@ class SyncEngine {
     for (final seg in parts) {
       if (seg.isEmpty || seg == '.' || seg == '..') return null;
     }
-    return p.join(rootDir, ...parts);
+    return p.joinAll([rootDir, ...parts]);
   }
 
   bool _isCancelError(Object e) {

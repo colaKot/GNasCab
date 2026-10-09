@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "ดึงรายการคลังสื่อไม่สำเร็จ",
       "VIDEO_LIBRARY_ADD_SUCCESS": "สร้างคลังสื่อสำเร็จ",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "อัปเดตคลังสื่อสำเร็จ",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "ไม่สามารถอัปเดตคลังวิดีโอได้",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "ลบคลังสื่อสำเร็จ",
       "VIDEO_LIBRARY_NAME_EXISTS": "มีคลังสื่อชื่อนี้อยู่แล้ว",
       "VIDEO_LIBRARY_NOT_FOUND": "ไม่พบคลังสื่อ",

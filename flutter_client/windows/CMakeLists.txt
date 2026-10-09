@@ -35,6 +35,14 @@ include(InstallRequiredSystemLibraries)
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+# VS 2026 (MSVC 14.4x) turned the deprecated <experimental/coroutine> header into a
+# hard error (STL1011). permission_handler_windows and flutter_local_notifications_windows
+# still pull it in through C++/WinRT, so the whole plugin tree fails to compile.
+# The STL reads this macro to stop emitting that diagnostic; add_compile_definitions
+# reaches the plugin subdirectories because they are added further down this file.
+# Drop this once those two plugins stop using the experimental header.
+add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by

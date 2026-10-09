@@ -26,6 +26,7 @@ function createFileViewHandler(sourceType, action) {
 router.post('/library/list', authenticateJWT, videoLibraryController.listLibraries);
 router.post('/library/add', authenticateJWT, requireAdmin, videoLibraryController.addLibrary);
 router.post('/library/rename/:id', authenticateJWT, requireAdmin, videoLibraryController.renameLibrary);
+router.post('/library/show_in_home/:id', authenticateJWT, requireAdmin, videoLibraryController.setShowInHome);
 router.post('/library/delete/:id', authenticateJWT, requireAdmin, videoLibraryController.deleteLibrary);
 
 router.post('/source/list', authenticateJWT, requireAdmin, videoSourceController.listSources);

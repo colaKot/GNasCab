@@ -97,7 +97,7 @@ class _SettingsViewState extends State<SettingsView> {
           _Tile(
             icon: Icons.power_settings_new,
             title: 'auto_start'.tr,
-            subtitle: 'auto_start_desc'.tr,
+            subtitle: Text('auto_start_desc'.tr),
             trailing: _autoStartBusy
                 ? const SizedBox(
                     width: 18,

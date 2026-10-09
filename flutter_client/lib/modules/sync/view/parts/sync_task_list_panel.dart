@@ -152,10 +152,16 @@ class _SyncTaskListPanelState extends State<_SyncTaskListPanel> {
             onPressed: () => widget.ctrl.refreshList(showLoading: true),
           ),
           const SizedBox(width: 8),
-          FilledButton.icon(
-            onPressed: widget.onCreate,
-            icon: const Icon(Icons.add, size: 18),
-            label: Text('sync_create_task'.tr),
+          // ⭐「创建任务」在右上角，让位窗口按钮组（2026-10-09）
+          Padding(
+            padding: EdgeInsets.only(
+              right: PcWindowScope.of(context)?.titleBarControlsWidth ?? 0,
+            ),
+            child: FilledButton.icon(
+              onPressed: widget.onCreate,
+              icon: const Icon(Icons.add, size: 18),
+              label: Text('sync_create_task'.tr),
+            ),
           ),
         ],
       ),

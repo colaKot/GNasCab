@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/video_main_controller.dart';
 import 'home_parts/video_left_menu.dart';
+import '../../library_setting/view/video_library_settings_view.dart';
 import '../../source_setting/view/video_source_settings_view.dart';
 import '../../home/view/video_home_page.dart';
 import '../../detail/view/video_detail_page.dart';
@@ -144,6 +145,9 @@ class VideoMainView extends StatelessWidget {
                 key: ValueKey('video_folder_view'),
                 child: PcFolderViewPage(moduleType: FolderViewModuleType.video),
               );
+            }
+            if (key == 'settings.library') {
+              return const VideoLibrarySettingsView();
             }
             if (key == 'settings.source') {
               return const VideoSourceSettingsView();

@@ -9,9 +9,11 @@ import 'package:GNasCab/modules/video/base/video_utils/video_utils.dart';
 import 'package:GNasCab/modules/video/base/views/app_video_item_poster.dart';
 import 'package:GNasCab/modules/video/list/controller/video_list_controller.dart';
 import 'package:GNasCab/modules/video/list/view/app_video_list_page.dart';
+import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/app_video_home_page_controller.dart';
+import '../service/video_home_api_service.dart';
 
 class AppVideoHomePage extends StatefulWidget {
   final VoidCallback? onOpenMovie;
@@ -32,6 +34,14 @@ class AppVideoHomePage extends StatefulWidget {
 class _AppVideoHomePageState extends State<AppVideoHomePage> {
   final ScrollController _scrollController = ScrollController();
 
+  /// 库标题：服务端给的是 name_key（改名后为空）
+  String _resolveLibTitle(VideoHomeLibraryGroup group) {
+    final raw = group.libraryName.trim();
+    if (raw.isEmpty) return libTypeLabelKey(group.libType).tr;
+    final translated = raw.tr;
+    return translated == raw ? raw : translated;
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -46,8 +56,19 @@ class _AppVideoHomePageState extends State<AppVideoHomePage> {
         void handleDeleted(VideoHomeItemBean deleted) {
           ctrl.recommend.removeWhere((e) => e.id == deleted.id);
           ctrl.recentPlay.removeWhere((e) => e.id == deleted.id);
-          ctrl.recentAddMovie.removeWhere((e) => e.id == deleted.id);
-          ctrl.recentAddTv.removeWhere((e) => e.id == deleted.id);
+          ctrl.recentAddByLib.assignAll(
+            ctrl.recentAddByLib
+                .map(
+                  (g) => VideoHomeLibraryGroup(
+                    libraryId: g.libraryId,
+                    libraryName: g.libraryName,
+                    libType: g.libType,
+                    items: g.items.where((e) => e.id != deleted.id).toList(),
+                  ),
+                )
+                .where((g) => g.items.isNotEmpty)
+                .toList(),
+          );
         }
 
         void handleFavoriteChanged(int indexId, bool isFav) {
@@ -59,8 +80,21 @@ class _AppVideoHomePageState extends State<AppVideoHomePage> {
 
           updateList(ctrl.recommend);
           updateList(ctrl.recentPlay);
-          updateList(ctrl.recentAddMovie);
-          updateList(ctrl.recentAddTv);
+        }
+
+        /// 库分类点击：按libType 回到原有的 movie/tv 入口
+        void openLibGroup(VideoHomeLibraryGroup g) {
+          final isTv = g.libType == 'tv';
+          final cb = isTv ? widget.onOpenTv : widget.onOpenMovie;
+          if (cb != null) {
+            cb();
+            return;
+          }
+          Get.to(
+            () => AppVideoListPage(
+              initialMediaType: isTv ? 'tv' : 'movie',
+            ),
+          );
         }
 
         return Obx(() {
@@ -70,8 +104,7 @@ class _AppVideoHomePageState extends State<AppVideoHomePage> {
           final noData =
               ctrl.recommend.isEmpty &&
               ctrl.recentPlay.isEmpty &&
-              ctrl.recentAddMovie.isEmpty &&
-              ctrl.recentAddTv.isEmpty;
+              ctrl.recentAddByLib.isEmpty;
 
           return RefreshIndicator(
             onRefresh: () => ctrl.refreshAll(showLoading: false),
@@ -110,39 +143,14 @@ class _AppVideoHomePageState extends State<AppVideoHomePage> {
                     onFavoriteChanged: (item, isFav) =>
                         handleFavoriteChanged(item.id, isFav),
                   ),
-                if (ctrl.recentAddMovie.isNotEmpty)
+                // 按影视库分类：只显示勾了「主页显示」的库
+                for (final g in ctrl.recentAddByLib)
                   _AppVideoHorizontalSection(
-                    title: 'video_home_recent_add_movie'.tr,
-                    items: ctrl.recentAddMovie.toList(),
+                    key: ValueKey('app_home_lib_${g.libraryId}'),
+                    title: _resolveLibTitle(g),
+                    items: g.items,
                     onDeleted: handleDeleted,
-                    onTapTitle: () {
-                      final cb = widget.onOpenMovie;
-                      if (cb != null) {
-                        cb();
-                        return;
-                      }
-                      Get.to(
-                        () => const AppVideoListPage(initialMediaType: 'movie'),
-                      );
-                    },
-                    onFavoriteChanged: (item, isFav) =>
-                        handleFavoriteChanged(item.id, isFav),
-                  ),
-                if (ctrl.recentAddTv.isNotEmpty)
-                  _AppVideoHorizontalSection(
-                    title: 'video_home_recent_add_tv'.tr,
-                    items: ctrl.recentAddTv.toList(),
-                    onDeleted: handleDeleted,
-                    onTapTitle: () {
-                      final cb = widget.onOpenTv;
-                      if (cb != null) {
-                        cb();
-                        return;
-                      }
-                      Get.to(
-                        () => const AppVideoListPage(initialMediaType: 'tv'),
-                      );
-                    },
+                    onTapTitle: () => openLibGroup(g),
                     onFavoriteChanged: (item, isFav) =>
                         handleFavoriteChanged(item.id, isFav),
                   ),
@@ -169,6 +177,7 @@ class _AppVideoHorizontalSection extends StatelessWidget {
   final void Function(VideoHomeItemBean item, bool isFav)? onFavoriteChanged;
 
   const _AppVideoHorizontalSection({
+    super.key,
     required this.title,
     required this.items,
     this.showProgress = false,

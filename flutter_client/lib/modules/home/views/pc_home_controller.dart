@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/api/api_controller.dart';
+import '../../../core/bootstrap/app_launch.dart';
 import '../../../core/user/current_user_controller.dart';
 import '../service/apps_api_service.dart';
 import '../../gallery/controllers/custom_gallery_controller.dart';
@@ -82,8 +83,10 @@ class PcHomeController extends GetxController {
     return false;
   }
 
-  List<String> get _effectiveAllApps =>
-      _allApps.where((e) => !_isAppBlocked(e)).toList();
+  List<String> get _effectiveAllApps => _allApps
+      .where((e) => !_isAppBlocked(e))
+      .where((e) => AppLaunch.isAppAllowed(e))
+      .toList();
 
   List<String> get showApps => _effectiveAllApps
       .where((e) => !_hideApps.contains(e) && !_isAppBlocked(e))

@@ -284,6 +284,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Failed to fetch media libraries",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Media library created",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Media library updated",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Failed to update video library",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Media library deleted",
       "VIDEO_LIBRARY_NAME_EXISTS": "A media library with this name already exists",
       "VIDEO_LIBRARY_NOT_FOUND": "Media library not found",

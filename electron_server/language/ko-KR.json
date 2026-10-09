@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "미디어 라이브러리를 가져오지 못했습니다",
       "VIDEO_LIBRARY_ADD_SUCCESS": "미디어 라이브러리를 만들었습니다",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "미디어 라이브러리를 업데이트했습니다",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "비디오 라이브러리 업데이트에 실패했습니다",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "미디어 라이브러리를 삭제했습니다",
       "VIDEO_LIBRARY_NAME_EXISTS": "같은 이름의 미디어 라이브러리가 이미 있습니다",
       "VIDEO_LIBRARY_NOT_FOUND": "미디어 라이브러리를 찾을 수 없습니다",

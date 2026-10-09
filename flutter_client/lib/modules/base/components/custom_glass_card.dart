@@ -1,113 +1,78 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/custom_colors.dart';
 
-/// macOS 风格阴影：浅色模式极轻柔和，深色模式适度。
-List<BoxShadow> _glassCardShadows(ThemeData theme) {
-  final shadow = theme.colorScheme.shadow;
-  if (theme.brightness == Brightness.light) {
-    return [
-      BoxShadow(
-        color: shadow.withValues(alpha: 0.06),
-        blurRadius: 4,
-        offset: const Offset(0, 2),
-      ),
-      BoxShadow(
-        color: shadow.withValues(alpha: 0.03),
-        blurRadius: 4,
-        offset: const Offset(0, 0.5),
-      ),
-    ];
-  }
-  return [
-    BoxShadow(
-      color: shadow.withValues(alpha: 0.18),
-      blurRadius: 4,
-      offset: const Offset(0, 2),
-    ),
-  ];
-}
-
-/// 根据主题亮度返回合适的默认边框：浅色用 outlineVariant，深色用半透白。
-Border _defaultBorder(ThemeData theme) {
-  final isLight = theme.brightness == Brightness.light;
-  return Border.all(
-    color: isLight
-        ? theme.colorScheme.outlineVariant.withValues(alpha: 0.35)
-        : Colors.white.withValues(alpha: 0.12),
-    width: isLight ? 0.5 : 0.5,
-  );
-}
-
+/// 扁平卡片：纯色背景 + 0.5px 细边框，**无阴影、无毛玻璃**
+/// Windows 风格：直角（radius 4）、不投影、靠边框而不是阴影分层。
 class CustomGlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
   final BoxBorder? border;
   final double borderRadius;
+
+  /// 保留以兼容旧调用点，但**扁平卡片不再做模糊**，值被忽略
   final double blur;
+
+  /// 保留以兼容旧调用点，但**扁平卡片始终不透明**，值被忽略
   final double opacity;
+
   final VoidCallback? onTap;
 
   const CustomGlassCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(AppSpace.page),
     this.margin,
     this.border,
-    this.borderRadius = 16.0,
-    this.blur = 10.0,
-    this.opacity = 0.55,
+    this.borderRadius = 4.0,
+    this.blur = 0.0,
+    this.opacity = 1.0,
     this.onTap,
   });
+
+  /// 细边框：走主题的 hairlineBorderColor（浅色中性灰 / 深色半透白）
+  Border _defaultBorder(ThemeData theme) {
+    final custom = theme.extension<CustomColors>();
+    return Border.all(
+      color: custom?.hairlineBorderColor ?? const Color(0x1F000000),
+      width: 0.5,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final radius = BorderRadius.circular(borderRadius);
 
-    Widget content = Container(
+    final content = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: opacity),
+        color: theme.colorScheme.surface,
         borderRadius: radius,
         border: border ?? _defaultBorder(theme),
       ),
       child: child,
     );
 
-    Widget glass = Container(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: _glassCardShadows(theme),
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: content,
-        ),
-      ),
-    );
+    Widget card = content;
 
     if (onTap != null) {
-      return Padding(
-        padding: margin ?? EdgeInsets.zero,
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(borderRadius),
-            child: glass,
-          ),
+      card = Material(
+        color: Colors.transparent,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: content,
         ),
       );
     }
 
     if (margin != null) {
-      return Padding(padding: margin!, child: glass);
+      return Padding(padding: margin!, child: card);
     }
 
-    return glass;
+    return card;
   }
 }

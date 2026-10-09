@@ -12,7 +12,7 @@ import '../controller/video_source_settings_controller.dart';
 import '../models/video_source.dart';
 
 const double _kBaseCardWidth = 400;
-const double _kCardHeight = 380;
+const double _kCardHeight = 232;
 
 class VideoSourceSettingsView extends StatelessWidget {
   const VideoSourceSettingsView({super.key});
@@ -653,45 +653,42 @@ class _AddSourceCard extends StatelessWidget {
     final theme = Theme.of(context);
     return CustomGlassCard(
       onTap: onTap,
-      child: SizedBox.expand(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.add_circle_outline,
-                size: 38,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'video_source_add_card'.tr,
-                    style: theme.textTheme.titleSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  IconButton(
-                    tooltip: 'video_source_help_add_source'.tr,
-                    onPressed: () {
-                      DialogUtil.showInfoDialog(
-                        title: 'tip'.tr,
-                        content: 'video_source_help_add_source'.tr,
-                        buttonText: 'ok'.tr,
-                      );
-                    },
-                    icon: Icon(
-                      Icons.help_outline,
-                      size: 18,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Row(
+        children: [
+          Icon(
+            Icons.add_circle_outline,
+            size: 20,
+            color: theme.colorScheme.primary,
           ),
-        ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'video_source_add_card'.tr,
+              style: theme.textTheme.titleSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+            visualDensity: VisualDensity.compact,
+            tooltip: 'video_source_help_add_source'.tr,
+            onPressed: () {
+              DialogUtil.showInfoDialog(
+                title: 'tip'.tr,
+                content: 'video_source_help_add_source'.tr,
+                buttonText: 'ok'.tr,
+              );
+            },
+            icon: Icon(
+              Icons.help_outline,
+              size: 16,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -711,8 +708,8 @@ class _SourceCard extends StatelessWidget {
     final hours = ctrl.getIntervalHours(source);
 
     return CustomGlassCard(
-      child: SizedBox.expand(
-        child: Column(
+      padding: const EdgeInsets.fromLTRB(12, 10, 10, 8),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -757,8 +754,9 @@ class _SourceCard extends StatelessWidget {
                           message: source.path,
                           child: Text(
                             source.path,
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium,
                           ),
                         ),
                       ),
@@ -789,126 +787,146 @@ class _SourceCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 6),
             Row(
               children: [
                 Expanded(
                   child: Text(
                     'video_library_manage_title'.tr,
-                    style: theme.textTheme.bodyMedium,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ),
                 Icon(
                   libTypeIcon(source.libraryType),
-                  size: 16,
+                  size: 14,
                   color: theme.colorScheme.primary,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  source.libraryDisplayName.isEmpty
-                      ? '--'
-                      : source.libraryDisplayName,
-                  style: theme.textTheme.bodyMedium,
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    source.libraryDisplayName.isEmpty
+                        ? '--'
+                        : source.libraryDisplayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall,
+                  ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
                 Icon(
                   Icons.lock_outline,
-                  size: 14,
+                  size: 12,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
             const SizedBox(height: 6),
-            _switchRow(
-              title: 'video_source_match_nfo'.tr,
-              value: source.matchNfo == 1,
-              helpMessage: 'video_source_help_match_nfo'.tr,
-              helpIconColor: theme.colorScheme.onSurfaceVariant,
-              onChanged: (v) =>
-                  ctrl.updateMatchNfoOptimistic(source, v ? 1 : 0),
-            ),
-            const SizedBox(height: 6),
-            _switchRow(
-              title: 'video_source_scan_when_start'.tr,
-              value: source.scanWhenStart == 1,
-              helpMessage: 'video_source_help_scan_when_start'.tr,
-              helpIconColor: theme.colorScheme.onSurfaceVariant,
-              onChanged: (v) =>
-                  ctrl.updateSourceOptimistic(source, scanWhenStart: v ? 1 : 0),
-            ),
-            const SizedBox(height: 6),
-            _switchRow(
-              title: 'video_source_scan_when_change'.tr,
-              value: source.scanWhenChange == 1,
-              helpMessage: 'video_source_help_scan_when_change'.tr,
-              helpIconColor: theme.colorScheme.onSurfaceVariant,
-              onChanged: (v) => ctrl.updateSourceOptimistic(
-                source,
-                scanWhenChange: v ? 1 : 0,
-              ),
-            ),
-            const SizedBox(height: 6),
+            //紧凑布局：三个开关两列横排（扫描间隔占满整行），比竖排省一半高度
             Row(
               children: [
                 Expanded(
+                  child: _switchRow(
+                    title: 'video_source_match_nfo'.tr,
+                    value: source.matchNfo == 1,
+                    helpMessage: 'video_source_help_match_nfo'.tr,
+                    helpIconColor: theme.colorScheme.onSurfaceVariant,
+                    onChanged: (v) =>
+                        ctrl.updateMatchNfoOptimistic(source, v ? 1 : 0),
+                  ),
+                ),
+                Expanded(
+                  child: _switchRow(
+                    title: 'video_source_scan_when_start'.tr,
+                    value: source.scanWhenStart == 1,
+                    helpMessage: 'video_source_help_scan_when_start'.tr,
+                    helpIconColor: theme.colorScheme.onSurfaceVariant,
+                    onChanged: (v) => ctrl.updateSourceOptimistic(
+                      source,
+                      scanWhenStart: v ? 1 : 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Expanded(
+                  child: _switchRow(
+                    title: 'video_source_scan_when_change'.tr,
+                    value: source.scanWhenChange == 1,
+                    helpMessage: 'video_source_help_scan_when_change'.tr,
+                    helpIconColor: theme.colorScheme.onSurfaceVariant,
+                    onChanged: (v) => ctrl.updateSourceOptimistic(
+                      source,
+                      scanWhenChange: v ? 1 : 0,
+                    ),
+                  ),
+                ),
+                Expanded(
                   child: Row(
                     children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Text('video_source_scan_interval'.tr),
-                            IconButton(
-                              tooltip: 'video_source_help_scan_interval'.tr,
-                              onPressed: () {
-                                DialogUtil.showInfoDialog(
-                                  title: 'tip'.tr,
-                                  content: 'video_source_help_scan_interval'.tr,
-                                  buttonText: 'ok'.tr,
-                                );
-                              },
-                              icon: Icon(
-                                Icons.help_outline,
-                                size: 18,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                      Flexible(child: Text('video_source_scan_interval'.tr)),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 26,
+                          minHeight: 26,
                         ),
+                        visualDensity: VisualDensity.compact,
+                        tooltip: 'video_source_help_scan_interval'.tr,
+                        onPressed: () {
+                          DialogUtil.showInfoDialog(
+                            title: 'tip'.tr,
+                            content: 'video_source_help_scan_interval'.tr,
+                            buttonText: 'ok'.tr,
+                          );
+                        },
+                        icon: Icon(
+                          Icons.help_outline,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const Spacer(),
+                      CustomSwitch(
+                        value: intervalEnabled,
+                        onChanged: (v) {
+                          if (v) {
+                            final ms = hours.clamp(1, 24) * 3600 * 1000;
+                            ctrl.updateSourceOptimistic(
+                              source,
+                              scanInterval: 1,
+                              scanIntervalMs: ms,
+                            );
+                          } else {
+                            ctrl.updateSourceOptimistic(
+                              source,
+                              scanInterval: 0,
+                              scanIntervalMs: 0,
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
                 ),
-                CustomSwitch(
-                  value: intervalEnabled,
-                  onChanged: (v) {
-                    if (v) {
-                      final ms = hours.clamp(1, 24) * 3600 * 1000;
-                      ctrl.updateSourceOptimistic(
-                        source,
-                        scanInterval: 1,
-                        scanIntervalMs: ms,
-                      );
-                    } else {
-                      ctrl.updateSourceOptimistic(
-                        source,
-                        scanInterval: 0,
-                        scanIntervalMs: 0,
-                      );
-                    }
-                  },
-                ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 180),
               child: intervalEnabled
                   ? Row(
                       key: const ValueKey('interval'),
                       children: [
-                        Text('video_source_scan_interval_hours'.tr),
+                        Text(
+                          'video_source_scan_interval_hours'.tr,
+                          style: theme.textTheme.bodySmall,
+                        ),
                         const Spacer(),
                         DropdownButton<int>(
+                          isDense: true,
                           value: hours.clamp(1, 24),
                           items: List.generate(
                             24,
@@ -932,7 +950,6 @@ class _SourceCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 

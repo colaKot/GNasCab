@@ -4,7 +4,10 @@ REM  GNasCab dev environment (project-local, NOT written to system env)
 REM  Usage:  call G:\work\nascab\tool\env.bat
 REM ============================================================
 set "TOOLCHAIN=G:\work\_toolchain"
-set "FLUTTER_ROOT=%TOOLCHAIN%\flutter-3.38.10\flutter"
+REM 2026-10-08 升级到 Flutter 3.47.5（Dart 3.13.4），旧版 3.38.10 仍在
+REM G:\work\_toolchain\flutter-3.38.10\flutter，需要回退就改这一行。
+REM 注意：新 SDK 解包后真身多一层，是 flutter-sdk\flutter，不是 flutter-sdk。
+set "FLUTTER_ROOT=%TOOLCHAIN%\flutter-sdk\flutter"
 set "JAVA_HOME=%TOOLCHAIN%\jdk17\jdk-17.0.20.1+1"
 set "ANDROID_HOME=%TOOLCHAIN%\android-sdk"
 set "ANDROID_SDK_ROOT=%TOOLCHAIN%\android-sdk"

@@ -86,7 +86,7 @@ dependencies:
   flutter_highlight: ^0.7.0
   qr_flutter: ^4.1.0
   qr_code_scanner: ^1.0.1
-  flutter_quill: ^11.5.0
+  flutter_quill: 11.6.0
   flutter_quill_extensions: ^11.0.0
   dart_quill_delta: ^10.8.3
   sqflite_common_ffi: ^2.3.7
@@ -103,7 +103,7 @@ dependencies:
   tray_manager: ^0.5.2
   flutter_read:
     path: packages/flutter_read
-  pdfrx: ^2.2.24
+  pdfrx: 2.6.5
   flutter_local_notifications: ^21.0.0
   flutter_quill_to_pdf: ^2.3.9
   pdf: ^3.12.0
@@ -111,6 +111,7 @@ dependencies:
   # 目录同步核心：与 sync_client（Windows 独立同步客户端）共用同一份实现
   nascab_sync_core:
     path: ../packages/nascab_sync_core
+  flex_color_scheme: 8.4.0
 
 dependency_overrides:
   # 覆盖 pub 版：修复 Android MediaSession.onPlayPause 未转发（桌面小组件/部分系统播放暂停键无响应）

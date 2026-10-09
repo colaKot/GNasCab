@@ -254,6 +254,7 @@
       "VIDEO_LIBRARY_LIST_FAILED": "Не удалось получить медиатеки",
       "VIDEO_LIBRARY_ADD_SUCCESS": "Медиатека создана",
       "VIDEO_LIBRARY_UPDATE_SUCCESS": "Медиатека обновлена",
+      "VIDEO_LIBRARY_UPDATE_FAILED": "Не удалось обновить видеотеку",
       "VIDEO_LIBRARY_DELETE_SUCCESS": "Медиатека удалена",
       "VIDEO_LIBRARY_NAME_EXISTS": "Медиатека с таким названием уже существует",
       "VIDEO_LIBRARY_NOT_FOUND": "Медиатека не найдена",

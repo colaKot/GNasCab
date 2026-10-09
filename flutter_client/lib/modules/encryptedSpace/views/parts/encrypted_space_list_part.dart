@@ -7,10 +7,12 @@ class _EncryptedSpaceListTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return SizedBox(
       height: 40,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.only(left: 8, right: 8 + ctrlW),
         child: Row(
           children: [
             const Spacer(),
