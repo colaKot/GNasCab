@@ -19,9 +19,19 @@ const IMAGENET_STD = [0.229, 0.224, 0.225];
 
 const MODEL_PATH = () => path.resolve(remoteAssets.resolveOnnxModelsRoot(), 'places365', 'resnet50_places365.onnx');
 const LABELS_PATH = () => path.resolve(remoteAssets.resolveOnnxModelsRoot(), 'places365', 'categories_places365.txt');
+/**
+ * 场景标签的中文映射（每行 `<英文标签>\t<中文>`）。
+ *
+ * ⭐ 为什么需要：原始标签是英文（beach / mountain_snowy ...），
+ * 而用户搜的是中文 ⇒ 场景识别结果根本没法被中文搜索命中。
+ * 有了它，labelByIndex 直接返回中文，存储/展示/搜索三处一起变中文。
+ * 文件缺失时自动降级为英文，不会报错。
+ */
+const ZH_LABELS_PATH = () => path.resolve(remoteAssets.resolveOnnxModelsRoot(), 'places365', 'categories_places365.zh.txt');
 const PLACES365_BUNDLE_ID = 'onnx_models.places365';
 
 let _labels = null;
+let _zhLabelMap = null;
 let _sessionPromise = null;
 let _places365ReadyPromise = null;
 let _inputName = null;
@@ -84,11 +94,63 @@ function _parsePlaces365Categories(text) {
   return { labelByIndex, canonicalIdByIndex };
 }
 
+/**
+ * 读中文映射表。失败或文件不存在时返回空 Map（调用方降级为英文，不抛错）。
+ * key 统一成「下划线原样」，因为磁盘上的标签文件就是下划线写法。
+ */
+async function _loadZhLabelMap() {
+  if (_zhLabelMap) return _zhLabelMap;
+  const map = new Map();
+  try {
+    const text = await fs.promises.readFile(ZH_LABELS_PATH(), 'utf8');
+    for (const raw of text.split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      const tab = line.indexOf('\t');
+      if (tab <= 0) continue;
+      const key = line.slice(0, tab).trim();
+      const zh = line.slice(tab + 1).trim();
+      if (key && zh) map.set(key, zh);
+    }
+    Logger.info(`[placesUtil] 场景标签中文映射已加载: ${map.size} 条`);
+  } catch (e) {
+    Logger.warn(`[placesUtil] 中文标签映射不可用，回退英文: ${e && e.message ? e.message : e}`);
+  }
+  _zhLabelMap = map;
+  return _zhLabelMap;
+}
+
 async function getPlaces365Labels() {
   if (_labels) return _labels;
   await ensurePlaces365Ready();
   const text = await fs.promises.readFile(LABELS_PATH(), 'utf8');
-  _labels = _parsePlaces365Categories(text);
+  const parsed = _parsePlaces365Categories(text);
+
+  // ⭐ 把英文标签换成中文。enLabelByIndex 保留英文，供英文搜索/兼容旧数据。
+  const zhMap = await _loadZhLabelMap();
+  const labelByIndex = Array.isArray(parsed.labelByIndex) ? parsed.labelByIndex.slice() : [];
+  const enLabelByIndex = Array.isArray(parsed.labelByIndex) ? parsed.labelByIndex.slice() : [];
+  let translated = 0;
+  for (let i = 0; i < labelByIndex.length; i += 1) {
+    const en = enLabelByIndex[i];
+    if (!en) continue;
+    // 解析后的标签是「空格」形式（beach house），映射文件用「下划线」（beach_house）
+    const key = String(en).trim().replace(/\s+/g, '_');
+    const zh = zhMap.get(key);
+    if (zh) {
+      labelByIndex[i] = zh;
+      translated += 1;
+    }
+  }
+  if (translated > 0) {
+    Logger.info(`[placesUtil] 场景标签已中文化: ${translated} 个`);
+  }
+
+  _labels = {
+    labelByIndex,
+    enLabelByIndex,
+    canonicalIdByIndex: parsed.canonicalIdByIndex,
+  };
   return _labels;
 }
 

@@ -6,6 +6,7 @@ import 'package:GNasCab/modules/video/media_browser/view/parts/video_media_grid.
 import 'package:GNasCab/modules/video/media_browser/view/video_media_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 
 /// 图片库 / 混合库的浏览页：网格缩略图 + 竖向全屏浏览
 class VideoMediaBrowserPage extends StatefulWidget {
@@ -127,8 +128,10 @@ class _VideoMediaBrowserPageState extends State<VideoMediaBrowserPage> {
   }
 
   Widget _buildTopBar(ThemeData theme, VideoListController ctrl) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：搜索框被 Spacer 推到最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: EdgeInsets.fromLTRB(16, 12, 16 + ctrlW, 8),
       child: Row(
         children: [
           Text(widget.title, style: theme.textTheme.titleMedium),

@@ -299,7 +299,7 @@ class NotesSidebar extends StatelessWidget {
                             Icons.more_horiz_rounded,
                             size: 18,
                             color: selected
-                                ? Colors.white.withValues(alpha: 0.92)
+                                ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.92)
                                 : Theme.of(
                                     context,
                                   ).colorScheme.onSurfaceVariant,
@@ -326,7 +326,7 @@ class NotesSidebar extends StatelessWidget {
   }) {
     final scheme = Theme.of(context).colorScheme;
     final bg = selected ? scheme.primary : Colors.transparent;
-    final fg = selected ? Colors.white : scheme.onSurface;
+    final fg = selected ? scheme.onPrimary : scheme.onSurface;
     final tileChild = Padding(
       padding: EdgeInsets.symmetric(
         horizontal: collapsed ? 8 : 10,
@@ -407,7 +407,7 @@ class NotesSidebar extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: selected
-            ? Colors.white.withValues(alpha: 0.18)
+            ? scheme.onPrimary.withValues(alpha: 0.18)
             : scheme.primary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(7),
       ),

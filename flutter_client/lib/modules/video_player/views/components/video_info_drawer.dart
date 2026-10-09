@@ -184,6 +184,15 @@ class _VideoInfoDrawerState extends State<VideoInfoDrawer> {
                           textColor,
                           subTextColor,
                         ),
+                        Obx(
+                          () => Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: _buildBitrateRows(
+                              textColor,
+                              subTextColor,
+                            ),
+                          ),
+                        ),
 
                         const SizedBox(height: 24),
 
@@ -207,6 +216,41 @@ class _VideoInfoDrawerState extends State<VideoInfoDrawer> {
       title,
       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: color),
     );
+  }
+
+  /// 码率行：原画时只显示一行；转码时同时显示「原始码率」与「转码码率」。
+  List<Widget> _buildBitrateRows(Color textColor, Color subTextColor) {
+    final ctrl = widget.playerController;
+    final source = ctrl.sourceBitrateText;
+    final transcode = ctrl.transcodeBitrateText;
+    if (transcode == null) {
+      // 原画（或拿不到转码信息）：只报原始码率
+      final text = source;
+      if (text == null || text.isEmpty) return const [];
+      return [
+        _buildInfoRow(
+          'player_info_bitrate'.tr,
+          text,
+          textColor,
+          subTextColor,
+        ),
+      ];
+    }
+    final rows = <Widget>[
+      _buildInfoRow(
+        'player_info_source_bitrate'.tr,
+        (source == null || source.isEmpty) ? '-' : source,
+        textColor,
+        subTextColor,
+      ),
+      _buildInfoRow(
+        'player_info_transcode_bitrate'.tr,
+        transcode,
+        textColor,
+        subTextColor,
+      ),
+    ];
+    return rows;
   }
 
   Widget _buildInfoRow(

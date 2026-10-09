@@ -2,6 +2,36 @@ part of '../video_player_controller.dart';
 
 /// 保存和读取用户对当前视频的偏好 如字幕索引 声轨索引
 extension PlayerPreference on PlayerController {
+  /// 拉取服务端配置的「默认播放画质」（影视设置页写入，服务端级配置）。
+  ///
+  /// 只在打开播放列表时拉一次；失败/未配置都保持 'original'（沿用历史行为）。
+  /// 该接口对所有登录用户开放，子账号的播放端同样遵守。
+  Future<void> loadDefaultPlayQuality() async {
+    _defaultPlayQuality = 'original';
+    final baseUrl = ApiController.instance.baseUrl;
+    final token = ApiController.instance.accessToken;
+    try {
+      final res = await HttpUtil.post(
+        '$baseUrl/api/video/getPlayQuality',
+        body: {},
+        headers: token != null ? {'Authorization': 'Bearer $token'} : null,
+      );
+      if (!res.isOk) return;
+      final data = res.json;
+      if (data == null) return;
+      final payload = data['data'];
+      if (payload is! Map) return;
+      final quality = payload['quality']?.toString().trim() ?? '';
+      if (quality.isEmpty || !qualityOptions.contains(quality)) return;
+      _defaultPlayQuality = quality;
+    } catch (_) {}
+  }
+
+  /// 新开一段播放（非 seek/非手动切画质）时套用配置的默认画质。
+  void applyDefaultPlayQualityForNewPlayback() {
+    currentQuality.value = _defaultPlayQuality;
+  }
+
   Future<void> saveProgress() async {
     if (playlist.isEmpty || currentIndex.value >= playlist.length) return;
     final fileInfo = playlist[currentIndex.value];

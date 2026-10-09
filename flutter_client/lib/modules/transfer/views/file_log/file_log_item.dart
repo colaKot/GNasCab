@@ -161,7 +161,7 @@ class FileLogItem extends StatelessWidget {
                       children: [
                         CircularProgressIndicator(
                           value: progress,
-                          backgroundColor: Colors.grey[200],
+                          backgroundColor: theme.dividerColor,
                           valueColor: AlwaysStoppedAnimation<Color>(
                             statusColor,
                           ),
@@ -346,7 +346,7 @@ class FileLogItem extends StatelessWidget {
                     children: [
                       CircularProgressIndicator(
                         value: progress,
-                        backgroundColor: Colors.grey[200],
+                        backgroundColor: theme.dividerColor,
                         valueColor: AlwaysStoppedAnimation<Color>(statusColor),
                         strokeWidth: 3,
                       ),

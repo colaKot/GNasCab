@@ -23,6 +23,20 @@ class VideoLeftMenu extends StatelessWidget {
     final isAdmin = CurrentUserController.instance.isAdmin;
 
     return Obx(() {
+      // ⭐ 只显示「有内容」的影视库（2026-10-09）：
+      //   ① 库本身没内容（还没扫描 / 没配来源）
+      //   ② 子账号对该库的**所有来源都没有权限**
+      //      —— 服务端 counts 是按「用户可见路径」统计的，无权时天然就是 0
+      //   两种情况都表现为 totalCount == 0，所以一个条件就够。
+      //   ⚠️ 不要用 sourceCount 判断：它只表示「该库配了几个来源」，
+      //      子账号没有权限时它依然 > 0，判不出来。
+      //   ⛔ 这里**不做「全空则回退显示全部」的兜底**：那会在子账号对本模块所有库
+      //      都无权限时，把全部库（含无权库）重新放出来 —— 正是本需求要避免的行为。
+      //      库列表全空时左侧栏仍有「首页 / 历史 / 收藏 / 文件浏览」可用，不会整栏空白。
+      final visibleLibs = controller.libraries
+          .where((l) => l.totalCount > 0)
+          .toList();
+
       // 首页 + 动态影视库栏目 + 历史 / 收藏 / 文件
       final libraryItems = <TwoLevelSideMenuItem>[
         TwoLevelSideMenuItem(
@@ -30,8 +44,9 @@ class VideoLeftMenu extends StatelessWidget {
           key: 'library.home',
           icon: Icons.home_outlined,
         ),
-        // ⭐ 左侧栏显示**全部**影视库，不按「主页显示」过滤（2026-10-09 铁柱纠正）
-        for (final lib in controller.libraries)
+        // 左侧栏按「有内容 + 有权限」过滤，但**不受「主页显示」开关影响**
+        // （2026-10-09 铁柱纠正：左侧栏不管有没有开主页显示都要显示）。
+        for (final lib in visibleLibs)
           TwoLevelSideMenuItem(
             title: lib.displayName,
             key: VideoMainController.libraryKeyOf(lib.id),

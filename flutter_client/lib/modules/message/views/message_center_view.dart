@@ -470,7 +470,7 @@ class _MessageCenterViewState extends State<MessageCenterView> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.error,
-          foregroundColor: Colors.white,
+          foregroundColor: theme.colorScheme.onError,
         ),
       );
     });

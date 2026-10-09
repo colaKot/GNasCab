@@ -133,7 +133,7 @@ function buildHttpError(msgKey, statusCode) {
 }
 
 class FileServerController {
-  async _startFileServerByIpc({ serverType, restart }) {
+  _startFileServerByIpc = async ({ serverType, restart }) => {
     const serverTypeStr = serverType === undefined || serverType === null ? '' : String(serverType).trim();
     if (!serverTypeStr) throw buildHttpError('common.INVALID_PARAMS', 400);
 
@@ -152,9 +152,9 @@ class FileServerController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
-  async _stopFileServerByIpc({ serverType }) {
+  _stopFileServerByIpc = async ({ serverType }) => {
     const serverTypeStr = serverType === undefined || serverType === null ? '' : String(serverType).trim();
     if (!serverTypeStr) throw buildHttpError('common.INVALID_PARAMS', 400);
 
@@ -173,7 +173,7 @@ class FileServerController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
   async getPorts(req, res) {
     try {

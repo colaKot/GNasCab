@@ -13,7 +13,8 @@ python/env/python-mac-arm64/**/*
 python/env/python-win-x64/**/*
 database/**/*
 test/**/*
-dist/**/*
+# 构建产物：dist 是默认输出，dist_vN 是绕开回收站限制时的备用输出目录
+dist*/**/*
 src/workers/ai/faces/insightface-master/**/*
 src/workers/ai/faces/debug_landmark/**/*
 web/main/**/*

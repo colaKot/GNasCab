@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:GNasCab/core/theme/app_skin.dart';
+import 'package:GNasCab/core/theme/skin_presets.dart';
 import '../pc_home_controller.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/theme/dark_theme.dart';
@@ -55,10 +57,16 @@ class PcAppWindow extends StatefulWidget {
 
   /// ⭐⭐ 窗口按钮组占用宽度（2026-10-09）。
   /// 顶部有元素、且该元素要靠右的 app 顶栏，必须用这个值做水平让位。
-  /// ⚠️ 这是一个**兜底常量**；app 视图内部优先用
-  /// `PcWindowScope.of(context)?.titleBarControlsWidth`（能跟随实例）。
+  /// ⚠️ 这是一个**兜底常量**（取默认皮肤）；app 视图内部优先用
+  /// `PcWindowScope.of(context)?.titleBarControlsWidth`（能跟随实例/皮肤）。
   static double get titleBarControlsWidth =>
-      _TrafficLightButtonsState.totalWidth;
+      SkinPresets.defaultSkin.titleBarControlsWidth;
+
+  /// ⭐⭐ 标题栏高度（2026-10-09 换肤）：跟随当前皮肤。
+  /// ⚠️ 静态常量 [titleBarHeight] 只是**默认皮肤兜底**；有 context 的地方一律走这里，
+  /// 否则切换皮肤（如「紧凑」标题栏变矮）后垂直让位会对不上。
+  static double titleBarHeightFor(BuildContext context) =>
+      Theme.of(context).extension<AppSkin>()?.titleBarHeight ?? titleBarHeight;
 
   @override
   State<PcAppWindow> createState() => _PcAppWindowState();
@@ -100,9 +108,11 @@ class _PcAppWindowState extends State<PcAppWindow> {
   Widget _buildWindow(BuildContext context) {
     final ctrl = PcHomeController.instance;
     final theme = Theme.of(context);
+    // ⭐ 外观皮肤：窗口圆角 / 标题栏高度 / 右上角按钮造型都从这里取（2026-10-09）
+    final skin = theme.extension<AppSkin>() ?? SkinPresets.defaultSkin;
     final isVideoPlayer = widget.windowId == 'video_player';
     final canResize = ctrl.windowCanResize(widget.windowId);
-    const outerRadius = 16.0;
+    final outerRadius = skin.windowRadius;
     final themeBackgroundColor = isVideoPlayer
         ? Colors.black
         : theme.scaffoldBackgroundColor;
@@ -113,8 +123,8 @@ class _PcAppWindowState extends State<PcAppWindow> {
 
     final appContent = PcWindowScope(
       windowId: widget.windowId,
-      // ⭐ 让子树能读到按钮组宽度，右侧元素据此让位
-      titleBarControlsWidth: _TrafficLightButtonsState.totalWidth,
+      // ⭐ 让子树能读到按钮组宽度，右侧元素据此让位（跟随皮肤）
+      titleBarControlsWidth: skin.titleBarControlsWidth,
       child: widget.viewBuilder(context),
     );
 
@@ -150,7 +160,7 @@ class _PcAppWindowState extends State<PcAppWindow> {
         clipBehavior: Clip.antiAlias,
         child: CustomInsetBorderShell(
           radius: outerRadius,
-          borderWidth: 0.5,
+          borderWidth: skin.windowBorderWidth,
           borderColor: frameColor,
           backgroundColor: themeBackgroundColor,
           child: Listener(
@@ -163,7 +173,7 @@ class _PcAppWindowState extends State<PcAppWindow> {
                   left: 0,
                   top: 0,
                   right: 0,
-                  height: PcAppWindow.titleBarHeight,
+                  height: skin.titleBarHeight,
                   child: _DragArea(
                     windowId: widget.windowId,
                     checkInteractive: _hasInteractiveContentAt,
@@ -183,17 +193,19 @@ class _PcAppWindowState extends State<PcAppWindow> {
                 // 顶层：窗口控制按钮（右上角，Windows 习惯）
                 Positioned(
                   right: 12,
-                  top:
-                      (PcAppWindow.titleBarHeight -
-                          _TrafficLightButtonsState._btnHeight) /
-                      2,
+                  top: (skin.titleBarHeight - skin.titleBarButtonHeight) / 2,
                   child: _TrafficLightButtons(
                     windowId: widget.windowId,
+                    skin: skin,
                     canMinimize: ctrl.windowCanMinimize(widget.windowId),
                     canMaximize: ctrl.windowCanMaximize(widget.windowId),
                   ),
                 ),
-                // 右上角已让给窗口控制按钮，角标换到左上角与左下角标呼应
+                // 右上角已让给窗口控制按钮，角标换到左上角与左下角标呼应。
+                // ⚠️ 必须 `flipX`：`window_right_corner.png` 的点阵贴在图片的**右上角**
+                // （左边那个 `window_left_corner.png` 贴在左下角，所以左下角直接用是对的）。
+                // 当初从左下搬到左上时漏了镜像，于是这条点阵方向看着是**反的**
+                //（铁柱：「左上角有个拉伸的小图案，但是反了」）。
                 if (canResize)
                   Positioned(
                     left: 1.6,
@@ -203,16 +215,19 @@ class _PcAppWindowState extends State<PcAppWindow> {
                       child: SizedBox(
                         width: 20,
                         height: 20,
-                        child: Image.asset(
-                          'assets/icons/home/window_right_corner.png',
-                          width: 16,
-                          height: 16,
-                          color:
-                              (isVideoPlayer
-                                      ? Colors.white
-                                      : theme.colorScheme.onSurface)
-                                  .withValues(alpha: 0.5),
-                          fit: BoxFit.contain,
+                        child: Transform.flip(
+                          flipX: true,
+                          child: Image.asset(
+                            'assets/icons/home/window_right_corner.png',
+                            width: 16,
+                            height: 16,
+                            color:
+                                (isVideoPlayer
+                                        ? Colors.white
+                                        : theme.colorScheme.onSurface)
+                                    .withValues(alpha: 0.5),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
@@ -429,11 +444,15 @@ class _DragAreaState extends State<_DragArea> {
 
 class _TrafficLightButtons extends StatefulWidget {
   final String windowId;
+
+  /// ⭐ 外观皮肤：按钮造型 / 尺寸由它决定（2026-10-09）
+  final AppSkin skin;
   final bool canMinimize;
   final bool canMaximize;
 
   const _TrafficLightButtons({
     required this.windowId,
+    required this.skin,
     required this.canMinimize,
     required this.canMaximize,
   });
@@ -445,18 +464,11 @@ class _TrafficLightButtons extends StatefulWidget {
 class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
   bool _isHovering = false;
 
-  /// ⭐ 扁平化按钮尺寸（2026-10-09）。
-  /// 原先是 12×12 圆点 + 8 间距，在40px 标题栏里又小又圆，视觉上像三个小点。
-  /// 现在改成 **24×16 圆角矩形**，宽扁造型更贴Windows 11 / macOS 现代窗口。
-  static const double _btnWidth = 24.0;
-  static const double _btnHeight = 16.0;
-  static const double _spacing = 4.0;
-  static const double _iconSize = 11.0;
-
-  /// ⭐⭐ 按钮组在标题栏里占的总宽度（含间距 + 右侧留白）。
-  /// 各 app 的顶栏要靠它做**水平让位**，否则右侧元素会被按钮压住。
-  /// 用 `PcWindowScope.of(context)?.titleBarControlsWidth` 取，不要写死数字。
-  static double get totalWidth => _btnWidth * 3 + _spacing * 2 + 12;
+  /// ⭐ 按钮尺寸全部来自皮肤（2026-10-09）：
+  /// - Windows 11：24×16 宽扁圆角矩形
+  /// - macOS：14×14 圆形交通灯
+  /// - 极简：更小更方
+  AppSkin get _skin => widget.skin;
 
   bool get _isFocused =>
       PcHomeController.instance.topmostApp == widget.windowId;
@@ -467,6 +479,13 @@ class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
   static const Color _closeBase = Color(0xFFFF5F57);
   static const Color _minimizeBase = Color(0xFFFFBD2E);
   static const Color _maximizeBase = Color(0xFF28CA41);
+
+  /// 按钮圆角：macOS 皮肤 = 正圆；极简 = 更方的 2；Windows = 控件圆角（扁平）
+  double get _radius => switch (_skin.titleBarButtonStyle) {
+    AppTitleBarButtonStyle.macos => _skin.titleBarButtonHeight / 2,
+    AppTitleBarButtonStyle.minimal => 2,
+    AppTitleBarButtonStyle.windows => AppRadius.control,
+  };
 
   /// 窗口未聚焦时统一压成中性灰（保留一点原色相，避免三个点糊成一团）
   Color _dotColor(Color activeColor, Brightness brightness) {
@@ -502,12 +521,12 @@ class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
 
     final child = AnimatedContainer(
       duration: const Duration(milliseconds: 120),
-      width: _btnWidth,
-      height: _btnHeight,
+      width: _skin.titleBarButtonWidth,
+      height: _skin.titleBarButtonHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        // ⭐ 扁平化：圆角只留 4px，不再是圆形
-        borderRadius: BorderRadius.circular(AppRadius.control),
+        // 造型由皮肤决定：Windows 扁平圆角 / macOS 正圆
+        borderRadius: BorderRadius.circular(_radius),
         color: showIcon ? _hoverColor(activeColor, brightness) : color,
       ),
       child: AnimatedOpacity(
@@ -515,7 +534,7 @@ class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
         opacity: showIcon ? 1 : 0,
         child: Icon(
           icon,
-          size: _iconSize,
+          size: _skin.titleBarButtonIconSize,
           color: brightness == Brightness.dark
               ? const Color(0xFF1A1A1A)
               : const Color(0xFFFFFFFF),
@@ -566,7 +585,7 @@ class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
             icon: Icons.remove,
             tooltip: 'home_window_min'.tr,
           ),
-          SizedBox(width: _spacing),
+          SizedBox(width: _skin.titleBarButtonSpacing),
           _buildButton(
             activeColor: _maximizeBase,
             onTap: widget.canMaximize
@@ -577,7 +596,7 @@ class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
                 ? 'home_window_restore'.tr
                 : 'home_window_max'.tr,
           ),
-          SizedBox(width: _spacing),
+          SizedBox(width: _skin.titleBarButtonSpacing),
           _buildButton(
             activeColor: _closeBase,
             onTap: () => ctrl.closeApp(widget.windowId),

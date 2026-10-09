@@ -84,7 +84,7 @@ class TransmissionController {
     this.rpc = new TransmissionRpcClient();
   }
 
-  async _startByIpc({ restart }) {
+  _startByIpc = async ({ restart }) => {
     const requestId = `startTransmission_${Date.now()}_${Math.random().toString(16).slice(2)}`;
     const wait = waitForIpcResponse({ requestId, responseType: 'startTransmissionResponse', timeoutMs: 25000 });
     process.send({
@@ -97,9 +97,9 @@ class TransmissionController {
       throw buildHttpError(data.error || 'transmission.START_FAILED', 500);
     }
     return data;
-  }
+  };
 
-  async _stopByIpc() {
+  _stopByIpc = async () => {
     const requestId = `stopTransmission_${Date.now()}_${Math.random().toString(16).slice(2)}`;
     const wait = waitForIpcResponse({ requestId, responseType: 'stopTransmissionResponse', timeoutMs: 15000 });
     process.send({
@@ -112,9 +112,9 @@ class TransmissionController {
       throw buildHttpError(data.error || 'transmission.STOP_FAILED', 500);
     }
     return data;
-  }
+  };
 
-  async _getStatusByIpc() {
+  _getStatusByIpc = async () => {
     const requestId = `getTransmissionStatus_${Date.now()}_${Math.random().toString(16).slice(2)}`;
     const wait = waitForIpcResponse({ requestId, responseType: 'getTransmissionStatusResponse', timeoutMs: 10000 });
     process.send({
@@ -123,7 +123,7 @@ class TransmissionController {
       timestamp: Date.now(),
     });
     return wait;
-  }
+  };
 
   async getStatus(req, res) {
     try {

@@ -9,6 +9,7 @@ import '../../controller/video_detail_controller.dart';
 import '../../../../base/components/custom_extended_image.dart';
 import '../../../base/video_utils/video_utils.dart';
 import '../../../video_main/controller/video_main_controller.dart';
+import 'media_flags_badge_row.dart';
 
 /// 顶部大图区域：背景海报 + 渐变遮罩 + 标题/评分/元信息。
 class VideoDetailTopSection extends StatelessWidget {
@@ -178,29 +179,17 @@ class VideoDetailTopSection extends StatelessWidget {
                           ),
                       ],
                     ),
-                    if (resLabel.isNotEmpty)
+                    // 分辨率 + HDR / 杜比徽章。分辨率文字作为首枚徽章传入，避免 4K 重复出现两次。
+                    if (MediaFlagsBadgeRow.willRender(
+                      ctrl.mediaFlags,
+                      leadingLabel: resLabel,
+                    ))
                       Positioned(
                         right: 0,
                         bottom: 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.45),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.22),
-                            ),
-                          ),
-                          child: Text(
-                            resLabel,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                        child: MediaFlagsBadgeRow(
+                          flags: ctrl.mediaFlags,
+                          leadingLabel: resLabel,
                         ),
                       ),
                   ],

@@ -53,16 +53,16 @@ function mapStartStopErrorToResponse(errorCode) {
 }
 
 class FileBackupController {
-  async _reloadByIpc() {
+  _reloadByIpc = async () => {
     if (typeof process.send !== 'function') return { ok: true, skipped: true };
     const requestId = `reloadFileBackupTasks_${Date.now()}_${Math.random().toString(16).slice(2)}`;
     const wait = waitForIpcResponse({ requestId, responseType: 'reloadFileBackupTasksResponse', timeoutMs: 8000 });
     process.send({ type: 'reloadFileBackupTasks', data: { requestId }, timestamp: Date.now() });
     const data = await wait;
     return data;
-  }
+  };
 
-  async _startByIpc({ id }) {
+  _startByIpc = async ({ id }) => {
     const idNum = Number(id);
     if (!Number.isFinite(idNum) || idNum <= 0) throw buildHttpError('common.INVALID_PARAMS', 400);
     if (typeof process.send !== 'function') throw buildHttpError('common.ERROR', 500);
@@ -75,9 +75,9 @@ class FileBackupController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
-  async _stopByIpc({ id }) {
+  _stopByIpc = async ({ id }) => {
     const idNum = Number(id);
     if (!Number.isFinite(idNum) || idNum <= 0) throw buildHttpError('common.INVALID_PARAMS', 400);
     if (typeof process.send !== 'function') throw buildHttpError('common.ERROR', 500);
@@ -90,7 +90,7 @@ class FileBackupController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
   async list(req, res) {
     try {

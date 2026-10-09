@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../modules/base/components.dart';
 import 'recover_password_controller.dart';
-import '../../../../core/bg/background_controller.dart';
-import '../../../../core/theme/dark_theme.dart';
 import '../../../../utils/dimens_util.dart';
 import '../../../../utils/dialog_util.dart';
 
@@ -27,18 +25,12 @@ class RecoverView extends GetView<RecoverPasswordController> {
     RecoverPasswordController controller,
   ) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           return Scaffold(
             body: Obx(
-              () => Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(BackgroundController.instance.loginBgUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              () => AuthThemeBackground(
                 child: _buildCenterView(context),
               ),
             ),
@@ -187,14 +179,14 @@ class RecoverView extends GetView<RecoverPasswordController> {
                                         : controller.handleRecover,
                                     isDisabled: controller.isLoading.value,
                                     icon: controller.isLoading.value
-                                        ? const SizedBox(
+                                        ? SizedBox(
                                             width: 20,
                                             height: 20,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               valueColor:
                                                   AlwaysStoppedAnimation<Color>(
-                                                    Colors.white,
+                                                    theme.colorScheme.onPrimary,
                                                   ),
                                             ),
                                           )

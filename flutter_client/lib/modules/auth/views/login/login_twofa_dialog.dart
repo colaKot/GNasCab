@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/theme/dark_theme.dart';
 import '../../../../utils/dimens_util.dart';
 import '../../../../utils/dialog_util.dart';
 
@@ -26,7 +25,7 @@ class _TwofaCodeDialogState extends State<TwofaCodeDialog> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           final theme = Theme.of(context);
@@ -68,7 +67,7 @@ class _TwofaCodeDialogState extends State<TwofaCodeDialog> {
                     onTap: () {
                       Get.dialog(
                         Theme(
-                          data: darkTheme,
+                          data: Theme.of(context),
                           child: AlertDialog(
                             title: Text('auth_2fa_cannot_verify'.tr),
                             content: Text('auth_2fa_cannot_verify_hint'.tr),

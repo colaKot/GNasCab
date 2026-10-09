@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../base/components/custom_bordered_icon_button.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';
+import '../../../../home/views/pc_components/pc_app_window.dart';
 import '../../../../../../utils/popup_menu_util.dart';
 import '../../controller/book_custom_list_controller.dart';
 import 'book_custom_list_dialogs.dart';
@@ -28,9 +29,11 @@ class _BookCustomListTopBarState extends State<BookCustomListTopBar> {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>();
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：搜索栏被 Spacer/Align 推到最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Container(
       height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.fromLTRB(16, 0, 16 + ctrlW, 0),
       decoration: BoxDecoration(
         color: customColors!.mainContentBgColor,
         borderRadius: BorderRadius.vertical(

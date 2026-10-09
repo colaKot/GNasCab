@@ -237,7 +237,7 @@ class _UserInfoDialogState extends State<UserInfoDialog> {
                   label: Text('home_status_logout'.tr),
                   style: FilledButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: theme.colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

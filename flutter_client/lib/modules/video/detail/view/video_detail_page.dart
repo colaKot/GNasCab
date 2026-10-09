@@ -9,6 +9,7 @@ import '../../../../utils/dialog_util.dart';
 import '../../../../utils/device_utils.dart';
 import '../controller/video_detail_controller.dart';
 import 'parts/app_video_detail_body.dart';
+import 'parts/media_flags_badge_row.dart';
 import 'parts/video_detail_body.dart';
 
 class VideoDetailPage extends StatefulWidget {
@@ -107,7 +108,7 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                           ? AppVideoDetailBody(ctrl: ctrl)
                           : VideoDetailBody(ctrl: ctrl),
                     ),
-                    //顶部栏：左侧分辨率标签 + 右侧关闭按钮
+                    //顶部栏：左侧分辨率 + HDR/杜比徽章，右侧关闭按钮
                     Positioned(
                       left: closeSide,
                       right: closeSide,
@@ -115,24 +116,19 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          if (isPhone && resLabel.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.45),
-                                borderRadius: BorderRadius.circular(999),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.22),
-                                ),
-                              ),
-                              child: Text(
-                                resLabel,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
+                          if (isPhone &&
+                              MediaFlagsBadgeRow.willRender(
+                                ctrl.mediaFlags,
+                                leadingLabel: resLabel,
+                              ))
+                            Flexible(
+                              child: MediaFlagsBadgeRow(
+                                flags: ctrl.mediaFlags,
+                                leadingLabel: resLabel,
+                                fontSize: 12,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 9,
+                                  vertical: 5,
                                 ),
                               ),
                             ),

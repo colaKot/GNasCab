@@ -255,7 +255,7 @@ class _PcWallpaperPickerViewState extends State<PcWallpaperPickerView> {
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: theme.colorScheme.error,
-              foregroundColor: Colors.white,
+              foregroundColor: theme.colorScheme.onError,
             ),
             onPressed: () => Get.back(result: true),
             child: Text('delete'.tr),
@@ -370,7 +370,7 @@ class _PcWallpaperPickerViewState extends State<PcWallpaperPickerView> {
                 onPressed: _mode == 'fixed' && _selectedName == null
                     ? null
                     : _apply,
-                child: Text('home_wallpaper_apply'.tr, style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white)),
+                child: Text('home_wallpaper_apply'.tr),
               ),
             ],
           ),
@@ -472,10 +472,10 @@ class _PcWallpaperPickerViewState extends State<PcWallpaperPickerView> {
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       padding: const EdgeInsets.all(2),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.check,
                                         size: 16,
-                                        color: Colors.white,
+                                        color: theme.colorScheme.onPrimary,
                                       ),
                                     ),
                                   ),

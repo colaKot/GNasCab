@@ -177,6 +177,12 @@ extension PlayerControls on PlayerController {
     //（否则 Safari+HEVC 手动切「原画」会跳过自动转码，仅原生探测后报错；与首次打开行为不一致）
     if (kIsWeb) {
       checkWebIfNeedTranscode();
+      // 手动选的档位被 Web 兼容规则强制改写为兜底转码画质时给出提示，
+      // 避免用户误以为「切换画质失效」（仅提示，不改变行为）。
+      if (currentQuality.value != quality &&
+          currentQuality.value == fallbackTranscodeQuality) {
+        ToastUtil.show('video_auto_transcode_tip'.tr);
+      }
     } else if (defaultTargetPlatform == TargetPlatform.android) {
       checkAndroidIfNeedTranscode();
       applyAndroidFvpEngineIfNeeded();

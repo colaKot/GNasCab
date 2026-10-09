@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "Paramètres TMDB enregistrés",
       "TRANSCODE_CONFIG_SAVED": "Répertoire temporaire de transcodage enregistré",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "Qualité de lecture par défaut enregistrée",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "Le répertoire temporaire de transcodage n'existe pas",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "Le chemin temporaire de transcodage n'est pas un répertoire",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "Le répertoire temporaire de transcodage n'est pas accessible en écriture",

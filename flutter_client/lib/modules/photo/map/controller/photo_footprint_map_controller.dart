@@ -22,6 +22,28 @@ class PhotoFootprintMapController extends GetxController {
   final Rx<LatLng> center = const LatLng(34.0, 108.0).obs;
   final RxDouble zoom = 5.0.obs;
 
+  /// ⭐ marker 尺寸档位（0..3），由原始 [zoom] **量化**得到。
+  ///
+  /// ⚠️ 为什么要单独做一个 Rx：`onMapChanged` 在**拖动/缩放的每一帧**都会被调用，
+  /// 而 marker 尺寸只跟缩放档位有关。若 marker 直接读 `zoom.value`，
+  /// 每帧都会让 marker 层重建（N 个 marker × 每帧）⇒ 拖起来一顿一顿的。
+  /// 量化之后只有跨档（<5 / <7 / <8 / 其余）时才变一次。
+  final RxInt markerSizeTier = 0.obs;
+
+  /// 把连续缩放值映射成 marker 尺寸档位。档位与 `_markerSizeForTier` 一一对应。
+  static int markerSizeTierOf(double z) {
+    if (z < 5.0) return 0;
+    if (z < 7.0) return 1;
+    if (z < 8.0) return 2;
+    return 3;
+  }
+
+  /// 只在档位真的变了才写 Rx（避免无谓重建）
+  void _syncMarkerSizeTier() {
+    final t = markerSizeTierOf(zoom.value);
+    if (t != markerSizeTier.value) markerSizeTier.value = t;
+  }
+
   RxInt? mapRebuildSeed;
 
   Timer? _debounceTimer;
@@ -45,6 +67,7 @@ class PhotoFootprintMapController extends GetxController {
         zoom.value = z.toDouble();
       }
     }
+    _syncMarkerSizeTier();
     initData();
   }
 
@@ -92,6 +115,7 @@ class PhotoFootprintMapController extends GetxController {
   }) {
     center.value = mapCenter;
     zoom.value = zoomLevel;
+    _syncMarkerSizeTier();
 
     // 立即取消当前进行中的 bounds 请求，避免 P2P 通道被上一批大响应占满导致卡死
     _boundsCancel?.complete();
@@ -188,10 +212,14 @@ class PhotoFootprintMapController extends GetxController {
 
   LatLng markerPosition(PhotoMapIndexItem item) {
     final coord = mapCoordinate;
+    // ⭐ 优先用网格中心定位。代表照片是网格里 id 最大（最新）的那一张，坐标随机；
+    // 缩放换挡时同一个区域的 marker 会跳来跳去。格心才是稳定的聚合点位置。
+    final lat0 = item.cellLat ?? item.latitude;
+    final lng0 = item.cellLng ?? item.longitude;
     final (lat, lng) = CoordinateTransform.toMapCoordinate(
       coord,
-      item.latitude,
-      item.longitude,
+      lat0,
+      lng0,
     );
     return LatLng(lat, lng);
   }

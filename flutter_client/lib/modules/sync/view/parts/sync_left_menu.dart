@@ -73,32 +73,34 @@ class _SyncLeftMenu extends StatelessWidget {
             },
           ),
           const Spacer(),
-          if (!collapsed)
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: onCreate,
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(
-                    'sync_create_task'.tr,
-                    overflow: TextOverflow.ellipsis,
+          // Web 端不显示「创建同步任务」入口
+          if (!DeviceUtils.isWeb)
+            if (!collapsed)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onCreate,
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text(
+                      'sync_create_task'.tr,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: CustomIconButton(
+                  icon: Icons.add,
+                  tooltip: 'sync_create_task'.tr,
+                  onPressed: onCreate,
+                  buttonSize: 40,
+                  iconSize: 20,
+                ),
               ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: CustomIconButton(
-                icon: Icons.add,
-                tooltip: 'sync_create_task'.tr,
-                onPressed: onCreate,
-                buttonSize: 40,
-                iconSize: 20,
-              ),
-            ),
           const SizedBox(height: 8),
         ],
       ),

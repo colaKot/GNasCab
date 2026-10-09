@@ -18,6 +18,7 @@ import '../controller/photo_album_controller.dart';
 import '../models/photo_album_model.dart';
 import '../../timeline/view/pc_photo_timeline.dart';
 import 'dialogs/photo_album_create_edit_dialog.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 part 'parts/photo_album_list_dialogs_create_edit.dart';
 part 'parts/photo_album_list_dialogs_delete.dart';
 part 'parts/photo_album_list_top_bar.dart';

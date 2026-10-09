@@ -185,14 +185,19 @@ class _ErrorBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline, color: Colors.white),
+          Icon(
+            Icons.error_outline,
+            color: Theme.of(context).colorScheme.onError,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+              ).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onError,
+              ),
             ),
           ),
         ],

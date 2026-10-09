@@ -6,6 +6,7 @@ import '../../../../core/api/api_controller.dart';
 import '../../../../utils/device_utils.dart';
 import '../../../../utils/local_web_asset_server.dart';
 import '../../../base/components/custom_extended_image.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import '../../timeline/controller/photo_timeline_controller.dart';
 import '../../timeline/view/app_photo_timeline_view.dart';
 import '../../timeline/view/pc_photo_timeline.dart';
@@ -29,6 +30,8 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
   bool _nearbyTimelineVisible = false;
   String _nearbyTitle = '';
   String? _nearbyGeohash;
+  /// 内嵌时间轴沿用地图上这个 marker 的聚合档位（0 = 未知，回退默认 2km 逻辑）。
+  int _nearbyPrecision = 0;
   int _nearbyTimelineSeed = 0;
   int _lastMapRebuildSeed = -1;
   Uri? _localProxyBase;
@@ -44,26 +47,26 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
     super.dispose();
   }
 
-  double _markerSizeForCount(int count, double zoom) {
-    const minSize = 35.0;
-    var maxSize = 85.0;
-    const minCountForMax = 5;
-    const maxCountForMin = 200;
-    if (zoom < 5.0) {
-      maxSize = 40.0;
+  /// 足迹 marker 的尺寸：**同屏内所有 marker 一样大**。
+  ///
+  /// ⭐ 2026-10-09 改：以前按 `photoCount` 从 85px（≤5 张）线性缩到 35px（≥200 张），
+  /// 结果同一屏里大大小小混在一起，照片多的点缩到 35px 连缩略图都看不清。
+  /// 现在只保留「随缩放档位收缩」这一层（缩得太小时必须让位，否则 marker 互相压盖），
+  /// 同一缩放级别下所有 marker 等大，取的就是原来「大」的那一档尺寸。
+  ///
+  /// ⚠️ 入参是**档位**而不是原始 zoom（见 `PhotoFootprintMapController.markerSizeTierOf`）：
+  /// 直接读连续 zoom 会让 marker 层在拖动/缩放的每一帧重建，那是卡顿的主因。
+  double _markerSizeForTier(int tier) {
+    switch (tier) {
+      case 0:
+        return 40.0;
+      case 1:
+        return 60.0;
+      case 2:
+        return 70.0;
+      default:
+        return 85.0;
     }
-    if (zoom < 7.0) {
-      maxSize = 60.0;
-    }
-    if (zoom < 8.0) {
-      maxSize = 70.0;
-    }
-    if (count <= minCountForMax) return maxSize;
-    if (count >= maxCountForMin) return minSize;
-
-    final t =
-        (count - minCountForMax) / (maxCountForMin - minCountForMax).toDouble();
-    return (maxSize + (minSize - maxSize) * t).clamp(minSize, maxSize);
   }
 
   void _scheduleInitialFetch(PhotoFootprintMapController ctrl) {
@@ -85,6 +88,12 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
     return GetBuilder<PhotoFootprintMapController>(
       init: PhotoFootprintMapController(),
       builder: (ctrl) {
+        // ⭐ 快照（**在 Obx 之外**读）：initialCenter / initialZoom 只用于首帧初始化相机
+        // （FlutterMap 的 key 带 rebuildSeed，换瓦片服务器才会重建）。
+        // 放在 Obx 外读 ⇒ 平移/缩放时整个 Stack 不再重建。
+        // ⚠️ 别把这两行搬进 Obx，否则拖动时每帧重建整棵树（就是卡顿的主因）。
+        final initialCenter = ctrl.center.value;
+        final initialZoom = ctrl.zoom.value;
         return Obx(() {
           final isMobile = DeviceUtils.isMobile;
           final zi = ctrl.zoomInfo.value;
@@ -136,7 +145,10 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
 
           final minZoom = zi?.minZoom.toDouble() ?? 3.0;
           final maxZoom = zi?.maxZoom.toDouble() ?? 18.0;
-          final switchButtonTop = 10.0;
+          // ⭐ 让开标题栏：窗口按钮（最小化/最大化/关闭）在右上角，
+          // 「切换地图」浮动按钮若贴在 top:10 会被压住（2026-10-09）。
+          // 下移到标题栏之下（跟随皮肤标题栏高度）。
+          final switchButtonTop = PcAppWindow.titleBarHeightFor(context) + 8;
 
           _scheduleInitialFetch(ctrl);
           final customColors = Theme.of(context).extension<CustomColors>();
@@ -148,8 +160,8 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
                 key: ValueKey('photo_footprint_map_$rebuildSeed'),
                 mapController: _mapController,
                 options: MapOptions(
-                  initialCenter: ctrl.center.value,
-                  initialZoom: ctrl.zoom.value,
+                  initialCenter: initialCenter,
+                  initialZoom: initialZoom,
                   initialRotation: 0,
                   minZoom: minZoom,
                   maxZoom: maxZoom,
@@ -184,10 +196,16 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
                         );
                       },
                     ),
-                  MarkerLayer(
-                    markers: ctrl.items
-                        .map((e) => _markerFor(context, ctrl, e))
-                        .toList(),
+                  // ⭐ marker 层单独一个 Obx：只依赖 `items`（重新拉取才会变，已有 650ms 防抖）
+                  // 和 `markerSizeTier`（缩放跨档才变一次）。
+                  // 平移/缩放过程中 zoom 每帧都在变，但**这里不读 zoom** ⇒
+                  // 拖动时不会重建 marker（原来每帧重建 N 个 marker 是卡顿主因）。
+                  Obx(
+                    () => MarkerLayer(
+                      markers: ctrl.items
+                          .map((e) => _markerFor(context, ctrl, e))
+                          .toList(),
+                    ),
                   ),
                 ],
               ),
@@ -209,27 +227,33 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
               Positioned(
                 left: 12,
                 bottom: 12,
-                child: _InfoBadge(
-                  text:
-                      '${'zoom_level'.tr}: ${ctrl.zoom.value.toStringAsFixed(1)}',
+                // 单独 Obx：只有这个小徽章跟着 zoom 重建
+                child: Obx(
+                  () => _InfoBadge(
+                    text:
+                        '${'zoom_level'.tr}: ${ctrl.zoom.value.toStringAsFixed(1)}',
+                  ),
                 ),
               ),
               Positioned(
                 right: 12,
                 bottom: 12,
-                child: _MapZoomButtons(
-                  mapController: _mapController,
-                  currentZoom: ctrl.zoom.value,
-                  minZoom: minZoom,
-                  maxZoom: maxZoom,
-                  onZoomChanged: () {
-                    final camera = _mapController.camera;
-                    ctrl.onMapChanged(
-                      bounds: camera.visibleBounds,
-                      zoomLevel: camera.zoom,
-                      mapCenter: camera.center,
-                    );
-                  },
+                // 单独 Obx：缩放按钮只关心 zoom（用来在到顶/到底时禁用）
+                child: Obx(
+                  () => _MapZoomButtons(
+                    mapController: _mapController,
+                    currentZoom: ctrl.zoom.value,
+                    minZoom: minZoom,
+                    maxZoom: maxZoom,
+                    onZoomChanged: () {
+                      final camera = _mapController.camera;
+                      ctrl.onMapChanged(
+                        bounds: camera.visibleBounds,
+                        zoomLevel: camera.zoom,
+                        mapCenter: camera.center,
+                      );
+                    },
+                  ),
                 ),
               ),
               Positioned(
@@ -311,6 +335,7 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
                               ),
                               listType: 'timeline',
                               geohash: _nearbyGeohash,
+                              precisionOverride: _nearbyPrecision,
                             ),
                           ),
                         ],
@@ -343,7 +368,8 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
         ? ApiController.instance.getTinyUrl(fullpath)
         : '';
     final theme = Theme.of(context);
-    final markerSize = _markerSizeForCount(ctrl.items.length, ctrl.zoom.value);
+    // 尺寸只跟缩放档位有关（量化过的 Rx，不是连续 zoom），见 _markerSizeForTier。
+    final markerSize = _markerSizeForTier(ctrl.markerSizeTier.value);
     final outerRadius = (markerSize * 0.2).clamp(6.0, 14.0);
     final innerRadius = (outerRadius - 2).clamp(4.0, 12.0);
     final fallbackIconSize = (markerSize * 0.35).clamp(16.0, 26.0);
@@ -371,59 +397,82 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
                 width: _markerBorderWidth,
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(innerRadius),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  imageUrl.isNotEmpty
-                      ? CustomExtendedImage(
-                          imageUrl: imageUrl,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          borderRadius: innerRadius,
-                          showLoading: false,
-                        )
-                      : Container(
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.12,
+            // ⭐ 聚合角标必须画在 ClipRRect **外面**：它是宽度随位数自适应的椭圆胶囊，
+            // 放在圆角裁剪里会被 marker 的圆角切掉一角（用户报「显示不下」就是这个）。
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(innerRadius),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        imageUrl.isNotEmpty
+                            ? CustomExtendedImage(
+                                imageUrl: imageUrl,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                                borderRadius: innerRadius,
+                                showLoading: false,
+                              )
+                            : Container(
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.12,
+                                ),
+                                child: Icon(
+                                  Icons.photo,
+                                  size: fallbackIconSize,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                        if (hasDate)
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              height: barHeight,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(barBottomRadius),
+                                  bottomRight: Radius.circular(
+                                    barBottomRadius,
+                                  ),
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                _formatYearMonth(item.originalTime!),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: barFontSize,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            Icons.photo,
-                            size: fallbackIconSize,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                  if (hasDate)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        height: barHeight,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(barBottomRadius),
-                            bottomRight: Radius.circular(barBottomRadius),
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          _formatYearMonth(item.originalTime!),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: barFontSize,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                      ],
                     ),
-                ],
-              ),
+                  ),
+                ),
+                // ⭐ 聚合角标：本格内有多张照片时，在右上角挂一个数字气泡。
+                // 缩小时同一个区域会合并成一个大点并显示总数，放大后数字变 1、角标自动消失
+                // —— 这就是「随缩放自动合并/拆分」在 UI 上的落点。
+                if (item.isCluster)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: _ClusterCountBadge(
+                      count: item.photoCount ?? 1,
+                      markerSize: markerSize,
+                    ),
+                  ),
+              ],
             ),
           ),
         ),
@@ -443,11 +492,16 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
 
     final title =
         "${'location'.tr}-${(geoName ?? '').isNotEmpty ? geoName : 'photo_map_location'.tr}";
+    // ⭐ 把该 marker 的聚合档位透传下去。
+    // 不传的话，时间轴会用默认 nearbyRangeKm=2 → geohash 前 6 位（约1.2km）反查，
+    // 而低缩放档的 marker 可能代表 150km 见方 ⇒ 点开后列出来的照片只是这个大范围的一小部分，
+    // 看着就像「点进去照片怎么变少了 / 跟缩放无关」。
     if (DeviceUtils.isMobile) {
       await Get.to(
         () => AppPhotoFootprintNearbyTimelinePage(
           title: title,
           geohash: item.geohash,
+          precisionOverride: item.cellPrecision ?? 0,
         ),
       );
       return;
@@ -456,6 +510,7 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
     setState(() {
       _nearbyTitle = geoName ?? '';
       _nearbyGeohash = item.geohash;
+      _nearbyPrecision = item.cellPrecision ?? 0;
       _nearbyTimelineVisible = true;
       _nearbyTimelineSeed += 1;
     });
@@ -536,10 +591,16 @@ class _PhotoFootprintMapViewState extends State<PhotoFootprintMapView> {
 class AppPhotoFootprintNearbyTimelinePage extends StatefulWidget {
   final String title;
   final String? geohash;
+
+  /// ⭐ 地图上该 marker 的聚合档位（2~6，0 = 未指定）。
+  /// 传下去让列表反查范围与地图聚合范围一致，见 [PhotoTimelineController.precisionOverride]。
+  final int precisionOverride;
+
   const AppPhotoFootprintNearbyTimelinePage({
     super.key,
     required this.title,
     required this.geohash,
+    this.precisionOverride = 0,
   });
 
   @override
@@ -564,6 +625,7 @@ class _AppPhotoFootprintNearbyTimelinePageState
       init: PhotoTimelineController(
         initialListType: 'timeline',
         initialGeohash: widget.geohash,
+        precisionOverride: widget.precisionOverride,
       ),
       tag: _timelineTag,
       dispose: (_) {
@@ -701,6 +763,67 @@ class _InfoBadge extends StatelessWidget {
         border: Border.all(color: theme.dividerColor),
       ),
       child: Text(text, style: theme.textTheme.bodySmall),
+    );
+  }
+}
+
+/// 地图 marker 右��角的聚合数量气泡。
+///
+/// 只在 [PhotoMapIndexItem.photoCount] > 1 时显示；放大到该网格只剩一张照片时自动消失，
+/// 这就是「缩放时聚合 ↔ 拆分」在视觉上的体现。
+class _ClusterCountBadge extends StatelessWidget {
+  final int count;
+  final double markerSize;
+
+  const _ClusterCountBadge({required this.count, required this.markerSize});
+
+  /// 最多显示 **5 位**数字（用户要求「最多要装下 5 位」）；再大才用「123k」紧凑写法。
+  /// 旧实现 4 位就转 k，「9999」在 30px 的正圆里已经放不下被裁掉了。
+  static String _format(int n) {
+    if (n <= 0) return '';
+    if (n < 100000) return '$n';
+    final k = n / 1000;
+    return '${k.toStringAsFixed(k >= 100 ? 0 : 1)}k';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final label = _format(count);
+    // 气泡随 marker 缩放，但设上下限：小 marker 上不能缩到看不清，大 marker 上别糊满
+    final h = (markerSize * 0.42).clamp(16.0, 30.0);
+    // ⭐ 字号比原来小一号（0.55 → 0.46，上限 15 → 13），给 5 位数腾出宽度
+    final fontSize = (h * 0.46).clamp(9.0, 13.0);
+
+    return Container(
+      constraints: BoxConstraints(minWidth: h, minHeight: h),
+      padding: EdgeInsets.symmetric(horizontal: h * 0.24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary,
+        // ⭐ 椭圆胶囊：**宽度随数字位数自适应**（原来是 `shape: BoxShape.circle` ——
+        // 正圆直径被 minWidth/minHeight 卡死，5 位数只能被裁掉，就是「显示不下」的原因）
+        borderRadius: BorderRadius.circular(h / 2),
+        border: Border.all(color: Colors.white, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.clip,
+        style: TextStyle(
+          color: theme.colorScheme.onPrimary,
+          fontSize: fontSize,
+          fontWeight: FontWeight.w700,
+          height: 1.0,
+        ),
+      ),
     );
   }
 }

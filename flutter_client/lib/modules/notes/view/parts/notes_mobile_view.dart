@@ -413,10 +413,6 @@ class _NotesMobileViewState extends State<NotesMobileView> {
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: () => controller.pickNotebook(context),
-                style: FilledButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  iconColor: Colors.white,
-                ),
                 icon: const Icon(Icons.folder_open_rounded),
                 label: Text('notes_switch_notebook'.tr),
               ),

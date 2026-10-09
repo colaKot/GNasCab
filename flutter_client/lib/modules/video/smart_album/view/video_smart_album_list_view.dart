@@ -10,6 +10,7 @@ import '../../../base/components/custom_expandable_search_bar.dart';
 import '../../../base/components/custom_popup_select_button.dart';
 import '../../../../utils/context_menu_util.dart';
 import '../../../../utils/dialog_util.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import '../../base/beans/video_item_bean.dart';
 import '../../base/video_utils/video_utils.dart';
 import '../../list/view/video_list_page.dart';

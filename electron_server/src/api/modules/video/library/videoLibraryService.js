@@ -1,11 +1,20 @@
 const userUtil = require('../../../../utils/userUtil');
 const VideoSourceService = require('../source/videoSourceService');
+const { applyVisibleIndexFilter, isPathVisibleTo } = require('../videoVisibilityUtil');
 
 // 影视库类型（创建后不可修改）
 const LIB_TYPES = ['movie', 'tv', 'image', 'mixed'];
 
 const VIDEO_MEDIA_TYPES = ['movie', 'bdmv', 'video_ts'];
 
+/**
+ * ⚠️ 已废弃：本文件不再使用它（可见性过滤统一到 `../videoVisibilityUtil`）。
+ *
+ * 这个实现**有 bug，别再抄**：它把反斜杠也翻倍（`\` → `\\`），
+ * 而 SQLite 的 LIKE 默认不认 `\` 转义 ⇒ Windows 路径的前缀匹配会**静默失效**
+ * （实测 `'E:\Media\sub' LIKE 'E:\\Media\\%'` = 0）。
+ * 正确做法见 `videoVisibilityUtil.escapeLikeValue`：只转 `%` `_`，并用 `^` 作 ESCAPE 字符。
+ */
 function _escapeLikeValue(input) {
   return String(input || '')
     .replaceAll('\\', '\\\\')
@@ -149,23 +158,10 @@ class VideoLibraryService {
   }
 
   _applyIndexPathFilter(query, paths) {
-    const list = Array.isArray(paths) ? paths.map(p => String(p || '').trim()).filter(Boolean) : [];
-    if (list.length === 0) {
-      query.whereRaw('1 = 0');
-      return;
-    }
-    const sep = require('path').sep;
-    const escaped = list.map(p => ({
-      exact: p,
-      prefix: p.endsWith(sep) ? p : `${p}${sep}`,
-    }));
-    query.where(builder => {
-      for (const item of escaped) {
-        builder.orWhere(function () {
-          this.where('path', item.exact).orWhere('path', 'like', `${_escapeLikeValue(item.prefix)}%`);
-        });
-      }
-    });
+    // ⭐ 统一口径：与列表页、详情鉴权共用同一份实现。
+    // 原实现只有「前缀匹配」，**漏了目录行特判**（`is_file=0 且 path=父目录 且 filename=子目录名`），
+    // 导致电视剧库那种「剧集文件夹」代表的整部剧不算进计数 ⇒ 库计数虚低、左侧栏显示 0。
+    applyVisibleIndexFilter(query, paths);
   }
 
   // 每个库的可见条目数：库内来源路径 ∩ 用户可见路径
@@ -175,7 +171,6 @@ class VideoLibraryService {
 
     const sourceService = new VideoSourceService(this.knex);
     const validPaths = await sourceService.getValidPaths(user);
-    const validSet = new Set((validPaths || []).map(p => String(p)));
 
     const allSources = await this.knex(this.sourceTable).select('path', 'library_id').catch(() => []);
     const pathsByLib = new Map();
@@ -191,7 +186,11 @@ class VideoLibraryService {
     for (const lib of libraries) {
       const libId = Number(lib && lib.id) || 0;
       const libPaths = pathsByLib.get(libId) || [];
-      const visiblePaths = libPaths.filter(p => validSet.has(p));
+      // ⭐ 原来这里是 `validSet.has(p)` 精确比对：只有当「来源路径」恰好等于某条
+      // 「可见路径」时才算数。但 `getValidPaths` 返回的可能是更长的授权子路径
+      // （授权 `…\TV\BreakingBad`、来源 `…\TV`），精确比对必然落空 ⇒ 库计数虚低。
+      // 改用与 getValidPaths 同源的双向包含判断。
+      const visiblePaths = libPaths.filter(p => isPathVisibleTo(p, validPaths));
 
       const counts = { movie: 0, tv: 0, image: 0, total: 0 };
       if (visiblePaths.length > 0) {
@@ -201,11 +200,15 @@ class VideoLibraryService {
         for (const r of rows || []) {
           const mt = r && r.media_type ? String(r.media_type).trim() : '';
           const cnt = Number(r && r.total) || 0;
+          // ⭐ total = 该库内**全部**可见索引行之和，**不按 media_type 白名单筛**。
+          //   原来用 `counts.movie + counts.tv + counts.image` 求和，会把白名单
+          //   （movie/bdmv/video_ts）之外的媒体类型整类漏算 ⇒ 库明明有条目却算成 0，
+          //   被左侧栏当成「空库」隐藏。
+          counts.total += cnt;
           if (VIDEO_MEDIA_TYPES.includes(mt)) counts.movie += cnt;
           if (mt === 'tv') counts.tv += cnt;
           if (mt === 'image') counts.image += cnt;
         }
-        counts.total = counts.movie + counts.tv + counts.image;
       }
 
       out.push({

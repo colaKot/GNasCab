@@ -82,6 +82,12 @@ class PhotoTimelineController extends GetxController {
   final String? initialPlaceName;
   final bool initialLoadTheDay;
   final String? initialGeohash;
+
+  /// ⭐ 强制 geohash 反查精度（2~6）。足迹地图点开某个 marker 时传入该 marker 的聚合档位，
+  /// 保证「地图上这个点代表的范围」与「点开后列出的照片范围」一致。
+  /// 为 0 / null 时按 [nearbyRangeKm] 的默认映射走（原行为）。
+  final int precisionOverride;
+
   final int? initialYear;
 
   /// 未配置来源路径时是否弹出管理员提示（仅 PC 照片主页「时间轴」与 App 照片管理首页应开启）。
@@ -96,6 +102,7 @@ class PhotoTimelineController extends GetxController {
     this.initialPlaceName,
     this.initialLoadTheDay = false,
     this.initialGeohash,
+    this.precisionOverride = 0,
     this.initialYear,
     this.alertWhenNoSourcePath = false,
   });
@@ -259,6 +266,12 @@ class PhotoTimelineController extends GetxController {
   String? get geohashForRequest {
     final gh = baseGeohash.value.trim();
     if (gh.isEmpty) return null;
+    // ⭐ 地图传入的聚合档位优先。它和地图 marker 的聚合范围是同一套口径，
+    // 不用就会出现「marker 代表一大片、点开只列很小一块」的错位。
+    if (precisionOverride >= 2 && precisionOverride <= 6) {
+      final len = precisionOverride.clamp(2, gh.length);
+      return gh.substring(0, len);
+    }
     final precision = switch (nearbyRangeKm.value) {
       2 => 6,
       5 => 5,

@@ -14,6 +14,7 @@ import '../controller/photo_collection_controller.dart';
 import '../models/photo_collection_model.dart';
 import '../../timeline/view/pc_photo_timeline.dart';
 import 'dialogs/photo_collection_create_edit_dialog.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 
 part 'parts/photo_collection_card.dart';
 part 'parts/photo_collection_dialogs.dart';

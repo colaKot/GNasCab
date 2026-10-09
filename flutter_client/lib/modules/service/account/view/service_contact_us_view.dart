@@ -124,7 +124,7 @@ class ServiceContactUsView extends StatelessWidget {
       email,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Get.theme.colorScheme.primary,
-      colorText: Colors.white,
+      colorText: Get.theme.colorScheme.onPrimary,
       duration: const Duration(seconds: 2),
       margin: const EdgeInsets.all(16),
       borderRadius: 8,

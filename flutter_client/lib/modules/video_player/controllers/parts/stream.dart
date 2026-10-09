@@ -203,7 +203,7 @@ extension PlayerTracks on PlayerController {
       'vob',
     };
     if (forceTranscodeExtensions.contains(ext)) {
-      currentQuality.value = defaultTranscodeQuality;
+      currentQuality.value = fallbackTranscodeQuality;
       _playId ??= const Uuid().v4();
     }
   }
@@ -222,77 +222,105 @@ extension PlayerTracks on PlayerController {
     return applyPlaybackEngineForCurrentSource(PlaybackEngineType.fvp);
   }
 
+  /// Web 端视频能否在「仅转音频」时保持原画直通（服务端 `-c:v copy`）。
+  ///
+  /// 目前只认 H.264：全平台 Chromium 均可解码。HEVC/HDR/DV 在部分平台需要重编
+  /// 或色调映射（如 DoVi P5 直放会发紫），继续交给服务端重编更稳。
+  bool _webCanCopyVideoWhileTranscodingAudio() {
+    for (final v in _rawVideoTracks) {
+      final codec = v['codec_name']?.toString().toLowerCase() ?? '';
+      if (codec.isEmpty) continue;
+      return codec == 'h264';
+    }
+    return false;
+  }
+
   /// 检查Web端是否需要转码
   void checkWebIfNeedTranscode() {
     if (!kIsWeb) return;
-    // Web端自动检测是否需要转码
-    if (currentQuality.value == 'original') {
-      bool needTranscode = false;
-      String? unsupportedReason;
-      const unsupportedContainers = ['.m2ts', '.mts', '.ssif'];
-      final playbackExt = _currentPlaybackExtForWebCheck();
-      if (unsupportedContainers.contains(playbackExt)) {
-        needTranscode = true;
-        unsupportedReason = 'Container $playbackExt not supported on Web';
-      }
-      // 1. 检查音频编码
-      // 常见Web不支持的音频: eac3, ac3, dts, truehd
-      // 支持: aac, mp3, opus, vorbis, flac (部分)
-      final unsupportedAudio = [
-        'eac3',
-        'ac3',
-        'dts',
-        'truehd',
-        'dts-hd',
-        'mlp',
-      ];
-      print("检测web端是否需要转吗:当前音频:${currentAudioTrack.value}");
-      //检查一下当前选中的音频是否需要转码
-      for (final s in _rawAudioTracks) {
-        if (s['label'] == currentAudioTrack.value) {
-          final codec = s['codec_name']?.toString().toLowerCase() ?? '';
-          print("当前音频编码:$codec");
-          if (unsupportedAudio.contains(codec)) {
-            needTranscode = true;
-            unsupportedReason = 'Audio codec $codec not supported on Web';
-            break;
-          }
-        }
-      }
+    // Web端自动检测是否需要转码（仅在原画状态下判定；已在转码则保持用户/当前选择）
+    if (currentQuality.value != 'original') return;
 
-      // 2. 视频（仅 Safari）：HEVC 原画直链常整包拉流、失败后再重试；Chrome 不支持时会较快终止，不拉全文件。
-      if (DeviceUtils.isWebSafariBrowser &&
-          !needTranscode &&
-          _rawVideoTracks.isNotEmpty) {
-        const safariHevcVideo = [
-          'hevc',
-          'h265',
-          'hev1',
-          'hvc1',
-        ];
-        for (final v in _rawVideoTracks) {
-          final vc = v['codec_name']?.toString().toLowerCase() ?? '';
-          if (vc.isEmpty) continue;
-          if (safariHevcVideo.contains(vc)) {
-            needTranscode = true;
-            unsupportedReason =
-                'Video codec $vc (HEVC): Safari Web 原画不稳定，已切换转码';
-            break;
-          }
-        }
-      }
+    bool needTranscode = false;
+    // 是否命中「需要重编视频」的原因（容器/视频编码）。
+    // 若只有音频不受支持，则不再降低整片画质，改为「仅转音频、视频原画直通」。
+    bool videoReason = false;
+    bool audioReason = false;
+    String? unsupportedReason;
 
-      // Web 端字幕由独立组件渲染，不再触发“自动切转码”。
+    const unsupportedContainers = ['.m2ts', '.mts', '.ssif'];
+    final playbackExt = _currentPlaybackExtForWebCheck();
+    if (unsupportedContainers.contains(playbackExt)) {
+      needTranscode = true;
+      videoReason = true;
+      unsupportedReason = 'Container $playbackExt not supported on Web';
+    }
 
-      if (needTranscode) {
-        print('Auto switching to transcode: $unsupportedReason');
-        // 切换到默认转码质量  如果当前不在转码状态 才切换
-        if (currentQuality.value == 'original') {
-          currentQuality.value = defaultTranscodeQuality;
-          _playId ??= const Uuid().v4();
+    // 1. 检查音频编码
+    // eac3(E-AC-3) 在 Windows 上由 Chromium 走 Media Foundation 解码，不再计入
+    // "Web 不支持"，否则会把用户的「原画」静默降级成转码。
+    // 常见Web不支持的音频: ac3, dts, truehd
+    // 支持: aac, mp3, opus, vorbis, flac (部分)
+    final unsupportedAudio = [
+      'ac3',
+      'dts',
+      'truehd',
+      'dts-hd',
+      'mlp',
+    ];
+    print("检测web端是否需要转吗:当前音频:${currentAudioTrack.value}");
+    //检查一下当前选中的音频是否需要转码
+    for (final s in _rawAudioTracks) {
+      if (s['label'] == currentAudioTrack.value) {
+        final codec = s['codec_name']?.toString().toLowerCase() ?? '';
+        print("当前音频编码:$codec");
+        if (unsupportedAudio.contains(codec)) {
+          needTranscode = true;
+          audioReason = true;
+          unsupportedReason = 'Audio codec $codec not supported on Web';
+          break;
         }
       }
     }
+
+    // 2. 视频（仅 Safari）：HEVC 原画直链常整包拉流、失败后再重试；Chrome 不支持时会较快终止，不拉全文件。
+    if (DeviceUtils.isWebSafariBrowser &&
+        !needTranscode &&
+        _rawVideoTracks.isNotEmpty) {
+      const safariHevcVideo = [
+        'hevc',
+        'h265',
+        'hev1',
+        'hvc1',
+      ];
+      for (final v in _rawVideoTracks) {
+        final vc = v['codec_name']?.toString().toLowerCase() ?? '';
+        if (vc.isEmpty) continue;
+        if (safariHevcVideo.contains(vc)) {
+          needTranscode = true;
+          videoReason = true;
+          unsupportedReason =
+              'Video codec $vc (HEVC): Safari Web 原画不稳定，已切换转码';
+          break;
+        }
+      }
+    }
+
+    // Web 端字幕由独立组件渲染，不再触发“自动切转码”。
+
+    if (!needTranscode) return;
+    print('Auto switching to transcode: $unsupportedReason');
+
+    // 仅音频不受支持、且视频本身 Web 可直放：只转音频，视频保持原画分辨率，避免整片降码率。
+    if (!videoReason && audioReason && _webCanCopyVideoWhileTranscodingAudio()) {
+      currentQuality.value = PlayQuality.originalAudio;
+      _playId ??= const Uuid().v4();
+      return;
+    }
+
+    // 其余情况（容器/视频编码不支持，或无法确认视频可直放）仍走兜底转码画质
+    currentQuality.value = fallbackTranscodeQuality;
+    _playId ??= const Uuid().v4();
   }
 
   /// 是否是无字幕

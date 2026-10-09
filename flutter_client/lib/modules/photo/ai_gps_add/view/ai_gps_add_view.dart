@@ -168,7 +168,11 @@ class _RunningBanner extends StatelessWidget {
               Expanded(
                 child: Text(
                   'photo_ai_gps_add_scanning'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  // 底色是 primaryContainer（亮色下是浅粉彩）⇒ 必须用 onPrimaryContainer，
+                  // 写死白色在亮色模式下读不出来。
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
                 ),
               ),
             ],

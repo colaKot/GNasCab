@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "Cài đặt TMDB đã được lưu",
       "TRANSCODE_CONFIG_SAVED": "Thư mục tạm transcode đã được lưu",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "Đã lưu chất lượng phát mặc định",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "Thư mục tạm transcode không tồn tại",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "Đường dẫn tạm transcode không phải là thư mục",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "Thư mục tạm transcode không thể ghi",

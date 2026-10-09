@@ -150,8 +150,6 @@ class PcInternalFolderDropTarget extends StatelessWidget {
   final Widget child;
   final bool alignDropHintToListIconLeading;
 
-  static const Color _dropHintTextColor = Color(0xFFE8E8E8);
-
   @override
   Widget build(BuildContext context) {
     if (!pcFileItemIsDirectoryDropTarget(item)) return child;
@@ -209,7 +207,7 @@ class PcInternalFolderDropTarget extends StatelessWidget {
                                   child: Text(
                                     'move'.tr,
                                     style: theme.textTheme.labelLarge?.copyWith(
-                                      color: _dropHintTextColor,
+                                      color: theme.colorScheme.onPrimaryContainer,
                                     ),
                                   ),
                                 ),
@@ -229,7 +227,7 @@ class PcInternalFolderDropTarget extends StatelessWidget {
                                 child: Text(
                                   'move'.tr,
                                   style: theme.textTheme.labelLarge?.copyWith(
-                                    color: _dropHintTextColor,
+                                    color: theme.colorScheme.onPrimaryContainer,
                                   ),
                                 ),
                               ),
@@ -255,8 +253,6 @@ class PcInternalCurrentDirectoryDropTarget extends StatelessWidget {
 
   final PcFileExplorerController ctrl;
   final Widget child;
-
-  static const Color _hintColor = Color(0xFFE8E8E8);
 
   @override
   Widget build(BuildContext context) {
@@ -313,7 +309,7 @@ class PcInternalCurrentDirectoryDropTarget extends StatelessWidget {
                               child: Text(
                                 'move'.tr,
                                 style: theme.textTheme.labelLarge?.copyWith(
-                                  color: _hintColor,
+                                  color: theme.colorScheme.onPrimaryContainer,
                                 ),
                               ),
                             ),
@@ -343,8 +339,6 @@ class PcInternalPathSegmentDropTarget extends StatelessWidget {
   final PcFileExplorerController ctrl;
   final String segmentPath;
   final Widget child;
-
-  static const Color _hintColor = Color(0xFFE8E8E8);
 
   @override
   Widget build(BuildContext context) {
@@ -388,7 +382,7 @@ class PcInternalPathSegmentDropTarget extends StatelessWidget {
                         child: Text(
                           'move'.tr,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: _hintColor,
+                            color: theme.colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

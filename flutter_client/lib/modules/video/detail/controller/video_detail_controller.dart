@@ -194,6 +194,15 @@ class VideoDetailController extends GetxController {
 
   String get mediaType => (item?['media_type']?.toString() ?? '').trim();
 
+  /// 服务端解析好的媒体特性标记（4K / HDR10 / HDR10+ / HLG / 杜比视界 / 杜比全景声）。
+  /// 数据源：/video/detail 的 `media_flags`，由扫描时写入的 ffprobe streams 按 file_hash 推出，
+  /// 电视剧/季是所有剧集的并集。没命中任何特性时服务端返回 null。
+  Map<String, dynamic>? get mediaFlags {
+    final v = raw.value?['media_flags'];
+    if (v is Map) return v.cast<String, dynamic>();
+    return null;
+  }
+
   int get openSkipStartSeconds =>
       (item?['open_skip_start_sec'] as num?)?.toInt() ?? 0;
 

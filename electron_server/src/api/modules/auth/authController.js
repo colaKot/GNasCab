@@ -215,7 +215,7 @@ class AuthController {
     this.appearanceService = new AppearanceService();
   }
 
-  async _getLoginCommonData() {
+  _getLoginCommonData = async () => {
     const httpPort = await tableConfig.getConfigByKey(tableConfig.KEY_API_PORT_HTTP);
     const httpsPort = await tableConfig.getConfigByKey(tableConfig.KEY_API_PORT_HTTPS);
     const serverId = await tableConfig.getServerId();
@@ -238,9 +238,9 @@ class AuthController {
       shellSupported,
       customHostname,
     };
-  }
+  };
 
-  async _sendLoginSuccess(req, res, result) {
+  _sendLoginSuccess = async (req, res, result) => {
     const common = await this._getLoginCommonData();
     const ipAddresses = NetUtil.getIPv4Addresses();
     const preferred = ipAddresses && ipAddresses.find(ip => ip.startsWith('192.') || ip.startsWith('10.'));
@@ -268,9 +268,9 @@ class AuthController {
       },
       'auth.LOGIN_SUCCESS'
     );
-  }
+  };
 
-  async _resolveDeviceInfo({ knexMain, userId, deviceFingerprint, clientIp }) {
+  _resolveDeviceInfo = async ({ knexMain, userId, deviceFingerprint, clientIp }) => {
     let fingerprint = deviceFingerprint;
     if (typeof fingerprint === 'string') {
       try {
@@ -299,9 +299,9 @@ class AuthController {
     const lastSeen = device.last_seen_at ? new Date(device.last_seen_at).getTime() : 0;
     const isStale = Number.isFinite(lastSeen) && Date.now() - lastSeen > 30 * 24 * 60 * 60 * 1000;
     return { deviceId, deviceName, osVersion, device, isNew: false, isStale };
-  }
+  };
 
-  async _addNewDeviceLoginMessage({ knexMain, uid, deviceName, osVersion }) {
+  _addNewDeviceLoginMessage = async ({ knexMain, uid, deviceName, osVersion }) => {
     try {
       const userLocale = await resolveServerUiLanguageFromDb();
       const safeName = deviceName && typeof deviceName === 'string' && deviceName.trim() ? deviceName.trim() : getTranslation('messages.message.UNKNOWN_DEVICE', userLocale);
@@ -319,9 +319,9 @@ class AuthController {
         isPublic: 0,
       });
     } catch (_) {}
-  }
+  };
 
-  async _logTwofaAttempt({ knexMain, userId, action, method, clientIp, deviceId, ok, reasonCode }) {
+  _logTwofaAttempt = async ({ knexMain, userId, action, method, clientIp, deviceId, ok, reasonCode }) => {
     try {
       await knexMain('user_2fa_verify_log').insert({
         user_id: userId || null,
@@ -334,9 +334,9 @@ class AuthController {
         create_time: new Date(),
       });
     } catch (_) {}
-  }
+  };
 
-  async _countRecentTwofaAttempts({ knexMain, userId, action, windowMs }) {
+  _countRecentTwofaAttempts = async ({ knexMain, userId, action, windowMs }) => {
     const since = new Date(Date.now() - windowMs);
     const rows = await knexMain('user_2fa_verify_log')
       .where({ user_id: userId, action: action || 'login' })
@@ -344,7 +344,7 @@ class AuthController {
       .count('id as count');
     const count = rows && rows[0] ? Number(rows[0].count) || 0 : 0;
     return count;
-  }
+  };
 
   /**
    * 检测用户表中是否已存在超级管理员

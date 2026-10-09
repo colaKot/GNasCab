@@ -155,8 +155,8 @@ class _VideoDetailActionsSectionState extends State<VideoDetailActionsSection> {
             CustomButton(
               width: 138,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade800,
-                foregroundColor: Colors.white,
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(kActionButtonRadius),
                 ),
@@ -271,9 +271,9 @@ class _VideoDetailActionsSectionState extends State<VideoDetailActionsSection> {
                   child: LinearProgressIndicator(
                     minHeight: 6,
                     value: progress,
-                    backgroundColor: Colors.white.withValues(alpha: 0.12),
+                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.blue.shade400,
+                      theme.colorScheme.primary,
                     ),
                   ),
                 ),

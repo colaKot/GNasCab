@@ -47,26 +47,45 @@ function matchApi(allowedList, reqApi) {
  * @param {string} resType - 资源类型（默认：file）
  * @returns {Promise<boolean>} 是否有权限
  */
+/**
+ * scoped token 的 `allow_path` 边界检查（**单向下沉**：目标必须在授权目录之内）。
+ *
+ * 只有 `tokenRecord.type === 'scoped'` 的受限令牌才会带上 `allow_path`
+ * （`authMiddleware.js:59-61`）—— 这是令牌的核心安全边界，任何接口都不该绕过。
+ *
+ * 抽成独立函数是为了让「影视详情」在改用与列表页统一的可见性口径时，
+ * **仍然保留这条边界**（原来的 hasPermission 里它和第 4 步的权限表匹配是耦合的，
+ * 而权限表匹配用的单向下沉正是「列表能看、详情 403」的成因）。
+ *
+ * 未设置 allow_path ⇒ 返回 true（不限制），与 hasPermission 原语义一致。
+ */
+function isWithinAllowPath(user, resPath) {
+  const allowPathRaw = user && (user.allow_path ?? user.allowPath ?? user.token_allow_path);
+  const allowPath = parseAnyOrArray(allowPathRaw);
+  if (allowPath === 'ANY') return true;
+  if (!Array.isArray(allowPath)) return true;
+
+  const normalizedPath = typeof resPath === 'string' && resPath.trim() ? normalizePathItem(resPath.trim()) : '';
+  if (!normalizedPath) return false;
+
+  for (const p of allowPath) {
+    const rulePath = typeof p === 'string' && p.trim() ? normalizePathItem(p.trim()) : '';
+    if (!rulePath) continue;
+    if (normalizedPath === rulePath || normalizedPath.startsWith(rulePath.endsWith(path.sep) ? rulePath : rulePath + path.sep)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 async function hasPermission(knex, user, action, resPath, resType = tableUserPermission.RES_TYPES.FILE) {
   if (!knex) return false;
   if (!user) return false;
   const normalizedPath = typeof resPath === 'string' && resPath.trim() ? normalizePathItem(resPath.trim()) : '';
   if (!normalizedPath) return false;
 
-  const allowPathRaw = user.allow_path ?? user.allowPath ?? user.token_allow_path;
-  const allowPath = parseAnyOrArray(allowPathRaw);
-  if (allowPath !== 'ANY' && Array.isArray(allowPath)) {
-    let ok = false;
-    for (const p of allowPath) {
-      const rulePath = typeof p === 'string' && p.trim() ? normalizePathItem(p.trim()) : '';
-      if (!rulePath) continue;
-      if (normalizedPath === rulePath || normalizedPath.startsWith(rulePath.endsWith(path.sep) ? rulePath : rulePath + path.sep)) {
-        ok = true;
-        break;
-      }
-    }
-    if (!ok) return false;
-  }
+  // ① scoped token 的 allow_path 边界（单向下沉，先收范围）
+  if (!isWithinAllowPath(user, normalizedPath)) return false;
 
   const userType = typeof user.type === 'string' ? user.type.toLowerCase() : '';
   if (userType === tableUser.TYPE_SUPER_ADMIN || userType === tableUser.TYPE_ADMIN) return true;
@@ -121,6 +140,7 @@ async function hasPermission(knex, user, action, resPath, resType = tableUserPer
 
 module.exports = {
   hasPermission,
+  isWithinAllowPath,
   parseAnyOrArray,
   matchApi,
 };

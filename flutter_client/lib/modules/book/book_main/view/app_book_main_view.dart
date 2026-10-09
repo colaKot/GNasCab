@@ -318,7 +318,7 @@ class _AppBookMainViewState extends State<AppBookMainView> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.labelLarge?.copyWith(
-              color: selected ? Colors.white : theme.colorScheme.onSurface,
+              color: selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),

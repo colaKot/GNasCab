@@ -27,7 +27,9 @@ class PcTextEditorView extends StatelessWidget {
           body: SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.only(top: PcAppWindow.titleBarHeight),
+              padding: EdgeInsets.only(
+                top: PcAppWindow.titleBarHeightFor(context),
+              ),
               child: Column(
                 children: [
                   EditorToolbar(controller: controller),

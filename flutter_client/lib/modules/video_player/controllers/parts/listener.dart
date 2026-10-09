@@ -139,7 +139,7 @@ extension PlayerListener on PlayerController {
         _isRecoveringFromError = true;
         isInitialized.value = false;
         _reloadRetryCount = 0;
-        currentQuality.value = defaultTranscodeQuality;
+        currentQuality.value = fallbackTranscodeQuality;
         await Future<void>.delayed(const Duration(milliseconds: 300));
         if (isClosed) return;
         _isRecoveringFromError = false;
@@ -177,7 +177,7 @@ extension PlayerListener on PlayerController {
 
       if (choice == 0) {
         _reloadRetryCount = 0;
-        currentQuality.value = defaultTranscodeQuality;
+        currentQuality.value = fallbackTranscodeQuality;
         await _initializePlayer(keepPosition: true);
       } else if (choice == 1) {
         _reloadRetryCount = 0;

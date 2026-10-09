@@ -64,12 +64,15 @@ class _SyncTaskListPanelState extends State<_SyncTaskListPanel> {
                         imageWidth: 120,
                         imageHeight: 120,
                       ),
-                      const SizedBox(height: 8),
-                      FilledButton.icon(
-                        onPressed: widget.onCreate,
-                        icon: const Icon(Icons.add, size: 18),
-                        label: Text('sync_create_task'.tr),
-                      ),
+                      // Web 端不提供「创建同步任务」入口（无本地目录选择能力）
+                      if (widget.onCreate != null) ...[
+                        const SizedBox(height: 8),
+                        FilledButton.icon(
+                          onPressed: widget.onCreate,
+                          icon: const Icon(Icons.add, size: 18),
+                          label: Text('sync_create_task'.tr),
+                        ),
+                      ],
                     ],
                   ),
                 );
@@ -118,6 +121,9 @@ class _SyncTaskListPanelState extends State<_SyncTaskListPanel> {
               children: [
                 Text(
                   'sync_menu_tasks'.tr,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -128,6 +134,9 @@ class _SyncTaskListPanelState extends State<_SyncTaskListPanel> {
                     'sync_task_count'.trParams({
                       'count': widget.ctrl.tasks.length.toString(),
                     }),
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -136,8 +145,9 @@ class _SyncTaskListPanelState extends State<_SyncTaskListPanel> {
               ],
             ),
           ),
+          // 搜索栏：原先右侧还挤着「创建同步任务」按钮，现已移除，故加宽并右移
           SizedBox(
-            width: 200,
+            width: 260,
             child: CustomTextField(
               controller: _searchCtrl,
               hintText: 'search'.tr,
@@ -151,17 +161,9 @@ class _SyncTaskListPanelState extends State<_SyncTaskListPanel> {
             tooltip: 'refresh'.tr,
             onPressed: () => widget.ctrl.refreshList(showLoading: true),
           ),
-          const SizedBox(width: 8),
-          // ⭐「创建任务」在右上角，让位窗口按钮组（2026-10-09）
-          Padding(
-            padding: EdgeInsets.only(
-              right: PcWindowScope.of(context)?.titleBarControlsWidth ?? 0,
-            ),
-            child: FilledButton.icon(
-              onPressed: widget.onCreate,
-              icon: const Icon(Icons.add, size: 18),
-              label: Text('sync_create_task'.tr),
-            ),
+          // 让位窗口按钮组（避免标题被窗口控件压住）
+          SizedBox(
+            width: PcWindowScope.of(context)?.titleBarControlsWidth ?? 0,
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../home/views/pc_home_controller.dart';
+import '../../home/views/pc_components/pc_app_window.dart';
 import '../../base/components/custom_expandable_search_bar.dart';
 import '../../base/components/custom_split_view.dart';
 import 'pc_components/pc_file_breadcrumb.dart';
@@ -125,13 +126,15 @@ class _PcFileBrowserState extends State<PcFileBrowser> {
         //显示所有文件
         ctrl.onlyShowDir.value = false;
         final theme = Theme.of(context);
+        // ⭐ 右侧给窗口按钮组让位（2026-10-09）：右上角搜索栏贴窗口右缘
+        final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
         return Column(
           children: [
-            // 顶部区域：左侧返回+面包屑（带边框），右侧搜索栏（与 title bar 同高，左侧为红绿灯按钮留空）
+            // 顶部区域：左侧返回+面包屑（带边框），右侧搜索栏（与 title bar 同高，右侧让开窗口按钮）
             SizedBox(
               height: _topBarHeight,
               child: Padding(
-                padding: const EdgeInsets.only(left: 72, right: 12),
+                padding: EdgeInsets.only(left: 72, right: 12 + ctrlW),
                 child: Row(
                   children: [
                     Expanded(

@@ -120,7 +120,7 @@ function buildHttpErrorWithArgs(msgKey, args = [], statusCode = 500) {
 }
 
 class FileMountController {
-  async _startByIpc({ id }) {
+  _startByIpc = async ({ id }) => {
     const idNum = Number(id);
     if (!Number.isFinite(idNum) || idNum <= 0) throw buildHttpError('common.INVALID_PARAMS', 400);
     if (!process.send) throw buildHttpError('common.ERROR', 500);
@@ -144,9 +144,9 @@ class FileMountController {
       throw buildHttpErrorWithArgs('fileMount.START_FAILED', [detail || errCode || 'common.ERROR'], mapped.statusCode);
     }
     return data;
-  }
+  };
 
-  async _stopByIpc({ id }) {
+  _stopByIpc = async ({ id }) => {
     const idNum = Number(id);
     if (!Number.isFinite(idNum) || idNum <= 0) throw buildHttpError('common.INVALID_PARAMS', 400);
     if (!process.send) throw buildHttpError('common.ERROR', 500);
@@ -159,7 +159,7 @@ class FileMountController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
   async list(req, res) {
     try {

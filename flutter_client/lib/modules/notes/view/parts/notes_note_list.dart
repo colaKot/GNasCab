@@ -164,15 +164,15 @@ class NotesNoteList extends StatelessWidget {
     final borderColor = selected
         ? scheme.primary
         : scheme.outlineVariant.withValues(alpha: 0.16);
-    final primaryText = selected ? Colors.white : scheme.onSurface;
+    final primaryText = selected ? scheme.onPrimary : scheme.onSurface;
     final secondaryText = selected
-        ? Colors.white.withValues(alpha: 0.84)
+        ? scheme.onPrimary.withValues(alpha: 0.84)
         : scheme.onSurfaceVariant;
     final previewText = selected
-        ? Colors.white.withValues(alpha: 0.9)
+        ? scheme.onPrimary.withValues(alpha: 0.9)
         : scheme.onSurface.withValues(alpha: 0.78);
     final menuIconColor = selected
-        ? Colors.white.withValues(alpha: 0.92)
+        ? scheme.onPrimary.withValues(alpha: 0.92)
         : scheme.onSurfaceVariant;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
@@ -223,7 +223,7 @@ class NotesNoteList extends StatelessWidget {
                         Icon(
                           Icons.check_circle_rounded,
                           size: 16,
-                          color: Colors.white.withValues(alpha: 0.92),
+                          color: scheme.onPrimary.withValues(alpha: 0.92),
                         ),
                         const SizedBox(width: 5),
                       ],
@@ -250,7 +250,7 @@ class NotesNoteList extends StatelessWidget {
                               child: Icon(
                                 Icons.push_pin_rounded,
                                 size: 14,
-                                color: selected ? Colors.white : scheme.primary,
+                                color: selected ? scheme.onPrimary : scheme.primary,
                               ),
                             ),
                           ),
@@ -326,7 +326,7 @@ class NotesNoteList extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11.5,
                             color: selected
-                                ? Colors.white.withValues(alpha: 0.84)
+                                ? scheme.onPrimary.withValues(alpha: 0.84)
                                 : scheme.onSurfaceVariant.withValues(
                                     alpha: 0.92,
                                   ),

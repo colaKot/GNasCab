@@ -859,9 +859,7 @@ class _TorrentCard extends StatelessWidget {
     final uploaded = torrent['uploadedEver'] as num?;
     final ratio = torrent['uploadRatio'] as num?;
     final isLight = theme.brightness == Brightness.light;
-    final completedAccent = isLight
-        ? const Color(0xFF2E7D32)
-        : theme.colorScheme.tertiary;
+    final completedAccent = theme.colorScheme.tertiary;
     final cardBase = theme.cardColor;
 
     return Padding(
@@ -914,9 +912,7 @@ class _TorrentCard extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: isLight
-                          ? const Color(0xFFE8F5E9)
-                          : Color.lerp(cardBase, completedAccent, 0.18),
+                      color: Color.lerp(cardBase, completedAccent, 0.18),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(

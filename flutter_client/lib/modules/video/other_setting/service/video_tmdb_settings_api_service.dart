@@ -83,4 +83,31 @@ class VideoTmdbSettingsApiService extends BaseApiService {
       showLoading: showLoading,
     );
   }
+
+  /// 读取服务端级「默认播放画质」。该接口对所有登录用户开放（含子账号），
+  /// 否则管理员设置了默认码率，非管理员的播放端读不到。
+  Future<ApiResponse<Map<String, dynamic>>> getPlayQuality({
+    bool showLoading = false,
+  }) {
+    return apiPost<Map<String, dynamic>>(
+      '/api/video/getPlayQuality',
+      body: {},
+      showLoading: showLoading,
+    );
+  }
+
+  Future<ApiResponse<Map<String, dynamic>>> setPlayQuality({
+    required String quality,
+    required bool audioDownmix,
+    bool showLoading = false,
+  }) {
+    return apiPost<Map<String, dynamic>>(
+      '/api/video/setPlayQuality',
+      body: {
+        'quality': quality,
+        'audioDownmix': audioDownmix ? 1 : 0,
+      },
+      showLoading: showLoading,
+    );
+  }
 }

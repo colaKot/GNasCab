@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "TMDB 설정이 저장되었습니다",
       "TRANSCODE_CONFIG_SAVED": "트랜스코드 임시 디렉토리가 저장되었습니다",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "기본 재생 화질이 저장되었습니다",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "트랜스코드 임시 디렉토리가 존재하지 않음",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "트랜스코드 임시 경로가 디렉토리가 아님",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "트랜스코드 임시 디렉토리에 쓸 수 없음",

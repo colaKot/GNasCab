@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "تم حفظ إعدادات TMDB",
       "TRANSCODE_CONFIG_SAVED": "تم حفظ مجلد الترميز المؤقت",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "تم حفظ جودة التشغيل الافتراضية",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "مجلد الترميز المؤقت غير موجود",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "مسار الترميز المؤقت ليس مجلداً",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "مجلد الترميز المؤقت غير قابل للكتابة",

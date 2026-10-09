@@ -9,6 +9,7 @@ export 'components/custom_tag.dart';
 export 'components/custom_icon_button.dart';
 export 'components/custom_language_selector.dart';
 export 'components/custom_auth_header.dart';
+export 'components/auth_theme_background.dart';
 export 'components/custom_context_menu_item.dart';
 export 'components/custom_checkbox.dart';
 export 'components/custom_hover_select_menu.dart';

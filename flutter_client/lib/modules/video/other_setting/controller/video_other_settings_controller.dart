@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../utils/dialog_util.dart';
 import '../../../../utils/toast_util.dart';
+import '../../base/video_utils/play_quality.dart';
 import '../service/video_tmdb_settings_api_service.dart';
 
 class TranscodeHwDecoderOption {
@@ -63,6 +64,9 @@ class VideoOtherSettingsController extends GetxController {
   final RxList<TranscodeHwDecoderOption> availableHwDecoders =
       <TranscodeHwDecoderOption>[].obs;
   final RxBool subtitlePreExtractEnabled = true.obs;
+  final RxString defaultPlayQuality = 'original'.obs;
+  /// 音频降混：勾选后每次转码都把非双声道音轨降混成双声道（默认不勾选）
+  final RxBool audioDownmixEnabled = false.obs;
 
   final _api = VideoTmdbSettingsApiService.instance;
 
@@ -72,6 +76,7 @@ class VideoOtherSettingsController extends GetxController {
     fetchSettings(showLoading: false);
     fetchTranscodeSettings(showLoading: false);
     fetchSubtitleSettings(showLoading: false);
+    fetchPlayQualitySettings(showLoading: false);
   }
 
   @override
@@ -230,6 +235,51 @@ class VideoOtherSettingsController extends GetxController {
 
   void setPreferredHwDecoder(String value) {
     preferredHwDecoder.value = value.trim();
+  }
+
+  /// 把画质键翻译成界面文案（原画走多语言，其余是「分辨率 + 码率」）。
+  String playQualityLabel(String quality) => PlayQuality.label(quality);
+
+  Future<void> fetchPlayQualitySettings({bool showLoading = false}) async {
+    try {
+      final res = await _api.getPlayQuality(showLoading: showLoading);
+      if (!res.success) return;
+      final data = res.data ?? <String, dynamic>{};
+      final quality = (data['quality']?.toString() ?? '').trim();
+      defaultPlayQuality.value = PlayQuality.options.contains(quality)
+          ? quality
+          : PlayQuality.original;
+      audioDownmixEnabled.value =
+          data['audioDownmix'] == 1 ||
+          data['audioDownmix'] == '1' ||
+          data['audioDownmix'] == true;
+    } catch (_) {}
+  }
+
+  Future<void> savePlayQualitySettings() async {
+    final quality = defaultPlayQuality.value;
+    if (!PlayQuality.options.contains(quality)) {
+      ToastUtil.show('operation_failed'.tr);
+      return;
+    }
+    DialogUtil.showLoading(message: 'loading'.tr);
+    try {
+      final res = await _api.setPlayQuality(
+        quality: quality,
+        audioDownmix: audioDownmixEnabled.value,
+        showLoading: false,
+      );
+      if (!res.success) {
+        DialogUtil.dismissLoading();
+        ToastUtil.show(res.message ?? 'operation_failed'.tr);
+        return;
+      }
+      DialogUtil.dismissLoading();
+      ToastUtil.show('operation_success'.tr);
+      await fetchPlayQualitySettings(showLoading: false);
+    } finally {
+      DialogUtil.dismissLoading();
+    }
   }
 
   TranscodeHwDecoderOption? findHwDecoderOption(String key) {

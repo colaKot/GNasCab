@@ -57,7 +57,7 @@ class _AppVideoMainViewState extends State<AppVideoMainView> {
           child: Text(
             label,
             style: theme.textTheme.labelLarge?.copyWith(
-              color: selected ? Colors.white : theme.colorScheme.onSurface,
+              color: selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
           ),

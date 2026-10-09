@@ -81,7 +81,7 @@ function normalizeUploadedOriginalName(raw) {
 }
 
 class NotesController {
-  async _handle(req, res, action, successMessage = 'common.SUCCESS') {
+  _handle = async (req, res, action, successMessage = 'common.SUCCESS') => {
     try {
       const data = await action();
       return ResponseUtil.success(req, res, data, successMessage);
@@ -94,7 +94,7 @@ class NotesController {
         Number(err.statusCode) || 500,
       );
     }
-  }
+  };
 
   getNotebookStatus = async (req, res) =>
     this._handle(

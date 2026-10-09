@@ -46,7 +46,7 @@ class AddServerItemView extends StatelessWidget {
                     ), // 使用主题主色
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, size: 32, color: Colors.white),
+                  child: Icon(icon, size: 32, color: theme.colorScheme.onPrimary),
                 ),
                 const SizedBox(width: 16),
                 // 添加服务器文字

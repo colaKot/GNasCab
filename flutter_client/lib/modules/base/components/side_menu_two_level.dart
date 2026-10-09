@@ -60,7 +60,7 @@ class _CollapsedMenuItemState extends State<_CollapsedMenuItem> {
                 ? theme.colorScheme.onSurface.withValues(alpha: 0.06)
                 : Colors.transparent);
       final fg = selected
-          ? Colors.white
+          ? theme.colorScheme.onPrimary
           : theme.colorScheme.onSurface.withValues(
               alpha: _hovered ? 0.9 : 0.75,
             );
@@ -120,9 +120,11 @@ class _SubMenuTileState extends State<_SubMenuTile> {
           : (_hovered
                 ? theme.colorScheme.onSurface.withValues(alpha: 0.01)
                 : Colors.transparent);
-      final fg = selected ? Colors.white : theme.colorScheme.onSurface;
+      final fg = selected
+          ? theme.colorScheme.onPrimary
+          : theme.colorScheme.onSurface;
       final iconColor = selected
-          ? Colors.white
+          ? theme.colorScheme.onPrimary
           : fg.withValues(alpha: _hovered ? 0.9 : 0.75);
 
       return Padding(
@@ -193,7 +195,9 @@ class TwoLevelSideMenu extends StatelessWidget {
   final String? toggleExpandTooltip;
   final String? toggleCollapseTooltip;
   final Widget? headerTrailing;
-  final double topPlaceholderHeight;
+
+  /// 顶部让位高度。null = 跟随当前皮肤的标题栏高度（换肤后自动同步）。
+  final double? topPlaceholderHeight;
   final List<SideMenuTwoLevelGroup> groups;
   const TwoLevelSideMenu({
     super.key,
@@ -205,7 +209,7 @@ class TwoLevelSideMenu extends StatelessWidget {
     this.toggleExpandTooltip,
     this.toggleCollapseTooltip,
     this.headerTrailing,
-    this.topPlaceholderHeight = PcAppWindow.titleBarHeight,
+    this.topPlaceholderHeight,
   });
 
   @override
@@ -218,7 +222,10 @@ class TwoLevelSideMenu extends StatelessWidget {
       color: customColors?.leftTreeBgColor,
       child: Column(
         children: [
-          SizedBox(height: topPlaceholderHeight),
+          SizedBox(
+            height:
+                topPlaceholderHeight ?? PcAppWindow.titleBarHeightFor(context),
+          ),
           SizedBox(
             height: AppSize.sideItemHeight,
             child: Center(

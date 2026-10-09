@@ -169,7 +169,7 @@ void _runNasCabApp({
   required ThemeMode initialThemeMode,
   required String initialRoute,
 }) {
-  // ⭐ 配色方案也从持久化读取（2026-10-08 支持设置页切配色）。
+  // ⭐ 配色方案 / 外观皮肤 / 字体都从持久化读取（2026-10-09 换肤系统）。
   // 启动与设置页切换走同一个 ThemeApplyService，避免两处逻辑不一致。
   final persisted = ThemeApplyService.instance.readPersisted();
   // 滚动条粗细沿用用户设置（静态成员，只能类名访问）
@@ -180,10 +180,18 @@ void _runNasCabApp({
     GetMaterialApp(
       navigatorKey: Get.key,
       title: AppLaunch.appTitle,
-      // 亮/暗两套都按当前配色现场构建；滚动条底色取主题 outline（换配色自动跟随），
-      // 粗细与悬停态仍由用户设置控制（功能，不是风格）。
-      theme: ThemeApplyService.instance.lightFor(persisted.scheme),
-      darkTheme: ThemeApplyService.instance.darkFor(persisted.scheme),
+      // 亮/暗两套都按当前「配色 + 皮肤 + 字体」现场构建；滚动条底色取主题 outline
+      // （换配色自动跟随），粗细与悬停态仍由用户设置控制（功能，不是风格）。
+      theme: ThemeApplyService.instance.lightFor(
+        persisted.scheme,
+        skin: persisted.skin,
+        fontFamily: persisted.fontFamily,
+      ),
+      darkTheme: ThemeApplyService.instance.darkFor(
+        persisted.scheme,
+        skin: persisted.skin,
+        fontFamily: persisted.fontFamily,
+      ),
       themeMode: initialThemeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

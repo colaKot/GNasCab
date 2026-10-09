@@ -7,6 +7,8 @@ import '../../../core/theme/app_tokens.dart';
 import '../../../core/theme/theme_apply_service.dart';
 import '../../../core/theme/theme_manager.dart';
 import 'color_scheme_grid.dart';
+import 'skin_grid.dart';
+import 'font_list.dart';
 
 class ThemeSelectorView extends StatelessWidget {
   const ThemeSelectorView({super.key});
@@ -73,6 +75,36 @@ class ThemeSelectorView extends StatelessWidget {
             ),
             // 页面内嵌⇒ 不关页面，且无需外部刷新勾（下一行本来就随主题重建）
             const ThemeSchemeGrid(closeAfterPick: false),
+            SizedBox(height: AppSpace.section),
+            Text(
+              'settings_theme_skin'.tr,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: AppSpace.xs),
+            Text(
+              'settings_theme_skin_desc'.tr,
+              style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+            ),
+            const ThemeSkinGrid(closeAfterPick: false),
+            SizedBox(height: AppSpace.section),
+            Text(
+              'settings_theme_font'.tr,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: AppSpace.xs),
+            Text(
+              'settings_theme_font_desc'.tr,
+              style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+            ),
+            const ThemeFontList(),
           ],
         ),
       ),

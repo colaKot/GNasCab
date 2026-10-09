@@ -48,7 +48,7 @@ function buildHttpError(msgKey, statusCode) {
 }
 
 class SecurityController {
-  async _sendToMain({ type, responseType, payload, timeoutMs }) {
+  _sendToMain = async ({ type, responseType, payload, timeoutMs }) => {
     const requestId = `${type}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
     const wait = waitForIpcResponse({ requestId, responseType, timeoutMs: timeoutMs ?? 8000 });
     process.send({
@@ -59,7 +59,7 @@ class SecurityController {
     const data = await wait;
     if (!data || data.ok !== true) throw buildHttpError('common.ERROR', 500);
     return data;
-  }
+  };
 
   async getConfig(req, res) {
     try {

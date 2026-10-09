@@ -12,6 +12,7 @@ import '../../controllers/download_controller.dart';
 import '../../models/transfer_task.dart';
 import '../../../base/components/custom_divider.dart';
 import '../../../../utils/popup_menu_util.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import 'task_download_item.dart';
 
 class TaskDownloadPage extends StatefulWidget {
@@ -55,6 +56,8 @@ class _TaskDownloadPageState extends State<TaskDownloadPage>
     final controller = Get.find<DownloadController>();
     final theme = Theme.of(context);
     final customColors = Theme.of(context).extension<CustomColors>();
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：暂停/开始/清除按钮贴最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -65,7 +68,7 @@ class _TaskDownloadPageState extends State<TaskDownloadPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.fromLTRB(14, 14, 14 + ctrlW, 14),
             child: Row(
               children: [
                 Obx(

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../../base/components/custom_glass_card.dart';
 import '../../../base/components/custom_switch.dart';
 import '../../../files/views/folder_picker_dialog.dart';
+import '../../base/video_utils/play_quality.dart';
 import '../../../../utils/dialog_util.dart';
 import '../controller/video_other_settings_controller.dart';
 
@@ -43,6 +44,7 @@ class VideoOtherSettingsView extends StatelessWidget {
                           await ctrl.fetchSettings(showLoading: true);
                           await ctrl.fetchTranscodeSettings(showLoading: true);
                           await ctrl.fetchSubtitleSettings(showLoading: true);
+                          await ctrl.fetchPlayQualitySettings(showLoading: true);
                         },
                         icon: const Icon(Icons.refresh),
                       ),
@@ -129,6 +131,33 @@ class VideoOtherSettingsView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
+                                'video_playback_settings_title'.tr,
+                                style: theme.textTheme.titleSmall,
+                              ),
+                              const SizedBox(height: 12),
+                              _DefaultPlayQualityField(ctrl: ctrl),
+                              const SizedBox(height: 14),
+                              _AudioDownmixToggle(ctrl: ctrl),
+                              const SizedBox(height: 14),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: ElevatedButton(
+                                  onPressed: () => ctrl.savePlayQualitySettings(),
+                                  child: Text('save'.tr),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      CustomGlassCard(
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
                                 'video_transcode_settings_title'.tr,
                                 style: theme.textTheme.titleSmall,
                               ),
@@ -157,6 +186,94 @@ class VideoOtherSettingsView extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _DefaultPlayQualityField extends StatelessWidget {
+  final VideoOtherSettingsController ctrl;
+
+  const _DefaultPlayQualityField({required this.ctrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Obx(() {
+      final value = PlayQuality.options.contains(ctrl.defaultPlayQuality.value)
+          ? ctrl.defaultPlayQuality.value
+          : PlayQuality.original;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'video_default_play_quality'.tr,
+            style: theme.textTheme.titleSmall,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'video_default_play_quality_tip'.tr,
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            value: value,
+            isExpanded: true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            items: PlayQuality.options
+                .map(
+                  (option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(ctrl.playQualityLabel(option)),
+                  ),
+                )
+                .toList(),
+            onChanged: (v) =>
+                ctrl.defaultPlayQuality.value = v ?? PlayQuality.original,
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class _AudioDownmixToggle extends StatelessWidget {
+  final VideoOtherSettingsController ctrl;
+
+  const _AudioDownmixToggle({required this.ctrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Obx(() {
+      final enabled = ctrl.audioDownmixEnabled.value;
+      return Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'video_audio_downmix'.tr,
+                  style: theme.textTheme.titleSmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'video_audio_downmix_tip'.tr,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          CustomSwitch(
+            value: enabled,
+            onChanged: (v) => ctrl.audioDownmixEnabled.value = v,
+          ),
+        ],
+      );
+    });
   }
 }
 

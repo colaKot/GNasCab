@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 
 import '../../../../modules/base/components.dart';
 import './admin_create_controller.dart';
-import '../../../../core/theme/dark_theme.dart';
 import '../../../../utils/dimens_util.dart';
 
 /// 创建管理员界面 - 使用 GetX 重构
@@ -23,7 +22,7 @@ class AdminCreateView extends GetView<AdminCreateController> {
 
   Widget _buildContent(BuildContext context) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           final theme = Theme.of(context);
@@ -174,14 +173,14 @@ class AdminCreateView extends GetView<AdminCreateController> {
                                   : () => controller.handleSubmit(),
                               isDisabled: controller.isLoading.value,
                               icon: controller.isLoading.value
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 20,
                                       height: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
+                                              theme.colorScheme.onPrimary,
                                             ),
                                       ),
                                     )

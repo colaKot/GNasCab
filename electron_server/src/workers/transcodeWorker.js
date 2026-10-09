@@ -789,6 +789,11 @@ async function startTranscoding(playId, filePath, options = {}) {
   const targetWidth = toEvenNumber(parseTargetWidth(options));
   const gop = computeHlsGopFrames(segDur, videoStreamInfo);
   const needsHdrToSdr = streamNeedsHdrToSdr(videoStreamInfo);
+  // 仅转音频：视频保持原画直通（-c:v copy），只把音轨重编成 AAC。
+  // 不适用场景（HDR/DV 需色调映射、需烧录字幕、指定了目标分辨率）会在下面自动回退重编。
+  const wantVideoCopy = options.videoCopy === true;
+  // 音频降混：开启后把非双声道音轨降混成双声道；关闭时保持源声道数。
+  const audioDownmix = options.audioDownmix === true;
 
   return new Promise((resolve, reject) => {
     let usedHwOnce = false;
@@ -828,6 +833,11 @@ async function startTranscoding(playId, filePath, options = {}) {
       const effectiveUseBitmapSubtitleOverlay = skipSubtitleBurn ? false : useBitmapSubtitleOverlay;
       const useHwAccel = mode === 'hw_full' || mode === 'hw_encode' ? !!hwConfig && !!hwConfig.encoder : false;
       const videoCodec = useHwAccel ? hwConfig.encoder : 'libx264';
+      // 视频直通（仅转音频）：HDR/DV 需色调映射、需烧录字幕、指定了目标分辨率都必须重编视频
+      const videoCopy =
+        wantVideoCopy && !needsHdrToSdr && !burnSubtitle && !targetWidth;
+      // 直通模式下不需要任何硬解/滤镜链路
+      const useHwAccelLink = useHwAccel && !videoCopy;
       const hdrTonemapStrategy = hdrTonemapStrategyOverride ?? pickHdrTonemapStrategy(videoStreamInfo, videoCodec);
       const hasCpuFilters = effectiveUseBitmapSubtitleOverlay || effectiveBurnSubtitle || needsHdrToSdr;
       const skipHdrTargetScale = needsHdrToSdr && !!toEvenNumber(targetWidth);
@@ -839,15 +849,15 @@ async function startTranscoding(playId, filePath, options = {}) {
       const hdrSkipHwDecode = hdrUsesLibplacebo || hdrUsesOpenClTonemap;
       const hdrKeepsHwFramesForVtEncoder = hdrUsesVideotoolboxTonemap && isVideotoolboxEncoder(videoCodec);
       const useHwUploadAfterFilters =
-        useHwAccel &&
+        useHwAccelLink &&
         typeof hwConfig.hwUploadFilter === 'string' &&
         hwConfig.hwUploadFilter.length > 0 &&
         !hdrUsesLibplacebo &&
         !hdrUsesOpenClTonemap &&
         !hdrKeepsHwFramesForVtEncoder;
-      const hwDecodeArgs = useHwAccel && Array.isArray(hwConfig.decodeArgs) ? hwConfig.decodeArgs : [];
+      const hwDecodeArgs = useHwAccelLink && Array.isArray(hwConfig.decodeArgs) ? hwConfig.decodeArgs : [];
       const useCudaFull =
-        useHwAccel &&
+        useHwAccelLink &&
         mode === 'hw_full' &&
         !isHighBitDepthVideoStream(videoStreamInfo) &&
         videoCodec === 'h264_nvenc' &&
@@ -874,8 +884,8 @@ async function startTranscoding(playId, filePath, options = {}) {
         inputOptions.push('-copyts');
       }
 
-      const useHwUploadFilter = useHwAccel && typeof hwConfig.hwUploadFilter === 'string' && hwConfig.hwUploadFilter.length > 0;
-      if (useHwAccel && Array.isArray(hwConfig.initDeviceArgs) && hwConfig.initDeviceArgs.length > 0) {
+      const useHwUploadFilter = useHwAccelLink && typeof hwConfig.hwUploadFilter === 'string' && hwConfig.hwUploadFilter.length > 0;
+      if (useHwAccelLink && Array.isArray(hwConfig.initDeviceArgs) && hwConfig.initDeviceArgs.length > 0) {
         inputOptions.push(...buildFfmpegOptionPairs(hwConfig.initDeviceArgs));
       }
       if (needsHdrToSdr && hdrUsesLibplacebo && !inputOptions.some(v => String(v).includes('init_hw_device'))) {
@@ -887,14 +897,14 @@ async function startTranscoding(playId, filePath, options = {}) {
       if (needsHdrToSdr && hdrUsesVideotoolboxTonemap && !inputOptions.some(v => String(v).includes('init_hw_device'))) {
         inputOptions.push(...buildFfmpegOptionPairs(['-init_hw_device', 'videotoolbox']));
       }
-      if (useHwAccel && !hasCpuFilters && hwDecodeArgs.length > 0) {
+      if (useHwAccelLink && !hasCpuFilters && hwDecodeArgs.length > 0) {
         if (mode === 'hw_full') {
           inputOptions.push(...buildFfmpegOptionPairs(hwDecodeArgs));
         }
       }
 
       const canUseCudaDecodeWithCpuFilters =
-        useHwAccel &&
+        useHwAccelLink &&
         hasCpuFilters &&
         !hdrSkipHwDecode &&
         videoCodec === 'h264_nvenc' &&
@@ -905,7 +915,7 @@ async function startTranscoding(playId, filePath, options = {}) {
       }
 
       const canUseD3d11vaDecodeWithCpuFilters =
-        useHwAccel &&
+        useHwAccelLink &&
         hasCpuFilters &&
         !hdrSkipHwDecode &&
         (videoCodec === 'h264_amf' || videoCodec === 'hevc_amf') &&
@@ -920,7 +930,7 @@ async function startTranscoding(playId, filePath, options = {}) {
       if (useCudaFull && !inputOptions.some(v => String(v).includes('-extra_hw_frames'))) {
         inputOptions.push(`-extra_hw_frames ${CUDA_EXTRA_HW_FRAMES}`);
       }
-      if (useHwAccel && Array.isArray(hwConfig.inputArgs) && hwConfig.inputArgs.length > 0) {
+      if (useHwAccelLink && Array.isArray(hwConfig.inputArgs) && hwConfig.inputArgs.length > 0) {
         inputOptions.push(...buildFfmpegOptionPairs(hwConfig.inputArgs));
       }
 
@@ -964,7 +974,8 @@ async function startTranscoding(playId, filePath, options = {}) {
         }
       });
 
-      if (options.bitrate) {
+      // 视频直通时不能设置视频码率（会触发重编/报错）
+      if (options.bitrate && !videoCopy) {
         command.videoBitrate(options.bitrate);
       }
 
@@ -987,7 +998,10 @@ async function startTranscoding(playId, filePath, options = {}) {
         Logger.info(`[TranscodeWorker] HDR/DV source detected, applying SDR tonemap (${tonemapLabel}) playId=${playId}`);
       }
 
-      if (effectiveUseBitmapSubtitleOverlay) {
+      if (videoCopy) {
+        // 仅转音频：视频流直接 copy，不做任何滤镜/缩放/色调映射
+        command.outputOptions(['-map 0:v:0', `-map 0:a:${Number.isNaN(audioIndex) ? 0 : audioIndex}?`]);
+      } else if (effectiveUseBitmapSubtitleOverlay) {
         // 内嵌位图字幕烧录 (overlay)
         const scaleSteps = buildCpuVideoScaleSteps(targetWidth, videoCodec, videoStreamInfo, { skipTargetScale: skipHdrTargetScale });
         const hdrSteps = needsHdrToSdr ? buildHdrToSdrSteps(targetWidth, videoCodec, videoStreamInfo, hdrTonemapStrategy) : [];
@@ -1097,29 +1111,40 @@ async function startTranscoding(playId, filePath, options = {}) {
         }
       }
 
-      const outputOptions = [`-c:v ${videoCodec}`, `-g ${gop}`, '-c:a aac', '-b:a 128k', '-ac 2'];
+      const videoCodecOut = videoCopy ? 'copy' : videoCodec;
+      const outputOptions = [`-c:v ${videoCodecOut}`];
+      if (!videoCopy) {
+        outputOptions.push(`-g ${gop}`);
+      }
+      outputOptions.push('-c:a aac', '-b:a 128k');
+      // 勾选「音频降混」时强制双声道；未勾选时保持源声道数
+      if (audioDownmix) {
+        outputOptions.push('-ac 2');
+      }
       if (wmvFamily && seek !== null) {
         outputOptions.push('-avoid_negative_ts', 'make_zero', '-max_muxing_queue_size', '1024');
       }
-      if (videoCodec === 'libx264') {
-        outputOptions.splice(1, 0, '-preset veryfast', '-sc_threshold 0');
-      } else if (videoCodec === 'h264_nvenc') {
-        if (useCudaFull) {
-          outputOptions.splice(1, 0, '-preset fast');
-        } else {
-          outputOptions.splice(1, 0, '-preset fast', '-pix_fmt yuv420p');
+      if (!videoCopy) {
+        if (videoCodec === 'libx264') {
+          outputOptions.splice(1, 0, '-preset veryfast', '-sc_threshold 0');
+        } else if (videoCodec === 'h264_nvenc') {
+          if (useCudaFull) {
+            outputOptions.splice(1, 0, '-preset fast');
+          } else {
+            outputOptions.splice(1, 0, '-preset fast', '-pix_fmt yuv420p');
+          }
+        } else if (videoCodec === 'h264_qsv' || videoCodec === 'hevc_qsv') {
+          // QSV 上 force_key_frames 可能产生非 IDR 的 I 帧，HLS 只在 IDR 处切分；配合 temp_file 时会一直不写 .ts，杀进程才落盘超大 segment_000
+          const qsvExtra =
+            videoCodec === 'h264_qsv'
+              ? ['-look_ahead_depth', '0', '-forced_idr', '1', '-bf', '0']
+              : ['-look_ahead_depth', '0', '-forced_idr', '1'];
+          outputOptions.splice(1, 0, ...qsvExtra);
         }
-      } else if (videoCodec === 'h264_qsv' || videoCodec === 'hevc_qsv') {
-        // QSV 上 force_key_frames 可能产生非 IDR 的 I 帧，HLS 只在 IDR 处切分；配合 temp_file 时会一直不写 .ts，杀进程才落盘超大 segment_000
-        const qsvExtra =
-          videoCodec === 'h264_qsv'
-            ? ['-look_ahead_depth', '0', '-forced_idr', '1', '-bf', '0']
-            : ['-look_ahead_depth', '0', '-forced_idr', '1'];
-        outputOptions.splice(1, 0, ...qsvExtra);
-      }
-      if (needsHdrToSdr) {
-        // tonemap 输出均为 bt709 limited(tv)；勿沿用 DV 源 full range(pc)，否则 QSV 色域换算错误会发绿
-        outputOptions.splice(1, 0, '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv');
+        if (needsHdrToSdr) {
+          // tonemap 输出均为 bt709 limited(tv)；勿沿用 DV 源 full range(pc)，否则 QSV 色域换算错误会发绿
+          outputOptions.splice(1, 0, '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv');
+        }
       }
       const startNumberRaw = options && options.startNumber !== undefined ? Number(options.startNumber) : NaN;
       const startNumber = Number.isFinite(startNumberRaw) && startNumberRaw >= 0 ? Math.floor(startNumberRaw) : null;
@@ -1131,7 +1156,9 @@ async function startTranscoding(playId, filePath, options = {}) {
       if (tsOffset !== null) {
         outputOptions.push('-output_ts_offset', String(tsOffset));
       }
-      outputOptions.push(`-force_key_frames expr:gte(t,n_forced*${segDur})`);
+      if (!videoCopy) {
+        outputOptions.push(`-force_key_frames expr:gte(t,n_forced*${segDur})`);
+      }
       outputOptions.push('-f', 'hls', '-hls_time', String(segDur), '-hls_list_size', '0');
 
       command
@@ -1141,7 +1168,9 @@ async function startTranscoding(playId, filePath, options = {}) {
         .output(m3u8Path);
 
       command.on('start', cmdLine => {
-        if (useHwAccel) {
+        if (videoCopy) {
+          Logger.info(`[TranscodeWorker] Started FFmpeg (video copy + audio transcode): ${cmdLine}`);
+        } else if (useHwAccel) {
           Logger.info(`[TranscodeWorker] Started FFmpeg with HW accel (${hwConfig.name || hwConfig.encoder}): ${cmdLine}`);
         } else {
           Logger.info(`[TranscodeWorker] Started FFmpeg (CPU): ${cmdLine}`);
@@ -1234,7 +1263,7 @@ async function startTranscoding(playId, filePath, options = {}) {
           return;
         }
 
-        if (useHwAccel && useCudaFull && !usedHwEncodeFallback) {
+        if (useHwAccelLink && useCudaFull && !usedHwEncodeFallback) {
           // CUDA 全链路失败：优先回退到“仅硬件编码”，尽可能保留性能
           usedHwEncodeFallback = true;
           Logger.error(`[TranscodeWorker] CUDA decode+NVENC failed, fallback NVENC encode-only: ${playId}`, err || null);
@@ -1253,7 +1282,7 @@ async function startTranscoding(playId, filePath, options = {}) {
           return;
         }
 
-        if (useHwAccel && !usedHwOnce) {
+        if (useHwAccelLink && !usedHwOnce) {
           // 硬件加速失败：再回退到纯 CPU（最稳妥）
           usedHwOnce = true;
           Logger.error(`[TranscodeWorker] HW accel failed, fallback CPU: ${playId}`, err || null);

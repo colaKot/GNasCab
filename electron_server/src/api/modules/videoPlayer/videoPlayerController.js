@@ -7,6 +7,7 @@ const ffmpegPath = require('../../../libsPath/ffmpegPath');
 const ffprobePath = require('../../../libsPath/ffprobePath');
 const transCodeUtil = require('../../../utils/transCodeUtil');
 const tableVideoTranscodeSession = require('../../../db/table/tableVideoTranscodeSession');
+const tableConfig = require('../../../db/table/tableConfig');
 const multer = require('multer');
 const fsExtra = require('fs-extra');
 const { spawnSync } = require('node:child_process');
@@ -681,7 +682,7 @@ class VideoPlayerController {
   async transcode(req, res) {
     try {
       await tableVideoTranscodeSession.deleteOlderThanMs(24 * 60 * 60 * 1000, req.dbVideo).catch(() => null);
-      const { filePath, playId, seek, width, resolution, bitrate, audioIndex, subtitleIndex, subtitlePath, subtitleBurn, client, device_id, deviceId } = req.query;
+      const { filePath, playId, seek, width, resolution, bitrate, audioIndex, subtitleIndex, subtitlePath, subtitleBurn, videoCopy, client, device_id, deviceId } = req.query;
 
       if (!filePath || !playId) {
         return ResponseUtil.error(req, res, 'videoPlayer.INVALID_PARAMS');
@@ -718,6 +719,14 @@ class VideoPlayerController {
           }
         }
       }
+      // 音频降混：影视设置里的开关，开启后转码时把非双声道音轨降混成双声道
+      let audioDownmix = false;
+      try {
+        const downmixRaw = await tableConfig.getConfigByKey('videoAudioDownmix');
+        audioDownmix = downmixRaw === 1 || downmixRaw === '1' || downmixRaw === true;
+      } catch (_) {
+        audioDownmix = false;
+      }
       const baseOptions = {
         seek: seekSeconds,
         width: Number.isFinite(w) && w > 0 ? w : undefined,
@@ -727,6 +736,9 @@ class VideoPlayerController {
         subtitleIndex: subtitleTrackIndex,
         subtitlePath,
         subtitleBurn: effectiveSubtitleBurn,
+        // 视频是否原画直通（仅转音频）。Worker 会再校验 HDR/字幕烧录等不适用场景后回退重编。
+        videoCopy: videoCopy === 'true',
+        audioDownmix,
         segmentDurationSeconds: 2,
       };
 

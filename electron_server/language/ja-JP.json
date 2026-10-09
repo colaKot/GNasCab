@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "TMDB設定を保存しました",
       "TRANSCODE_CONFIG_SAVED": "トランスコード一時ディレクトリを保存しました",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "デフォルトの再生画質を保存しました",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "トランスコード一時ディレクトリが存在しません",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "トランスコード一時パスはディレクトリではありません",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "トランスコード一時ディレクトリに書き込めません",

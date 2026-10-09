@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import '../../../../core/theme/dark_theme.dart';
 
 Future<String?> scanPairCodeQr(BuildContext context) {
   return Navigator.of(context).push<String>(
@@ -38,7 +37,7 @@ class _PairCodeQrScannerPageState extends State<_PairCodeQrScannerPage> {
   Widget build(BuildContext context) {
     final nav = Navigator.of(context);
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           return Scaffold(

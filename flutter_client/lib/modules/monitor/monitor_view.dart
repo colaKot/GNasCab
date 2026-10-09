@@ -48,10 +48,9 @@ class _MonitorViewState extends State<MonitorView> {
             children: [
               // 第一部分：设备监控
               // Part 1: Device Monitor
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [_buildSectionTitle('monitor_device_monitor'.tr)],
-              ),
+              // ⭐ 与下方「存储设备」标题统一为左对齐（2026-10-09）：
+              // 原为 MainAxisAlignment.end 靠右，会撞右上角窗口按钮。
+              _buildSectionTitle('monitor_device_monitor'.tr),
               const SizedBox(height: 8),
               _buildDeviceMonitorCard(metrics),
 

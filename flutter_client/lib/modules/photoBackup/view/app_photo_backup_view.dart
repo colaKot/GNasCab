@@ -30,7 +30,6 @@ class AppPhotoBackupView extends GetView<PhotoBackupController> {
               icon: Icons.add,
               onPressed: () => _openTaskForm(context),
               tooltip: 'photo_backup_create'.tr,
-              iconColor: Colors.white,
             ),
           ),
         ],

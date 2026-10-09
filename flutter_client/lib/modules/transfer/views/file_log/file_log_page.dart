@@ -7,6 +7,7 @@ import '../../../../modules/base/components/custom_bordered_icon_button.dart';
 import '../../../../modules/base/components/custom_expandable_search_bar.dart';
 import '../../../../modules/base/components/custom_hover_select_menu.dart';
 import '../../../../modules/base/components/custom_no_data.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import '../../controllers/file_log_controller.dart';
 import 'file_log_item.dart';
 
@@ -77,6 +78,8 @@ class _FileLogPageState extends State<FileLogPage> {
     final customColors = Theme.of(context).extension<CustomColors>();
     final isMobile = DeviceUtils.isMobile;
     final paddingH = isMobile ? 12.0 : 16.0;
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：右侧清除按钮贴最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -90,7 +93,7 @@ class _FileLogPageState extends State<FileLogPage> {
             padding: EdgeInsets.fromLTRB(
               paddingH,
               isMobile ? 6.0 : 16.0,
-              paddingH,
+              paddingH + ctrlW,
               8,
             ),
             child: Row(

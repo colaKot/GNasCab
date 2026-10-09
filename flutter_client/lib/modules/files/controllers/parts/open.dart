@@ -1316,7 +1316,7 @@ class _PcWebPreviewViewState extends State<PcWebPreviewView> {
     if (_useExternalBrowser) {
       return Column(
         children: [
-          SizedBox(height: PcAppWindow.titleBarHeight),
+          SizedBox(height: PcAppWindow.titleBarHeightFor(context)),
           Expanded(
             child: Center(
               child: Padding(
@@ -1371,7 +1371,7 @@ class _PcWebPreviewViewState extends State<PcWebPreviewView> {
           },
           child: Column(
             children: [
-              SizedBox(height: PcAppWindow.titleBarHeight),
+              SizedBox(height: PcAppWindow.titleBarHeightFor(context)),
               Expanded(
                 child: Stack(
                   children: [

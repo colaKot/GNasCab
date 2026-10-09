@@ -9,8 +9,6 @@ import '../server_add/server_add_view.dart';
 import '../server_add/server_add_controller.dart';
 import '../admin_create/admin_create_view.dart';
 import '../admin_create/admin_create_controller.dart';
-import '../../../../core/bg/background_controller.dart';
-import '../../../../core/theme/dark_theme.dart';
 import '../../../../utils/dimens_util.dart';
 import '../../../../utils/device_utils.dart';
 
@@ -37,7 +35,7 @@ class _ServerListViewContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           return Obx(() {
@@ -63,15 +61,7 @@ class _ServerListViewContent extends StatelessWidget {
                 }
               },
               child: Scaffold(
-                body: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        BackgroundController.instance.loginBgUrl,
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                body: AuthThemeBackground(
                   child: Center(
                     child: Container(child: _buildCenterView(context)),
                   ),

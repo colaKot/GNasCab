@@ -18,6 +18,9 @@ class PcPhotoTimelineView extends GetView<PhotoTimelineController> {
   final bool loadTheDay;
   final String? geohash;
 
+  /// 足迹地图传入的聚合档位（2~6，0 = 未指定）。见 [PhotoTimelineController.precisionOverride]。
+  final int precisionOverride;
+
   /// 见 [PhotoTimelineController.alertWhenNoSourcePath]。
   final bool alertWhenNoSourcePath;
 
@@ -31,6 +34,7 @@ class PcPhotoTimelineView extends GetView<PhotoTimelineController> {
     this.placeName,
     this.loadTheDay = false,
     this.geohash,
+    this.precisionOverride = 0,
     this.alertWhenNoSourcePath = false,
   });
 
@@ -46,7 +50,10 @@ class PcPhotoTimelineView extends GetView<PhotoTimelineController> {
       t = '${t}_place_name_${placeName!.trim()}';
     }
     if (geohash != null && geohash!.trim().isNotEmpty) {
-      t = '${t}_geo_${geohash!.trim()}';
+      // ⭐ 档位也要进 tag：同一个 geohash 在不同缩放下档位不同，
+      // 不区分就会复用同一个控制器实例，导致点开不同 marker 显示同一个范围。
+      final suffix = precisionOverride >= 2 && precisionOverride <= 6 ? '_p$precisionOverride' : '';
+      t = '${t}_geo_${geohash!.trim()}$suffix';
     }
     return t;
   }
@@ -65,6 +72,7 @@ class PcPhotoTimelineView extends GetView<PhotoTimelineController> {
         initialPlaceName: placeName,
         initialLoadTheDay: loadTheDay,
         initialGeohash: geohash,
+        precisionOverride: precisionOverride,
         alertWhenNoSourcePath: alertWhenNoSourcePath,
       ),
       tag: controllerTag,

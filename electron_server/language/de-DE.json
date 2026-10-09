@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "TMDB-Einstellungen gespeichert",
       "TRANSCODE_CONFIG_SAVED": "Transcode-Temp-Verzeichnis gespeichert",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "Standard-Wiedergabequalität gespeichert",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "Transcode-Temp-Verzeichnis existiert nicht",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "Transcode-Temp-Pfad ist kein Verzeichnis",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "Transcode-Temp-Verzeichnis ist nicht beschreibbar",

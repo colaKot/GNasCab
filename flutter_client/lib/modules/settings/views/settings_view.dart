@@ -7,6 +7,8 @@ import '../../../core/languages/language_service.dart';
 import '../../../core/theme/theme_manager.dart';
 import '../../../core/theme/theme_apply_service.dart'; // ⭐ 运行时切配色/切亮暗
 import 'color_scheme_grid.dart'; // 配色方案网格
+import 'skin_grid.dart'; // 外观皮肤网格
+import 'font_list.dart'; // 界面字体列表
 import '../../../core/api/base_api_service.dart';
 import '../../../core/api/api_controller.dart';
 import '../../../core/user/current_user_controller.dart';
@@ -737,6 +739,63 @@ class _SettingsViewState extends State<SettingsView> {
                       // 点选即时生效，**不关弹窗** —— 让用户直接看到效果再决定。
                       ThemeSchemeGrid(
                         closeAfterPick: false,
+                        onPicked: () => setDialogState(() {}),
+                      ),
+
+                      // ── 外观皮肤（2026-10-09 新增，窗口/控件造型）──
+                      const Divider(height: 24),
+                      Row(
+                        children: [
+                          const Icon(Icons.window_outlined, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            'settings_theme_skin'.tr,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'settings_theme_skin_desc'.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(
+                            dialogCtx,
+                          ).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      ThemeSkinGrid(
+                        closeAfterPick: false,
+                        onPicked: () => setDialogState(() {}),
+                      ),
+
+                      // ── 界面字体（2026-10-09 新增）──
+                      const Divider(height: 24),
+                      Row(
+                        children: [
+                          const Icon(Icons.text_fields_outlined, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            'settings_theme_font'.tr,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'settings_theme_font_desc'.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(
+                            dialogCtx,
+                          ).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      ThemeFontList(
                         onPicked: () => setDialogState(() {}),
                       ),
                     ],

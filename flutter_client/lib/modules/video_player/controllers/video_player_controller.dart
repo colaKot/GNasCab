@@ -16,6 +16,7 @@ import '../../../utils/toast_util.dart';
 import '../../../utils/device_utils.dart';
 import '../../../utils/user_agent_util.dart';
 import '../../music/play_service/controller/music_play_service_controller.dart';
+import '../../video/base/video_utils/play_quality.dart';
 import '../cache/video_range_memory_cache.dart';
 import '../playback/playback_engine.dart';
 import '../playback/playback_engine_factory.dart';
@@ -178,40 +179,10 @@ class PlayerController extends GetxController with WindowListener {
   /// 当前播放质量 (original, 480p_1m, 720p_2m, 1080p_5m, 4k_10m ...)
   final RxString currentQuality = 'original'.obs;
 
-  /// 质量列表
-  final List<String> qualityOptions = [
-    'original',
-    '4k_20m',
-    '4k_15m',
-    '4k_10m',
-    '1080p_8m',
-    '1080p_5m',
-    '1080p_3m',
-    '1080p_2m',
-    '720p_3m',
-    '720p_2m',
-    '720p_1m',
-    '480p_1m',
-  ];
+  /// 质量列表。定义见 [PlayQuality]（与服务端白名单一一对应，改动必须两边同步）
+  final List<String> qualityOptions = PlayQuality.options;
 
-  static const Map<String, String> _qualityLabelShortMap = {
-    '4k_20m': '4K 20M',
-    '4k_15m': '4K 15M',
-    '4k_10m': '4K 10M',
-    '1080p_8m': '1080P 8M',
-    '1080p_5m': '1080P 5M',
-    '1080p_3m': '1080P 3M',
-    '1080p_2m': '1080P 2M',
-    '720p_3m': '720P 3M',
-    '720p_2m': '720P 2M',
-    '720p_1m': '720P 1M',
-    '480p_1m': '480P 1M',
-  };
-
-  String qualityLabelShort(String quality) {
-    if (quality == 'original') return 'player_quality_original'.tr;
-    return _qualityLabelShortMap[quality] ?? 'player_quality'.tr;
-  }
+  String qualityLabelShort(String quality) => PlayQuality.label(quality);
 
   Map<String, dynamic>? _pendingPreference;
   Duration? _pendingResumePosition;
@@ -224,7 +195,18 @@ class PlayerController extends GetxController with WindowListener {
   int _transcodeBaseSeconds = 0; // 转码基础秒数
   int? _pendingTranscodeSeekSeconds;
 
-  final String defaultTranscodeQuality = '1080p_3m'; // 默认转码质量
+  /// 内置转码兜底画质（用户没配默认码率时用）
+  final String defaultTranscodeQuality = '1080p_3m';
+
+  /// 服务端配置的「默认播放画质」（影视设置页写入）。'original' 表示默认原画播放。
+  /// 在 openPlaylist 时拉一次；播放中手动切换画质不会改它。
+  String _defaultPlayQuality = 'original';
+
+  /// 兜底转码画质：用户配了默认码率就用它，否则用内置的 1080p_3m。
+  /// 用于「原画失败自动切转码」「容器/编码不支持自动切转码」等被动降级路径。
+  String get fallbackTranscodeQuality =>
+      _defaultPlayQuality != 'original' ? _defaultPlayQuality : defaultTranscodeQuality;
+
   int maxReloadRetries = 2; // 最大重试次数
   int _reloadRetryCount = 0; // 当前重试次数
   bool _isRecoveringFromError = false; // 是否正在从错误中恢复
@@ -287,6 +269,7 @@ class PlayerController extends GetxController with WindowListener {
     }
     if (playlist.isEmpty) return;
     await loadPlaybackEnginePreference();
+    await loadDefaultPlayQuality();
     await _initializePlayer(keepPosition: false);
   }
 }

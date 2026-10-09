@@ -17,5 +17,8 @@ set LOG=G:\work\_patch_backup\logs\flutter_web_build.log
 cd /d G:\work\nascab\flutter_client
 echo ==== build start %DATE% %TIME% ==== > "%LOG%"
 call "G:\work\_toolchain\flutter-sdk\flutter\bin\flutter.bat" build web --release --no-web-resources-cdn --no-pub --pwa-strategy=none >> "%LOG%" 2>&1
-echo ==== EXITCODE=%ERRORLEVEL% %DATE% %TIME% ==== >> "%LOG%"
-endlocal
+set RC=%ERRORLEVEL%
+echo ==== EXITCODE=%RC% %DATE% %TIME% ==== >> "%LOG%"
+rem --- 必须 exit /b 把真实退出码带出去：只写 endlocal 会把 ERRORLEVEL 重置成 0，
+rem     于是「编译失败但 tool/bridge_cli.py 仍返回 rc=0」。判成功一定要看日志的 EXITCODE=。
+endlocal & exit /b %RC%

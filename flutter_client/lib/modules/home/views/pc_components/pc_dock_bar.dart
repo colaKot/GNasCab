@@ -160,7 +160,7 @@ class PcDockBar extends StatelessWidget {
                 height: 24,
                 alignment: Alignment.center,
                 child: LoadingAnimationWidget.beat(
-                  color: Colors.white,
+                  color: theme.colorScheme.primary,
                   size: 20,
                 ),
               ),
@@ -214,8 +214,15 @@ class PcDockBar extends StatelessWidget {
           width: 44,
           alignment: Alignment.center,
           child: active
-              ? LoadingAnimationWidget.inkDrop(color: Colors.white, size: 20)
-              : Icon(Icons.sync_outlined, size: 28, color: Colors.white),
+              ? LoadingAnimationWidget.inkDrop(
+                  color: theme.colorScheme.primary,
+                  size: 20,
+                )
+              : Icon(
+                  Icons.sync_outlined,
+                  size: 28,
+                  color: theme.colorScheme.onSurface,
+                ),
         ),
       ),
     );
@@ -226,10 +233,15 @@ class PcDockBar extends StatelessWidget {
       width: 40,
       height: 1,
       margin: const EdgeInsets.symmetric(vertical: 8),
-      color: Colors.white24,
+      color: theme.colorScheme.outlineVariant,
     );
   }
 
+  /// Dock 图标颜色：**从当前主题取**，不再写死白色。
+  ///
+  /// ⚠️ 2026-10-09 修：原来全部硬编码 `Colors.white`，而 Dock 底色是
+  /// `CustomGlassContainer` 的 `colorScheme.surface`。亮色模式下 surface 接近白 ⇒
+  /// **白图标压在白底上完全看不见**（铁柱报的"左侧栏图标全白"）。
   Widget _dockIcon(
     BuildContext context,
     IconData icon,
@@ -237,6 +249,7 @@ class PcDockBar extends StatelessWidget {
     VoidCallback onTap, {
     double size = 28,
   }) {
+    final color = Theme.of(context).colorScheme.onSurface;
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -245,7 +258,7 @@ class PcDockBar extends StatelessWidget {
         child: Container(
           width: 44,
           alignment: Alignment.center,
-          child: Icon(icon, size: size, color: Colors.white),
+          child: Icon(icon, size: size, color: color),
         ),
       ),
     );
@@ -257,6 +270,7 @@ class PcDockBar extends StatelessWidget {
     VoidCallback onTap,
   ) {
     final ctrl = PcHomeController.instance;
+    final dockFg = Theme.of(context).colorScheme.onSurface;
     final tooltip = (ctrl.windowTitle(windowId) ?? '').trim().isEmpty
         ? windowId
         : ctrl.windowTitle(windowId)!.trim();
@@ -305,11 +319,7 @@ class PcDockBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(7),
                         child:
                             ctrl.windowIcon(windowId) ??
-                            Icon(
-                              Icons.apps_outlined,
-                              size: 22,
-                              color: Colors.white,
-                            ),
+                            Icon(Icons.apps_outlined, size: 22, color: dockFg),
                       ),
                     ),
                   ),
@@ -321,7 +331,7 @@ class PcDockBar extends StatelessWidget {
                       width: 4,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.white54,
+                        color: dockFg.withValues(alpha: 0.55),
                         shape: BoxShape.circle,
                       ),
                     )
@@ -332,7 +342,7 @@ class PcDockBar extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 2),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(1),
-                        color: Colors.white54,
+                        color: dockFg.withValues(alpha: 0.55),
                       ),
                     ),
                 ],

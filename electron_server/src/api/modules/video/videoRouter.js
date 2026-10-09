@@ -45,6 +45,9 @@ router.post('/getTranscodeConfig', authenticateJWT, requireAdmin, videoConfigCon
 router.post('/setTranscodeConfig', authenticateJWT, requireAdmin, videoConfigController.setTranscodeConfig);
 router.post('/getSubtitleConfig', authenticateJWT, requireAdmin, videoConfigController.getSubtitleConfig);
 router.post('/setSubtitleConfig', authenticateJWT, requireAdmin, videoConfigController.setSubtitleConfig);
+// 默认播放画质：读取对所有登录用户开放（子账号的播放端也要遵守该默认值），写入仅管理员
+router.post('/getPlayQuality', authenticateJWT, videoConfigController.getPlayQuality);
+router.post('/setPlayQuality', authenticateJWT, requireAdmin, videoConfigController.setPlayQuality);
 
 router.post('/tmdb/search', authenticateJWT, videoTmdbController.search);
 router.post('/scrape/start', authenticateJWT, requireAdmin, videoScrapeController.start);

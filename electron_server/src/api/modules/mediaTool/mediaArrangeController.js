@@ -53,7 +53,7 @@ function mapStartStopErrorToResponse(errorCode) {
 }
 
 class MediaArrangeController {
-  async _startByIpc({ id }) {
+  _startByIpc = async ({ id }) => {
     const idNum = Number(id);
     if (!Number.isFinite(idNum) || idNum <= 0) throw buildHttpError('mediaTool.INVALID_PARAMS', 400);
     if (typeof process.send !== 'function') throw buildHttpError('common.ERROR', 500);
@@ -66,9 +66,9 @@ class MediaArrangeController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
-  async _stopByIpc({ id }) {
+  _stopByIpc = async ({ id }) => {
     const idNum = Number(id);
     if (!Number.isFinite(idNum) || idNum <= 0) throw buildHttpError('mediaTool.INVALID_PARAMS', 400);
     if (typeof process.send !== 'function') throw buildHttpError('common.ERROR', 500);
@@ -81,7 +81,7 @@ class MediaArrangeController {
       throw buildHttpError(mapped.msgKey, mapped.statusCode);
     }
     return data;
-  }
+  };
 
   async list(req, res) {
     try {

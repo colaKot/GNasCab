@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 
 import '../../../../modules/base/components.dart';
 import './server_add_controller.dart';
-import '../../../../core/theme/dark_theme.dart';
 import '../../../../utils/dimens_util.dart';
 
 /// 添加服务器界面 - 使用 GetX 重构
@@ -24,7 +23,7 @@ class ServerAddView extends GetView<ServerAddController> {
 
   Widget _buildContent(BuildContext context) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           final theme = Theme.of(context);
@@ -207,14 +206,14 @@ class ServerAddView extends GetView<ServerAddController> {
                                     : () => controller.handleSubmit(),
                                 isDisabled: controller.isLoading.value,
                                 icon: controller.isLoading.value
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
+                                                theme.colorScheme.onPrimary,
                                               ),
                                         ),
                                       )

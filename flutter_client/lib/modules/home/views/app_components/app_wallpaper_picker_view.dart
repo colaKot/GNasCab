@@ -545,10 +545,10 @@ class _AppWallpaperPickerViewState extends State<AppWallpaperPickerView> {
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           padding: const EdgeInsets.all(2),
-                                          child: const Icon(
+                                          child: Icon(
                                             Icons.check,
                                             size: 14,
-                                            color: Colors.white,
+                                            color: theme.colorScheme.onPrimary,
                                           ),
                                         ),
                                       ),

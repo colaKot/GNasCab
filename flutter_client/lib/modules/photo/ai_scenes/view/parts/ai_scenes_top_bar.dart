@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../base/components/custom_hover_select_menu.dart';
 import '../../../../base/components/custom_bordered_icon_button.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';
+import '../../../../home/views/pc_components/pc_app_window.dart';
 import '../../../../../core/user/current_user_controller.dart';
 import '../../controller/ai_scenes_controller.dart';
 
@@ -13,8 +14,10 @@ class AiScenesTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = CurrentUserController.instance.isAdmin;
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：刷新/搜索按钮贴最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: EdgeInsets.fromLTRB(16, 12, 16 + ctrlW, 12),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final filter = Obx(() {

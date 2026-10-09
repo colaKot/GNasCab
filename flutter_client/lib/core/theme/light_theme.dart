@@ -1,8 +1,9 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'app_color_schemes.dart';
-import 'app_tokens.dart';
+import 'app_skin.dart';
 import 'custom_colors.dart';
+import 'skin_presets.dart';
 
 /// ⭐⭐ 亮色主题构建入口（2026-10-08 从常量改为函数，支撑设置页运行时切配色）
 ///
@@ -14,6 +15,10 @@ import 'custom_colors.dart';
 /// - 配色：`scheme` 参数（67 套内置，登记表见 `AppColorSchemes.all`，精选 24 套）
 /// - 组件子主题：`subThemesData` 统一圆角与分隔线，不必逐组件手写
 ///
+/// ⭐ 2026-10-09 换肤系统：新增 [skin]（结构型外观：窗口/控件圆角、按钮高度、
+/// 图标尺寸）与 [fontFamily]（字体族）。**颜色仍全部从配色派生**，
+/// 皮肤只压尺寸/形状 ⇒ 皮肤 × 配色 两条轴自由组合。
+///
 /// ⚠️ **CustomColors 的灰阶全部从 `ColorScheme` 派生**，不写死 Windows 灰 ——
 /// 否则换了绿色/紫色配色，侧栏还是冷灰，跟主色打架（用户需求：
 /// "所有涉及主题的都以主题为主"）。
@@ -22,39 +27,50 @@ import 'custom_colors.dart';
 /// - `defaultRadius` 是 **double?**，不是 Radius
 /// - 关色调叠加是 **`applyElevationOverlayColor`**，没有 `elevationOverlayEnabled`
 /// - 分隔线宽度是 **`thinBorderWidth`**，没有 `dividerThickness`
-ThemeData buildLightTheme(FlexScheme scheme) {
+ThemeData buildLightTheme(
+  FlexScheme scheme, {
+  AppSkin? skin,
+  String? fontFamily,
+}) {
+  final sk = skin ?? SkinPresets.defaultSkin;
   final base = FlexThemeData.light(
     scheme: scheme,
     useMaterial3: true,
+    fontFamily: fontFamily,
     appBarElevation: 0, // Windows 标题栏不投影
     // 关掉 M3 色调叠加层，保持纯色分层（参数名在 8.x 是 applyElevationOverlayColor）
     applyElevationOverlayColor: false,
-    subThemesData: const FlexSubThemesData(
-      // 全局圆角统一走 token（控件档 = 4，与 Fluent 对齐）
-      defaultRadius: AppRadius.control,
+    subThemesData: FlexSubThemesData(
+      // 控件圆角由皮肤驱动（默认皮肤 = 4，与 Fluent 对齐）
+      defaultRadius: sk.controlRadius,
       // Fluent 的分隔线很细
       thinBorderWidth: 1,
     ),
   );
   final cs = base.colorScheme;
-  return base.copyWith(
-    scaffoldBackgroundColor: cs.surface,
-    extensions: <ThemeExtension<dynamic>>[
-      // ⚠️ 业务色槽：116 个文件依赖，**只加不改名**。
-      // 颜色全部取自当前配色的 ColorScheme ⇒ 换配色自动跟随。
-      CustomColors(
-        nestedCardColor: cs.surfaceContainerLowest, // 嵌套卡片：最浅
-        emptyCardColor: cs.surfaceContainerLow, // 空卡片
-        leftTreeBgColor: cs.surfaceContainer, // 左侧栏：比底色略深
-        mainContentBgColor: cs.surface, // 主内容
-        oprationBarBgColor: cs.surfaceContainerLow, // 操作栏
-        hairlineBorderColor: cs.outlineVariant, // 卡片细边框
-      ),
-    ],
+  // 皮肤压尺寸/形状（图标尺寸、按钮高度），颜色仍由 base 的 ColorScheme 决定
+  return sk.applyTo(
+    base.copyWith(
+      scaffoldBackgroundColor: cs.surface,
+      extensions: <ThemeExtension<dynamic>>[
+        // ⚠️ 业务色槽：116 个文件依赖，**只加不改名**。
+        // 颜色全部取自当前配色的 ColorScheme ⇒ 换配色自动跟随。
+        CustomColors(
+          nestedCardColor: cs.surfaceContainerLowest, // 嵌套卡片：最浅
+          emptyCardColor: cs.surfaceContainerLow, // 空卡片
+          leftTreeBgColor: cs.surfaceContainer, // 左侧栏：比底色略深
+          mainContentBgColor: cs.surface, // 主内容
+          oprationBarBgColor: cs.surfaceContainerLow, // 操作栏
+          hairlineBorderColor: cs.outlineVariant, // 卡片细边框
+        ),
+        // ⭐ 外观皮肤（窗口/控件造型）也挂进 extensions，供控件读取
+        sk,
+      ],
+    ),
   );
 }
 
-/// 默认亮色主题（`AppColorSchemes.defaultScheme`）。
+/// 默认亮色主题（`AppColorSchemes.defaultScheme` + 默认皮肤）。
 /// 保留这个变量是为了兼容既有引用与「启动时首帧」——
 /// 运行时切换请走 [buildLightTheme]。
 final ThemeData lightTheme = buildLightTheme(

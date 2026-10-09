@@ -52,7 +52,7 @@ extension PlayerPlayback on PlayerController {
 
     if (!currentIsNoSubtitle && nextNeedsBitmapBurn) {
       if (kIsWeb && currentQuality.value == 'original') {
-        currentQuality.value = defaultTranscodeQuality;
+        currentQuality.value = fallbackTranscodeQuality;
         _playId ??= const Uuid().v4();
       }
       await _initializePlayer(keepPosition: true);
@@ -297,6 +297,9 @@ extension PlayerPlayback on PlayerController {
       _autoSwitchedToTranscode = false;
       _resumeSeekBakedIntoUrlSeconds = null;
       _resetAutoSkipState(clearSegments: true);
+      // 新开一段播放：套用「默认播放画质」。放在 _fetchStreamInfo 之前，
+      // 这样服务端已配非原画时，stream info 里的「自动切转码」判定（仅在原画时触发）不会覆盖它。
+      applyDefaultPlayQualityForNewPlayback();
     }
 
     if (isUrl && currentQuality.value != 'original') {
@@ -321,7 +324,7 @@ extension PlayerPlayback on PlayerController {
       if (currentQuality.value == 'original' &&
           ApiController.instance.isP2pRelayMode &&
           (_sourceFileSizeBytes ?? 0) > p2pRelayLargeFileBytes) {
-        currentQuality.value = defaultTranscodeQuality;
+        currentQuality.value = fallbackTranscodeQuality;
       }
     } else if (!kIsWeb &&
         defaultTargetPlatform == TargetPlatform.android &&
@@ -896,33 +899,10 @@ extension PlayerPlayback on PlayerController {
     int? width;
     String? bitrate;
     final q = currentQuality.value;
-    final parts = q.split('_');
-    if (parts.length >= 2) {
-      final res = parts[0].toLowerCase();
-      final br = parts[1].toLowerCase();
-      if (res == '4k') {
-        width = 3840;
-      } else if (res == '1080p') {
-        width = 1920;
-      } else if (res == '720p') {
-        width = 1280;
-      } else if (res == '480p') {
-        width = 854;
-      }
-
-      final m = RegExp(r'^(\d+)(m|k)$').firstMatch(br);
-      if (m != null) {
-        final n = int.tryParse(m.group(1) ?? '');
-        final unit = m.group(2);
-        if (n != null && n > 0) {
-          if (unit == 'm') {
-            bitrate = '${n * 1000}k';
-          } else {
-            bitrate = '${n}k';
-          }
-        }
-      }
-    }
+    // 档位 → width/bitrate 的换算统一在 [PlayQuality]，与详情抽屉显示的码率同源
+    width = PlayQuality.widthOf(q);
+    final bitrateBps = PlayQuality.bitrateBpsOf(q);
+    if (bitrateBps != null) bitrate = '${bitrateBps ~/ 1000}k';
 
     int? audioIndex;
     if (currentAudioTrack.value.isNotEmpty) {
@@ -983,6 +963,8 @@ extension PlayerPlayback on PlayerController {
     }
     if (burn) startUrl += '&subtitleBurn=true';
     if (DeviceUtils.isWeb) startUrl += '&client=web';
+    // 仅转音频：视频原画直通（服务端 `-c:v copy`），只重编音轨
+    if (q == PlayQuality.originalAudio) startUrl += '&videoCopy=true';
 
     if (token != null) {
       startUrl += '&accessToken=$token';

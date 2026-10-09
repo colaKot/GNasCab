@@ -61,7 +61,7 @@ class UserController {
     this.createScopedToken = this.createScopedToken.bind(this);
   }
 
-  async _resolveDeviceInfo({ knexMain, userId, deviceFingerprint, clientIp }) {
+  _resolveDeviceInfo = async ({ knexMain, userId, deviceFingerprint, clientIp }) => {
     let fingerprint = deviceFingerprint;
     if (typeof fingerprint === 'string') {
       try {
@@ -90,9 +90,9 @@ class UserController {
     const lastSeen = device.last_seen_at ? new Date(device.last_seen_at).getTime() : 0;
     const isStale = Number.isFinite(lastSeen) && Date.now() - lastSeen > 30 * 24 * 60 * 60 * 1000;
     return { deviceId, deviceName, osVersion, device, isNew: false, isStale };
-  }
+  };
 
-  async _ensureOperatorTwofaVerified(req, { always = false } = {}) {
+  _ensureOperatorTwofaVerified = async (req, { always = false } = {}) => {
     const knexMain = req.dbMain;
     const operatorId = Number(req.user && req.user.id);
     if (!operatorId) throw new Error('common.UNAUTHORIZED');
@@ -150,7 +150,7 @@ class UserController {
     }
 
     return { required: true, verified: true };
-  }
+  };
 
   async listUsers(req, res) {
     try {
@@ -163,7 +163,7 @@ class UserController {
     }
   }
 
-  async createUser(req, res) {
+  createUser = async (req, res) => {
     try {
       await this._ensureOperatorTwofaVerified(req, { always: false });
       const service = new UserService(req.dbMain);
@@ -186,9 +186,9 @@ class UserController {
       const msgKey = err.message && err.message.startsWith('user.') ? err.message : 'user.USER_CREATE_FAILED';
       return ResponseUtil.error(req, res, msgKey, 400);
     }
-  }
+  };
 
-  async updateUser(req, res) {
+  updateUser = async (req, res) => {
     try {
       await this._ensureOperatorTwofaVerified(req, { always: false });
       const service = new UserService(req.dbMain);
@@ -221,9 +221,9 @@ class UserController {
       const msgKey = err.message && err.message.startsWith('user.') ? err.message : 'user.USER_UPDATE_FAILED';
       return ResponseUtil.error(req, res, msgKey, 400);
     }
-  }
+  };
 
-  async deleteUsers(req, res) {
+  deleteUsers = async (req, res) => {
     try {
       await this._ensureOperatorTwofaVerified(req, { always: false });
       const service = new UserService(req.dbMain);
@@ -254,7 +254,7 @@ class UserController {
       const msgKey = err.message && err.message.startsWith('user.') ? err.message : 'user.USER_DELETE_FAILED';
       return ResponseUtil.error(req, res, msgKey, 400);
     }
-  }
+  };
 
   async getUserPermissions(req, res) {
     try {
@@ -372,7 +372,7 @@ class UserController {
     }
   }
 
-  async enableUser2fa(req, res) {
+  enableUser2fa = async (req, res) => {
     try {
       const uid = Number(req.body && req.body.uid);
       if (!uid) return ResponseUtil.error(req, res, 'common.PARAM_ERROR', 400);
@@ -418,9 +418,9 @@ class UserController {
       const status = msgKey === 'common.ERROR' ? 500 : 400;
       return ResponseUtil.error(req, res, msgKey, status);
     }
-  }
+  };
 
-  async resetUser2fa(req, res) {
+  resetUser2fa = async (req, res) => {
     try {
       const uid = Number(req.body && req.body.uid);
       if (!uid) return ResponseUtil.error(req, res, 'common.PARAM_ERROR', 400);
@@ -433,7 +433,7 @@ class UserController {
       const status = msgKey === 'common.ERROR' ? 500 : msgKey === 'twofa.TWO_FACTOR_REQUIRED' ? 401 : 400;
       return ResponseUtil.error(req, res, msgKey, status);
     }
-  }
+  };
 
   async createScopedToken(req, res) {
     try {

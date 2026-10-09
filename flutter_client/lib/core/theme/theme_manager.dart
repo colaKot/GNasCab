@@ -2,15 +2,19 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_color_schemes.dart';
+import 'skin_presets.dart';
 
-/// 主题管理器 - 负责主题设置（亮/暗模式 + 配色方案）的持久化保存和读取
+/// 主题管理器 - 负责主题设置（亮/暗模式 + 配色方案 + 外观皮肤 + 字体）的持久化保存和读取
 ///
 /// 2026-10-08 新增配色方案持久化（配合设置页的配色切换）。
-/// ⚠️ 存的是 `FlexScheme` 的**枚举名字符串**而不是下标 ——
-/// 将来 flex 加/减内置配色、登记表调整顺序，已存的用户设置都不会错位。
+/// 2026-10-09 新增外观皮肤 / 字体持久化（换肤系统）。
+/// ⚠️ 存的是 `FlexScheme` / `AppSkinId` 的**枚举名字符串**而不是下标 ——
+/// 将来加/减内置配色、皮肤登记表调整顺序，已存的用户设置都不会错位。
 class ThemeManager {
   static const String _themeModeKey = 'app_theme_mode';
   static const String _colorSchemeKey = 'app_color_scheme';
+  static const String _skinKey = 'app_skin';
+  static const String _fontFamilyKey = 'app_font_family';
 
   static final ThemeManager _instance = ThemeManager._internal();
 
@@ -90,6 +94,55 @@ class ThemeManager {
         AppColorSchemes.byScheme(AppColorSchemes.defaultScheme)!;
   }
 
+  // ────────────── 外观皮肤（2026-10-09 新增）──────────────
+
+  /// 保存外观皮肤（存枚举名，非下标）
+  Future<bool> saveSkin(AppSkinId id) async {
+    try {
+      return await _prefs.setString(_skinKey, id.name);
+    } catch (e) {
+      print('保存外观皮肤失败: $e');
+      return false;
+    }
+  }
+
+  /// 读取外观皮肤。读不到 / 名字不认识 ⇒ 回默认，**不崩**。
+  AppSkinId getSkinId() {
+    try {
+      return SkinPresets.byName(_prefs.getString(_skinKey)).id;
+    } catch (e) {
+      print('获取外观皮肤失败: $e');
+      return SkinPresets.defaultId;
+    }
+  }
+
+  // ────────────── 界面字体（2026-10-09 新增）──────────────
+
+  /// 保存界面字体族。null / 空串 = 系统默认（清除该项）。
+  Future<bool> saveFontFamily(String? family) async {
+    try {
+      if (family == null || family.isEmpty) {
+        return await _prefs.remove(_fontFamilyKey);
+      }
+      return await _prefs.setString(_fontFamilyKey, family);
+    } catch (e) {
+      print('保存界面字体失败: $e');
+      return false;
+    }
+  }
+
+  /// 读取界面字体族。null = 系统默认。
+  String? getFontFamily() {
+    try {
+      final v = _prefs.getString(_fontFamilyKey);
+      if (v == null || v.isEmpty) return null;
+      return v;
+    } catch (e) {
+      print('获取界面字体失败: $e');
+      return null;
+    }
+  }
+
   /// 将ThemeMode转换为整数存储
   int _themeModeToInt(ThemeMode themeMode) {
     switch (themeMode) {
@@ -116,10 +169,12 @@ class ThemeManager {
     }
   }
 
-  /// 清除主题设置（含配色方案）
+  /// 清除主题设置（含配色方案 / 外观皮肤 / 字体）
   Future<bool> clearThemeMode() async {
     try {
       await _prefs.remove(_colorSchemeKey);
+      await _prefs.remove(_skinKey);
+      await _prefs.remove(_fontFamilyKey);
       return await _prefs.remove(_themeModeKey);
     } catch (e) {
       print('清除主题模式失败: $e');

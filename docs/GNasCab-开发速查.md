@@ -122,6 +122,100 @@ CustomColors(
 ⚠️ `main.dart` 里滚动条底色**已从 `Colors.grey.shade*` 改成 `colorScheme.outline`**，
 换配色时自动跟随。但滚动条的粗细/悬停态仍由用户设置控制，**那是功能不是风格，别删**。
 
+### 1.3.2 ⚠️⚠️ 「换了主题但颜色不跟着变」的两类真因（2026-10-09 排查）
+
+铁柱报：① 亮色模式下**桌面左侧栏图标全白、看不见**；② 登录页按钮永远是深蓝色；
+③ 换配色/背景「好像完全没用」。
+
+**先说结论：切换机制本身是好的**，别去怀疑 `ThemeApplyService`。
+`_refresh()` 直接写 `Get.rootController.theme / .darkTheme` 再调 `setThemeMode()`（内部 `update()`），
+而 `GetMaterialApp` 的根节点就是 `GetBuilder<GetMaterialController>(init: Get.rootController)`，
+`update()` → `refresh()` → `_notifyUpdate()` 会把它重建（源码 `get_controllers.dart:17`、
+`list_notifier.dart:43`）⇒ 两套主题都换得掉。**问题全在下面两类写死的颜色。**
+
+#### 真因① 前景写死白色，而背景是主题的浅色 surface ⇒ 亮色下"白压白"
+
+`CustomGlassContainer` / `CustomGlassCard` / AppBar 的背景都是
+**`theme.colorScheme.surface`**（亮色下≈白）。只要前景写成 `Colors.white`，
+亮色模式下就是**白图标压在白底上，完全看不见**。
+
+已修（2026-10-09）：
+
+| 文件 | 原写法 | 改成 |
+| --- | --- | --- |
+| `modules/home/views/pc_components/pc_dock_bar.dart` | 图标/分隔线/指示点全 `Colors.white`/`white24`/`white54` | `colorScheme.onSurface` / `outlineVariant` |
+| `modules/base/components/custom_button.dart` | 禁用态 `disabledForegroundColor: Colors.white(38%)` + 灰 12% 底 | `onSurface(38%)` / `onSurface(12%)` |
+| `modules/photoBackup/view/app_photo_backup_view.dart` | AppBar 里 `iconColor: Colors.white` | 删掉（回退默认 `onSurface`） |
+| `modules/photo/ai_gps_add/view/ai_gps_add_view.dart` | 白字压 `primaryContainer` | `onPrimaryContainer` |
+| `modules/files/views/pc_components/pc_internal_drag_item.dart` | `0xFFE8E8E8` 压 `primaryContainer`（3 个私有常量） | `colorScheme.onPrimaryContainer` |
+| `modules/base/components/side_menu_one_level.dart` / `side_menu_two_level.dart` | 选中项 `Colors.white`（底=primary） | `colorScheme.onPrimary` |
+
+⭐ **通用替换口诀**：压在 `surface` 上的前景 → `onSurface`；压在 `primary` 上 → `onPrimary`；
+压在 `primaryContainer` 上 → `onPrimaryContainer`；压在 `error` 上 → `onError`；
+`Colors.white24/54/70` 做分隔线/指示条 → `outlineVariant`。
+
+⚠️ **以下场合的白/黑是刻意的，别当 bug 顺手"修"掉**（详见 §1.3.1 的排除表，另加）：
+桌面图标文字（白字 + 黑阴影压壁纸）、图片/视频封面蒙层上的白字（`CustomAlbum` 的黑渐变）、
+播放/封面角标、`video_player` 浮层、`terminal`、`book/reader*`、二维码白底、PDF 搜索高亮、
+`Colors.black.withValues(alpha: 0.0x)` 这类投影。
+
+#### 真因② 登录前页面写死 `Theme(data: darkTheme)`
+
+`darkTheme` 是**编译期常量** = `buildDarkTheme(AppColorSchemes.defaultScheme)`
+（默认 `shadBlue`）⇒ **不管用户把配色换成什么，登录页/服务器列表/改密页永远是那一套蓝**
+（表现为「登录按钮是深蓝色、换主题不跟着换」）。
+
+⭐⭐ **最终结论（2026-10-09 二次修正，别再走回头路）**：
+
+1. **背景**：这些页面原来写死压一张深蓝色照片 `assets/home/login_bg.jpg`
+   ⇒ 背景永远不跟着主题走，「按钮跟随配色、背景固定深蓝」必然不搭。
+   现在统一用 **`AuthThemeBackground`**（`modules/base/components/auth_theme_background.dart`）
+   ——背景是**从 `ColorScheme` 派生的渐变**（`primaryContainer → surfaceContainerHighest`），
+   换配色/切亮暗都自动跟随。4 个页面已替换：
+   `login_view` / `admin_create_page` / `recover_password_view` / `server_list_view`。
+2. **主题**：因为背景不再是深色照片，**亮度必须跟随用户的亮/暗设置**，
+   否则亮色模式会出现深色文字压在深色卡片上。⇒ 登录前页面**不需要任何覆盖**，
+   直接沿用 App 主题（`GetMaterialApp` 已按配色+皮肤+字体+`themeMode` 解析好）。
+   各视图里保留 `Theme(data: Theme.of(context), ...)` 作为**显式 no-op**（顺便保住原 `Builder` 结构）。
+3. ⛔ **`ThemeApplyService.authTheme()` 已删除，别再往回加。**
+   中途版本（`authTheme()` = `darkFor(当前配色)`）只是把「永远蓝」变成「跟随配色的**暗色**」，
+   当时背景还是深色图所以能用；背景改主题化后就过时了。
+
+> ⛔ 别再往这些文件里写 `Theme(data: darkTheme)` 或任何写死的背景图/色值。
+> 同理已清理：登录相关视图里 6 处写死前景（footer 链接白字、4 个按钮内转圈 `Colors.white`、
+> 服务器项图标白字）全部改成 `colorScheme.onSurface` / `onPrimary`；
+> 8 个文件的 `theme_apply_service.dart` / `background_controller.dart` 失效导入也已删除。
+> ⚠️ 唯一**保留**写死 `darkTheme` 的地方是 `pc_app_window.dart` 里
+> `terminal` / `image_view` 两个窗口 —— 那是刻意的深色语义，不是漏改。
+
+#### 真因③ 窗口角落的「拉伸点阵」方向反了
+
+`assets/icons/home/` 两张角标图**点阵贴的位置不一样**（用 `magick … txt:` 逐像素看过）：
+- `window_right_corner.png` → 点阵贴在图片**右上角**
+- `window_left_corner.png` → 点阵贴在图片**左下角**
+
+所以「左上角」那个位置用 `window_right_corner.png` 时**必须横向镜像**，否则点阵朝右、
+看着像反的（铁柱：「左上角有个拉伸的小图案，但是反了」——当初右上角让给窗口控制按钮、
+角标搬到左上角时漏了镜像）。
+
+```dart
+// pc_app_window.dart —— 左上角
+Transform.flip(flipX: true, child: Image.asset('assets/icons/home/window_right_corner.png', …))
+```
+左下角直接用 `window_left_corner.png`（点阵本来就贴左下）**不需要翻转**。
+
+#### 验证与排查手法
+- 30 秒判据（不用起服务，直接证明"裸引用丢 this"或"常量主题"这类问题）见 §9.9。
+- **验前端产物是否真进包**：`flutter build web` 的 `main.dart.js` **字节数必须变化**；
+  被杀死的常量可以直接搜：本次把 `0xFFE8E8E8` 全删后，
+  `grep -c '15132390' main.dart.js` = **0**（十进制，Dart 编译后是数字字面量）。
+  ⛔ 别 grep 符号名（`authTheme` / `onPrimary`）—— release tree-shaking 会 mangle，**恒为 0，不能据此判断**。
+- 只有前端改动**不用重新打包服务端**：产物是 `flutter_client/build/web/`（扁平），
+  直接 `cp -rf` 到 `electron_server/dist_vN/win-unpacked/web/main/` 与 `electron_server/web/main/`
+  即可（`express.static` 实时查找，跑着的服务端不用重启）。
+- ⚠️ 浏览器第三层 SW 缓存：`flutter_service_worker.js` 是 0 字节，但**旧 SW 还在**
+  ⇒ 必须**关掉该站点所有标签页再重开 + 硬刷新**，否则看到的一直是旧 bundle。
+
 ### 1.4 ⭐⭐ PC 窗口按钮（2026-10-09 改造 + 冲突全量排查）
 
 **26 个窗口**（24 个固定 appKey + `folder_<micros>` / `editor_<md5>` 两类动态 ID）
@@ -190,6 +284,70 @@ Padding(padding: EdgeInsets.only(left: 12, right: 16 + ctrlW), ...)
 6. 相对 import 路径按 **URI 语义**算（`posixpath.relpath`），⛔ 别手数 `../`。
 7. 复杂正则/脚本**一律 `Write` 落文件再跑**，bash heredoc 会吃掉正则括号
    （`re.error: unbalanced parenthesis`）。
+
+### 1.5 ⭐⭐ 足迹地图（photo map）三坑：卡顿 / 聚合精度 / 数字角标（2026-10-09）
+
+涉及文件：`modules/photo/map/{view/photo_footprint_map_view.dart, controller/photo_footprint_map_controller.dart}`
++ 服务端 `electron_server/src/api/modules/photo/map/photoMapService.js`。
+
+#### 坑① 拖动/缩放卡顿 —— 每帧重建整棵标记树
+
+`MapOptions.onPositionChanged` **在拖动/缩放的每一帧都会回调**（不是只在手势结束时），
+原实现里它 → `ctrl.onMapChanged()` → 写 `center.value` / `zoom.value` 两个 Rx，
+而外层一个大 `Obx` 同时读了 `center`（`initialCenter`）、`zoom`（缩放徽章 / 缩放按钮）
+**和 `items`（marker 列表）** ⇒ **每帧重建整个 Stack，包括 N 个 marker**。
+
+修法（三条一起做才有用）：
+1. `initialCenter` / `initialZoom` 改成在 `GetBuilder.builder` 里**先快照**（在 `Obx` 之外读），
+   `Obx` 里不再读 `center`/`zoom`。
+2. `MarkerLayer` **单独包一个 `Obx`**，只依赖 `items`。
+3. 缩放徽章 / 缩放按钮各自包小 `Obx`（它们确实要跟着 zoom 变）。
+4. ⭐ **marker 尺寸不再读连续 `zoom`**，改成读控制器里量化过的 `RxInt markerSizeTier`
+   （`markerSizeTierOf(z)`：<5→0 / <7→1 / <8→2 / 其余→3），
+   `onMapChanged` 里**只在跨档时**才写这个 Rx。
+   否则「尺寸依赖 zoom」会把 marker 层重新绑回 zoom，前三条白做。
+
+> 一句话：**Rx 的读点决定重建范围**。让「高频变化的量」和「昂贵的子树」不挨着。
+
+#### 坑② 缩放 10.5/11/11.5 标记全部叠在一起 —— 聚合精度没按「屏幕间距」选
+
+判据只有一条：**格心在屏幕上的间距要 ≥ 1.7 × marker 直径**（marker 现在固定 85px）。
+
+```
+km/px = 40075 / (256 * 2^z)          # 赤道，最保守；纬度越高经度方向间距越大
+格心间距(px) = geohash 格宽(km) / (km/px)
+geohash 格宽(km)：p2=1250  p3=156  p4=39.3  p5=4.9  p6=1.22
+```
+
+服务端原表是 `z<=8→4, z<=14→5`，算出来：
+
+| zoom | 旧精度 | 旧间距 | 判定 | 新精度 | 新间距 |
+| --- | --- | --- | --- | --- | --- |
+| 9 | 5 | 16px | ❌ 重叠 | 4 | 129px |
+| 10 | 5 | 32px | ❌ 重叠 | 4 | 257px |
+| **10.5** | 5 | 45px | ❌ 重叠 | 4 | 364px |
+| **11** | 5 | 64px | ❌ 重叠 | 4 | 514px |
+| **11.5** | 5 | 91px | ⚠️ 只剩 6px 缝 | 4 | 727px |
+| **12** | 5 | 128px | ✅ | 5 | 128px |
+
+⇒ 铁柱说的「10.5 / 11 / 11.5 全叠在一起，到 12 才能看清」**和公式完全对得上**。
+修法：`getBoundsPhotoPrecision` 里 `z <= 8` 那档的边界改成 `z < 12`（即 8<z<12 由 p5 降为 p4）。
+
+⚠️ **反直觉但正确**：分辨率**变粗**（格子变大）才会分开 —— 格子越细，格心越近，越重叠。
+所以「看不清就调细」是错的。⛔ 改这张表前先按上面公式算间距。
+
+#### 坑③ 角标「显示不下」
+
+`_ClusterCountBadge` 原来是 `shape: BoxShape.circle` + `minWidth/minHeight`：
+**正圆直径被卡死**，4 位数已经贴边、5 位数直接被裁（`overflow: clip`）。
+而且它画在 marker 的 `ClipRRect` **里面**，宽一点就被圆角切掉一角。
+
+修法：
+1. 圆心改**椭圆胶囊**（`borderRadius: BorderRadius.circular(h / 2)`），宽度随位数自适应。
+2. 字号小一号（`0.55→0.46`，上限 `15→13`）。
+3. `_format` 支持 **5 位**（`n < 100000` 直接显示数字，再大才 `123k`）。
+4. ⭐ 把角标 `Positioned` **移到 `ClipRRect` 外面**（缩略图仍单独 `Positioned.fill + ClipRRect`），
+   否则永远会被 marker 圆角啃掉一块。
 
 ---
 
@@ -314,6 +472,50 @@ ArkTS/ArkUI，`@ComponentV2` + `@ObservedV2`/`@Trace`/`@Local`/`@Param`/`@Builde
 - ⚠️ **exe 的 `userDataFolder` 不是 `electron_server/.devdata`**！实测 exe 读
   `%APPDATA%\nascab_os_server\database\`。排查影视库/相册等表时**查错库会得出"表根本不存在"的假结论**
   （`.devdata` 是 10-01 的老开发库，`video_library` 表确实没有）。
+
+### 3.1 ⭐⭐ 默认播放画质
+
+- **画质档位只有一个真源**：客户端 `modules/video/base/video_utils/play_quality.dart`
+  （`PlayQuality.options` / `shortLabels` / `label` / `widthOf` / `bitrateBpsOf` / `formatBitrate`）。
+  服务端 `video/config/videoConfigController.js` 的 `PLAY_QUALITY_OPTIONS` 是**独立副本**
+  （跨进程没法共用），**增删档位必须两边同一次改完**，否则服务端判非法返 400。
+  ⚠️ `PlayerController.qualityOptions = PlayQuality.options` 刻意保留成**实例字段**——
+  视图里是 `controller.qualityOptions` 的写法，改成 static 要连带改 2 个视图。
+- **默认播放画质**（服务端级，`config` 表 `videoDefaultPlayQuality`，uid=0）：
+  `videoConfigController.getPlayQuality` / `setPlayQuality`。
+  ⚠️ **`getPlayQuality` 故意不加 `requireAdmin`**（`setPlayQuality` 加）——
+  子账号的播放端也要读它才能遵守管理员配的默认值。
+  客户端在 `PlayerController.openPlaylist` 里 `loadDefaultPlayQuality()` 拉一次，
+  再在 `_initializePlayer` 的 **`!keepPosition` 复位块内、`_fetchStreamInfo` 之前**
+  `applyDefaultPlayQualityForNewPlayback()` ⇒ 已配非原画时，stream info 里那些
+  「自动切转码」判定（只在原画时触发）不会把它顶回原画。
+  6 处被动降级路径（播放失败 / 容器不支持 / P2P 大文件 / 位图字幕 / Safari HEVC）
+  用 `fallbackTranscodeQuality` getter（用户配了就用配的，否则用内置 `1080p_3m`）。
+  ⚠️ URL 源仍强制原画（`isUrl && quality != 'original'` 那条）。
+- **播放码率显示**：`video_info_drawer.dart` 基础信息区。
+  原始码率取主视频流 `bit_rate`，ffprobe 没给时退回「文件大小 ÷ 总时长」；
+  转码码率走 `PlayQuality.bitrateBpsOf`（**与发给 transcode 接口的换算同源**，
+  别在抽屉里再写一份正则）。整块 `Obx` 包住 ⇒ 播放中切画质会实时变。
+- ⭐⭐ **4K/HDR/杜比徽章不用重扫库**：扫描期写的 `video_ffmpeg_info.streams`
+  （按 `video_index.file_hash` 关联）已经带齐所有信息。
+  `src/utils/videoMediaFlagsUtil.js` 解析出 6 个标记
+  `is4k / hdr10 / hdr10plus / hlg / dolbyVision / dolbyAtmos`，
+  `detailService.getDetail` 返回值新增 `media_flags`。
+  - 铁柱库实测：`is_file=1 & width>0` 共 5750/5757 行已探测，2017 个可播放文件全部命中。
+    全库统计 `is4k 293 / hdr10 87 / hlg 39 / dolbyVision 109 / dolbyAtmos 78`，
+    **`hdr10plus = 0`（库里确实没有 HDR10+，别按「应该有」去调规则）**。
+  - 判定规则全部来自实测，别凭印象改：HDR10 看 `color_transfer == 'smpte2084'`；
+    HLG 看 `arib-std-b67`；HDR10+ 看 side data 含 `2094`；Atmos 只认音频
+    `profile`/`tags` 里的 `atmos` 字样（**`truehd` ≠ Atmos，会误标**）。
+  - `tv`/`season` 取该目录下所有 `episod` 的**并集**；`_collectPlayableFileHashes`
+    的结构照抄 `_collectOpenSkipTargetIds`，两处对「剧」的理解必须同步。
+  - `_loadMediaFlagsByHashes` **400 一批 `whereIn`**（SQLite 变量数上限 999），
+    整部剧几百集不会炸。整段 try/catch 吞异常，**绝不影响详情本身**。
+  - 客户端 `detail/view/parts/media_flags_badge_row.dart`：`labelsFor`/`willRender` 是
+    静态纯函数（视图和「要不要渲染」判断同源）。HDR10+ 优先于 HDR10（不同时显示，
+    避免「HDR10+ HDR10」冗余）；杜比视界与 HDR **互相独立，都要标**。
+    ⚠️ PC 端接 `video_detail_top_section.dart` 时**必须保留 `Positioned(right:0,bottom:0)`**——
+    直接换成普通 Widget 会被 Stack 默认 `topStart` 甩到左上角。
 
 ---
 
@@ -1238,5 +1440,104 @@ stdout/stderr 被攒在管道里**直到进程结束才回传** ⇒ 「卡住」
 `G:\work\_patch_backup\logs\flutter_web_build.log`，末尾写 `EXITCODE=`）。
 启动：`python tool/bridge_cli.py run --shell 'G:\work\nascab\tool\build_web.bat'`。
 
+> ⚠️⚠️ **`tool/bridge_cli.py` 返回的 `rc` 不可信，判成功必须看日志里的 `EXITCODE=`**（2026-10-09 实测）：
+> bat 末尾原来只写 `endlocal`，而 `endlocal` 会把 `ERRORLEVEL` **重置成 0**
+> ⇒ 编译真的失败了（`Error: Failed to compile application for the Web.`、日志 `EXITCODE=1`），
+> 桥却回 `rc=0`。**我就这样白拷了一次旧产物到 web/main**。
+> 已修：两个 bat 都改成 `set RC=%ERRORLEVEL%` + `endlocal & exit /b %RC%`。
+> ⇒ 判据固定为「日志尾部必须出现 `EXITCODE=0` **且** `√ Built build\web`」。
 
 
+
+
+
+### 9.9 ⚠️⚠️ 控制器「裸引用 + `this`」⇒ 必然 500（2026-10-09 定位）
+
+**症状**：`GET /api/video/detail?index_id=11` 返回 **500**，浏览器控制台只有一行
+`Failed to load resource: the server responded with a status of 500`；剧集 / tvPlayInfo / 光盘内容
+同病。前端反复重编、重打包都无效，因为**问题全在服务端**。
+
+**根因**：`videoRouter.js` 用**裸引用**注册处理器：
+```js
+router.get('/detail', authenticateJWT, videoDetailController.getDetail);   // ❌ 丢 this
+```
+`getDetail` 是**普通类方法**，体内又调 `this._ensureIndexAccess(...)`。Express 派发时是普通函数调用，
+**类体是严格模式 ⇒ `this === undefined`** ⇒ 抛
+`Cannot read properties of undefined (reading '_ensureIndexAccess')`，
+被 `catch` 兜成 `ResponseUtil.error(req, res, e.message, 500)` ⇒ 前端只看到 500。
+
+⭐ 判据（30 秒验证，不用起服务）——完全复刻 Express 的派发：
+```js
+// electron_server/_probe.js
+const express = require('express');
+class C {
+  async m(req, res) { try { await this.helper(); res.json({ok:1}); }
+                      catch (e) { res.status(500).json({err: e.message}); } }
+  async helper() { return 1; }
+}
+const c = new C(); const app = express(); app.get('/t', c.m);   // 裸引用
+// → 500 {"err":"Cannot read properties of undefined (reading 'helper')"}
+```
+
+**两种正确写法**（仓库里都有先例，任选其一，**别混用后只改一半**）：
+1. **路由里包一层箭头**（`apiSettingRouter.js` 风格）：
+   `router.get('/get', authenticateJWT, (req, res) => apiSettingController.get(req, res));`
+2. **把方法声明成箭头函数属性**（类字段，`this` 取词法作用域，天然免疫）：
+   `getDetail = async (req, res) => { ... };`
+
+**⚠️ 最容易踩的"改了一半"**：把**辅助方法**改成箭头属性（如 `_ensureIndexAccess`、
+`_ensureOperatorTwofaVerified`、`_resolveDeviceInfo`），却漏掉**被 Express 直接引用的那个方法**。
+辅助方法免疫了没用——崩的是调用它的那个普通方法。**要改的是"被注册的那个"。**
+
+⭐ **判别口诀：看路由的注册写法，不看控制器。** 同样的控制器代码，两种注册结果完全相反：
+```js
+router.post('/start', mw, fileMountController.start);                    // ❌ 裸引用 → this=undefined
+router.post('/start', mw, (req, res) => fileMountController.start(req, res)); // ✅ 成员调用 → this 正常
+```
+`fileMountController` 里明明有 `this._startByIpc(...)` 却一直正常，就是因为它走的是第二行
+（`fileMountRouter.js`）；而 `videoRouter` / `userRouter` 走的是第一行，所以只有它们坏。
+**「同构代码一个坏一个好」的谜底就在这里，别再往控制器里找。**
+
+**已修（2026-10-09）**：
+| 文件 | 改成箭头属性的方法 | 注册处 |
+| --- | --- | --- |
+| `video/detail/detailController.js` | `getDetail` `getEpisodes` `getTvPlayInfo` `getDiscContents` `getDiscContentThumb` | `videoRouter.js:85-89` |
+| `user/userController.js` | `createUser` `updateUser` `deleteUsers` `enableUser2fa` `resetUser2fa` | `userRouter.js:11-41` |
+
+> ⚠️ 第二张表说明这个坑**不止影视**：`userRouter` 同样是裸引用 ⇒
+> **子账号创建 / 编辑 / 批量删除 / 2FA 启用与重置全部失败**（那几处 `catch` 返回 400
+> `user.USER_CREATE_FAILED` 之类，所以表现为"400 + 创建用户失败"，不是 500，更容易被忽略）。
+> 另外 `file/upload/uploadController.uploadChunk` 也是裸引用，但它在构造函数里
+> `this.uploadChunk = this.uploadChunk.bind(this)` ⇒ **安全**（第三种写法）。
+
+**批量排查脚本**：`tool/_fix_controller_this_bind.py`
+（引号/注释感知的括号配平 ⇒ 把目标方法原地改写成箭头函数属性，改完自动 `node --check`）。
+
+**端到端验证（不需要起服务）**：在打包 runtime 里直接从 `app.asar` 加载控制器并**裸调用**：
+```bash
+cd electron_server/dist_vN/win-unpacked
+ELECTRON_RUN_AS_NODE=1 ./GNasCabServer.exe _probe_asar.js
+```
+把 `req.dbVideo` / `req.dbMain` 换成「一调用就 throw」的假函数：修复后错误信息应变成
+`PROBE_DB_TOUCHED`（说明 `this` 已绑定、流程走进了鉴权），而**不再**是
+`Cannot read properties of undefined`。
+
+**⭐ 用 Python 直接比对「asar 里的代码 vs 磁盘源码」**（证明出包不过期，比只看 mtime 可靠）：
+```python
+data = open(asar, 'rb').read()
+js_start = data.find(b'{"files"')
+obj, end = json.JSONDecoder().raw_decode(data[js_start:js_start+40000000].decode('utf8', errors='replace'))
+base = (js_start + end + 3) // 4 * 4          # ⚠️ 数据区起点要按 4 字节**向上对齐**
+# 目录节点要走 node['files'][name]，顶层 JSON 本身也是 {"files": {...}}
+```
+⚠️ **两个必踩的坑**：① 数据区起点**不是** `16 + headerSize`（会差 1 字节，导致所有文件
+都"比不相等"）；② 比对前必须把两侧 `\r\n` 归一化成 `\n`，否则 CRLF 源码 vs LF 打包产物
+会差「行数」个字节（如 `detailController.js` 13169 vs 13504 = 335 行）。
+
+**打包脚本**：`tool/build_server_pack.bat [dist_vN]`
+（默认 `dist_v9`；自动 `taskkill /F /IM GNasCabServer.exe`，三个 `-c` 覆盖见 §9.8，
+日志 `G:/work/_patch_backup/logs/server_pack.log`）。
+启动：`python tool/bridge_cli.py run --shell 'tool\build_server_pack.bat dist_v9'`
+（约 2 分 10 秒；`flutter build web` 约 3 分 20 秒）。
+**顺序仍是「先打包、后拷 web」**：产物在 `flutter_client/build/web/`（扁平），
+拷到 `electron_server/dist_vN/win-unpacked/web/main/` 与 `electron_server/web/main/`。

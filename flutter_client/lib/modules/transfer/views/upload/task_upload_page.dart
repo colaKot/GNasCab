@@ -12,6 +12,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../controllers/upload_controller.dart';
 import '../../models/transfer_task.dart';
 import '../../../../utils/popup_menu_util.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import 'task_upload_item.dart';
 
 class TaskUploadPage extends StatefulWidget {
@@ -58,6 +59,8 @@ class _TaskUploadPageState extends State<TaskUploadPage>
     final controller = Get.find<UploadController>();
     final theme = Theme.of(context);
     final customColors = Theme.of(context).extension<CustomColors>();
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：暂停/开始/清除按钮贴最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -68,7 +71,7 @@ class _TaskUploadPageState extends State<TaskUploadPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.fromLTRB(14, 14, 14 + ctrlW, 14),
             child: Row(
               children: [
                 Obx(

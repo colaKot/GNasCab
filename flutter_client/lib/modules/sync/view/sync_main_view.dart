@@ -32,24 +32,31 @@ class SyncMainView extends StatelessWidget {
     return GetBuilder<SyncTaskListController>(
       init: ctrl,
       builder: (ctrl) {
+        // Web 端不提供「创建同步任务」入口（无本地目录选择能力）
+        final allowCreate = !DeviceUtils.isWeb;
         if (DeviceUtils.isMobile) {
           return Scaffold(
             appBar: AppBar(
               leading: const BackButton(),
               title: Text('app_sync'.tr),
               actions: [
-                IconButton(
-                  onPressed: () => _openCreateWizard(context, ctrl),
-                  icon: const Icon(Icons.add_outlined),
-                  tooltip: 'sync_create_task'.tr,
-                ),
+                if (allowCreate)
+                  IconButton(
+                    onPressed: () => _openCreateWizard(context, ctrl),
+                    icon: const Icon(Icons.add_outlined),
+                    tooltip: 'sync_create_task'.tr,
+                  ),
                 IconButton(
                   onPressed: () => ctrl.refreshList(showLoading: true),
                   icon: const Icon(Icons.refresh_outlined),
                 ),
               ],
             ),
-            body: _SyncTaskListPanel(ctrl: ctrl, showHeader: false),
+            body: _SyncTaskListPanel(
+              ctrl: ctrl,
+              showHeader: false,
+              onCreate: allowCreate ? () => _openCreateWizard(context, ctrl) : null,
+            ),
           );
         }
 
@@ -74,7 +81,8 @@ class SyncMainView extends StatelessWidget {
                 Expanded(
                   child: _SyncTaskListPanel(
                     ctrl: ctrl,
-                    onCreate: () => _openCreateWizard(context, ctrl),
+                    onCreate:
+                        allowCreate ? () => _openCreateWizard(context, ctrl) : null,
                   ),
                 ),
               ],

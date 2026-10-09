@@ -9,6 +9,11 @@ const nascabAccountUtil = require('../../service/utils/nascabAccountUtil');
 const fileService = require('../../file/core/fileService');
 const { TmdbClient } = require('../../../../workers/videoIndex/nfoFetchWorker/tmdbClient');
 const { parseSeasonNumberFromName } = require('../../../../workers/videoIndex/videoIndexUtil');
+const {
+  buildMediaFlags,
+  mergeMediaFlags,
+  hasAnyMediaFlag,
+} = require('../../../../utils/videoMediaFlagsUtil');
 
 function _compareSeasonRows(a, b) {
   const an = parseSeasonNumberFromName(a && a.filename);
@@ -254,6 +259,99 @@ function _shouldAddFirstFilePath(item) {
   const poster = item.poster_path ? String(item.poster_path).trim() : '';
   const fanart = item.fanart_path ? String(item.fanart_path).trim() : '';
   return !poster && !fanart;
+}
+
+/**
+ * 收集「这个详情条目对应的所有可播放文件」的 file_hash。
+ *
+ * - movie / episod / 其它 is_file=1：就是它自己的 file_hash
+ * - season：该季文件夹下的 episod
+ * - tv：所有季文件夹下的 episod + 直接挂在剧目录下的 episod
+ *   （结构与 _collectOpenSkipTargetIds 保持一致，避免两处对「剧」的理解不同步）
+ */
+async function _collectPlayableFileHashes({ knexVideo, item }) {
+  const ownHash = item && item.file_hash ? String(item.file_hash).trim() : '';
+  const mediaType = item && item.media_type ? String(item.media_type).trim().toLowerCase() : '';
+  if (Number(item && item.is_file) === 1) return ownHash ? [ownHash] : [];
+  if (mediaType === 'season') {
+    const seasonFolder = item.path && item.filename ? path.join(String(item.path), String(item.filename)) : '';
+    if (!seasonFolder) return ownHash ? [ownHash] : [];
+    const rows = await knexVideo('video_index')
+      .where({ path: seasonFolder, is_file: 1, media_type: 'episod' })
+      .select('file_hash')
+      .catch(() => []);
+    return _uniqueHashes(rows, ownHash);
+  }
+  if (mediaType === 'tv') {
+    const showFolder = item.path && item.filename ? path.join(String(item.path), String(item.filename)) : '';
+    if (!showFolder) return ownHash ? [ownHash] : [];
+
+    const seasonRows = await knexVideo('video_index')
+      .where({ path: showFolder, is_file: 0, media_type: 'season' })
+      .select('filename')
+      .catch(() => []);
+    const seasonFolders = [];
+    for (const row of seasonRows || []) {
+      const name = row && row.filename ? String(row.filename).trim() : '';
+      if (name) seasonFolders.push(path.join(showFolder, name));
+    }
+
+    const directRows = await knexVideo('video_index')
+      .where({ path: showFolder, is_file: 1, media_type: 'episod' })
+      .select('file_hash')
+      .catch(() => []);
+    const hashRows = [...(directRows || [])];
+    if (seasonFolders.length > 0) {
+      const episodeRows = await knexVideo('video_index')
+        .where({ is_file: 1, media_type: 'episod' })
+        .whereIn('path', seasonFolders)
+        .select('file_hash')
+        .catch(() => []);
+      hashRows.push(...(episodeRows || []));
+    }
+    return _uniqueHashes(hashRows, ownHash);
+  }
+  // 其它类型（如 bdmv / video_ts）：先用自己的 hash，命中不了再退回文件夹下的可播放文件
+  return ownHash ? [ownHash] : [];
+}
+
+function _uniqueHashes(rows, extra = '') {
+  const set = new Set();
+  const tail = String(extra || '').trim();
+  if (tail) set.add(tail);
+  for (const row of rows || []) {
+    const h = row && row.file_hash ? String(row.file_hash).trim() : '';
+    if (h) set.add(h);
+  }
+  return Array.from(set);
+}
+
+// SQLite 单条 SQL 的变量数有上限（默认 999），分批查询避免整部剧几百集时炸掉
+const _MEDIA_FLAGS_CHUNK_SIZE = 400;
+
+/**
+ * 按 file_hash 批量读取 ffprobe streams，合并成一份并集标记。
+ * 没有任何一项命中（或查不到数据）时返回 null —— 前端据此不渲染徽章。
+ */
+async function _loadMediaFlagsByHashes(knexVideo, hashes) {
+  const list = Array.from(
+    new Set((hashes || []).map(h => (h === undefined || h === null ? '' : String(h).trim())).filter(Boolean))
+  );
+  if (list.length === 0) return null;
+
+  const collected = [];
+  for (let i = 0; i < list.length; i += _MEDIA_FLAGS_CHUNK_SIZE) {
+    const chunk = list.slice(i, i + _MEDIA_FLAGS_CHUNK_SIZE);
+    const rows = await knexVideo('video_ffmpeg_info')
+      .whereIn('id', chunk)
+      .select('streams')
+      .catch(() => []);
+    for (const row of rows || []) {
+      const flags = buildMediaFlags(row && row.streams);
+      if (hasAnyMediaFlag(flags)) collected.push(flags);
+    }
+  }
+  return mergeMediaFlags(collected);
 }
 
 function _pickTmdbProfileSize(requested) {
@@ -945,7 +1043,23 @@ class VideoDetailService {
       item,
     });
 
-    return { item, season_list: seasonList, episode_list: episodeList, history };
+    // 4K / HDR / 杜比徽章：数据来自扫描时写入的 video_ffmpeg_info（按 file_hash 关联），无需重扫。
+    // 任何一步失败都不能影响详情本身，所以整体吞掉异常，media_flags 为 null 时前端不渲染徽章。
+    let mediaFlags = null;
+    try {
+      const hashes = await _collectPlayableFileHashes({ knexVideo: this.knexVideo, item });
+      mediaFlags = await _loadMediaFlagsByHashes(this.knexVideo, hashes);
+    } catch (_) {
+      mediaFlags = null;
+    }
+
+    return {
+      item,
+      season_list: seasonList,
+      episode_list: episodeList,
+      history,
+      media_flags: mediaFlags,
+    };
   }
 
   async getOrDownloadPersonJpeg({ tmdbId, size = 240, thumbUrl = '' }) {

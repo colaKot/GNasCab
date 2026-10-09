@@ -4,6 +4,7 @@ import '../../../../../modules/base/components/custom_expandable_search_bar.dart
 import '../../../../../modules/base/components/custom_bordered_icon_button.dart';
 import '../../controller/photo_trash_controller.dart';
 import '../../../../../modules/base/components/custom_popup_select_button.dart';
+import '../../../../home/views/pc_components/pc_app_window.dart';
 
 /// 回收站顶部控制栏组件
 class PhotoTrashControlBar extends StatefulWidget {
@@ -20,10 +21,12 @@ class _PhotoTrashControlBarState extends State<PhotoTrashControlBar> {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：搜索栏被 Expanded/Align 推到最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Obx(
       () => Container(
         height: 48,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        padding: EdgeInsets.fromLTRB(16, 0, 16 + ctrlW, 0),
         child: Row(
           children: [
             // 文件类型过滤

@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "Configuración de TMDB guardada",
       "TRANSCODE_CONFIG_SAVED": "Directorio temporal de transcodificación guardado",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "Calidad de reproducción predeterminada guardada",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "El directorio temporal de transcodificación no existe",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "La ruta temporal de transcodificación no es un directorio",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "El directorio temporal de transcodificación no es escribible",

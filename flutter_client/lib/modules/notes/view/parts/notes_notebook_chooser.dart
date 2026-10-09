@@ -27,7 +27,7 @@ class NotesNotebookChooser extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.menu_book_rounded, size: 64, color: Color(0xFF4F6AF2)),
+                Icon(Icons.menu_book_rounded, size: 64, color: theme.colorScheme.primary),
                 const SizedBox(height: 18),
                 Text(
                   'notes_notebook_choose_title'.tr,
@@ -42,10 +42,10 @@ class NotesNotebookChooser extends StatelessWidget {
                 const SizedBox(height: 22),
                 FilledButton.icon(
                   onPressed: () => controller.pickNotebook(context),
-                  icon: const Icon(Icons.folder_open_rounded, color: Colors.white),
+                  icon: const Icon(Icons.folder_open_rounded),
                   label: Text(
                     'notes_choose_folder'.tr,
-                    style: const TextStyle(fontSize: 14, color: Colors.white),
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ),
                 if (missingPath.isNotEmpty) ...[

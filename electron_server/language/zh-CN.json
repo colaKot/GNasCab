@@ -277,6 +277,7 @@
       "TMDB_CONFIG_SAVED": "TMDB 配置已保存",
       "TRANSCODE_CONFIG_SAVED": "转码临时目录已保存",
       "SUBTITLE_CONFIG_SAVED": "字幕设置已保存",
+      "PLAY_QUALITY_CONFIG_SAVED": "默认播放画质已保存",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "转码临时目录不存在",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "转码临时路径不是目录",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "转码临时目录不可写",

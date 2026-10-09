@@ -4,39 +4,20 @@ const VideoSourceService = require('../source/videoSourceService');
 const userUtil = require('../../../../utils/userUtil');
 const { intersectPaths, parsePathListText } = require('../../photo/timeline/photoPathQueryUtil');
 const smartAlbumFilterUtil = require('../smartAlbum/videoSmartAlbumFilterUtil');
+const { applyVisibleIndexFilter } = require('../videoVisibilityUtil');
 
+/**
+ * 列表页的可见性过滤。
+ *
+ * ⭐ 已改为委托共用模块 `videoVisibilityUtil.applyVisibleIndexFilter` ——
+ * 原来这份实现是「前缀 + 带分隔符边界 + 目录行特判」，
+ * 而库计数（`library/videoLibraryService._applyIndexPathFilter`）漏了目录行特判、
+ * 详情鉴权（`detail/detailController._ensureIndexAccess`）又用完全不同的单向下沉匹配，
+ * 三处口径不一致 ⇒ 出现「列表能看、点详情 403」和「列表有片子但库计数为 0」。
+ * 现在统一到一处，后续只维护 videoVisibilityUtil。
+ */
 function _applyVideoIndexPathPrefixFilter(query, paths) {
-  const list = Array.isArray(paths) ? paths.map(p => String(p || '').trim()).filter(Boolean) : [];
-  if (list.length === 0) {
-    query.whereRaw('1 = 0');
-    return;
-  }
-
-  const sep = path.sep;
-  const folderExactPairs = [];
-  for (const raw of list) {
-    const p = raw.endsWith(sep) ? raw.slice(0, -1) : raw;
-    if (!p) continue;
-    if (path.extname(p)) continue;
-    const parent = path.dirname(p);
-    const name = path.basename(p);
-    if (!parent || !name) continue;
-    folderExactPairs.push({ parent, name });
-  }
-
-  query.where(builder => {
-    for (const p of list) {
-      const prefix = p.endsWith(sep) ? p : `${p}${sep}`;
-      builder.orWhere(function () {
-        this.where('v.path', p).orWhere('v.path', 'like', `${prefix}%`);
-      });
-    }
-    for (const pair of folderExactPairs) {
-      builder.orWhere(function () {
-        this.where('v.is_file', 0).andWhere('v.path', pair.parent).andWhere('v.filename', pair.name);
-      });
-    }
-  });
+  applyVisibleIndexFilter(query, paths, { alias: 'v' });
 }
 
 function _resolveArtworkAbsolute({ baseDir, maybeRelative }) {

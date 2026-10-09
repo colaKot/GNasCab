@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:GNasCab/utils/device_utils.dart';
 import '../../../base/components/custom_icon_button.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import '../../controllers/custom_gallery_controller.dart';
 
 void _showShortcutsHelp(BuildContext context) {
@@ -44,6 +45,8 @@ class GalleryTopControls extends StatelessWidget {
     final buttonSpacing = isPhone ? 4.0 : 10.0;
     final iconSize = 24.0;
     final buttonSize = isPhone ? 40.0 : 30.0;
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：整排顶部按钮靠右，会被窗口按钮压住
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
 
     return Positioned(
       top: 0,
@@ -65,7 +68,7 @@ class GalleryTopControls extends StatelessWidget {
         child: Align(
           alignment: Alignment.topRight,
           child: Padding(
-            padding: EdgeInsets.only(top: topPadding, right: 20),
+            padding: EdgeInsets.only(top: topPadding, right: 20 + ctrlW),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

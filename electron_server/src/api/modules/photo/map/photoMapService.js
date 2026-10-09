@@ -59,6 +59,32 @@ function pickEvenly(list, maxCount) {
   return out;
 }
 
+/**
+ * 算 geohash 网格的中心坐标。
+ *
+ * 为什么需要：marker 之前直接落在「代表照片」的坐标上，而代表照片是该网格里
+ * id 最大（最新）的那一张，位置是随机的。缩放换挡时同一个区域的 marker 会
+ * 跳来跳去，看着像bug。落到格心之后位置稳定，视觉上才是真正的「聚合点」。
+ *
+ * 解不出来时返回空对象，由调用方回退到代表照片坐标。
+ */
+function _cellCenter(cell) {
+  const raw = String(cell || '').trim();
+  if (!raw) return {};
+  try {
+    const box = geohash.decode(raw); // {latitude:[minLat,maxLat], longitude:[minLng,maxLng]}
+    const latArr = box && box.latitude;
+    const lngArr = box && box.longitude;
+    if (!Array.isArray(latArr) || !Array.isArray(lngArr)) return {};
+    const lat = (Number(latArr[0]) + Number(latArr[1])) / 2;
+    const lng = (Number(lngArr[0]) + Number(lngArr[1])) / 2;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return {};
+    return { cell_lat: lat, cell_lng: lng };
+  } catch (_) {
+    return {};
+  }
+}
+
 function thinPhotosByGrid(photos, bounds, maxCount) {
   const list = Array.isArray(photos) ? photos : [];
   const limit = parsePositiveInt(maxCount, 0);
@@ -328,12 +354,30 @@ class PhotoMapService {
     return filePath;
   }
 
+  /**
+   * zoom → geohash 聚合精度。
+   *
+   * ⭐ 判据：**格心在屏幕上的间距 ≥ 1.7 × marker 直径**。
+   * marker 直径当前固定 85px（客户端 `photo_footprint_map_view.dart` 的 `_markerSizeForTier`）。
+   * 在赤道（最保守，纬度越高经度方向格子间距越大）：
+   *   km/px = 40075 / (256 * 2^z)
+   *   要求 cellLonKm / (km/px) ≥ 145px
+   * ⇒ pre-5（4.9km）要 z ≥ 11.9；pre-4（39km）要 z ≥ 8.9；pre-6（1.2km）要 z ≥ 14.2。
+   *
+   * ⚠️⚠️ 2026-10-09 修（铁柱报「10.5 / 11 / 11.5 全叠在一起，到 12 才能看清」）：
+   * 原实现是 `z <= 14 → 5`，于是 8 < z < 12 这段也用 4.9km 的格子。
+   * 算出格心间距：z=10.5 → 49px、z=11 → 70px、z=11.5 → 99px，
+   * 而 marker 直径 85px ⇒ 前两档**必然重叠**（11.5 只剩 14px 缝，看着也像叠着）。
+   * z=12 时间距 139px 刚好够 ⇒ 所以他觉得 12 是能看清的。完全对得上。
+   * 现在把 8 < z < 12 降到 4（39km），间距变成 130~960px，彻底分开。
+   * ⛔ 改这张表请先按上面公式算间距，别凭感觉调。
+   */
   getBoundsPhotoPrecision(zoom) {
     const z = Number(zoom);
     if (!Number.isFinite(z)) return 2;
     if (z <= 4) return 2;
     if (z <= 6) return 3;
-    if (z <= 8) return 4;
+    if (z < 12) return 4;
     if (z <= 14) return 5;
     return 6;
   }
@@ -475,13 +519,20 @@ class PhotoMapService {
       // chunk = 当前这一批要查询的 cell（uniqueCells 的一个切片）
       const chunk = queryCells.slice(i, i + chunkSize);
       try {
+        // ⭐ 同时取「代表照片 id」和「该网格内的照片总数」。
+        // 之前只取 max(id)，客户端拿不到数量 ⇒ marker 无法显示聚合角标、
+        // 也无法按「本格照片数」决定粒度，缩放时只能靠换 geohash 列隐式合并。
         const picked = await baseQuery
           .clone()
           .clearSelect()
           .clearOrder()
           // 只查询当前 chunk 里的 cell，避免 whereIn 参数过多导致报错或性能抖动
           .whereIn(geoColumn, chunk)
-          .select(knexPhoto.raw('?? as cell', [geoColumn]), knexPhoto.raw('max(photo_index.id) as id'))
+          .select(
+            knexPhoto.raw('?? as cell', [geoColumn]),
+            knexPhoto.raw('max(photo_index.id) as id'),
+            knexPhoto.raw('count(photo_index.id) as photo_count')
+          )
           .groupBy(geoColumn)
           .catch(() => null);
         const ids = Array.isArray(picked) ? picked.map(r => Number(r && r.id ? r.id : 0)).filter(n => Number.isFinite(n) && n > 0) : [];
@@ -507,7 +558,14 @@ class PhotoMapService {
           if (!Number.isFinite(id) || id <= 0) continue;
           if (mapByCell.has(cell)) continue;
           const row = rowById.get(id);
-          if (row && row.id) mapByCell.set(cell, row);
+          if (!row || !row.id) continue;
+          const count = Number(p && p.photo_count ? p.photo_count : 0);
+          mapByCell.set(cell, {
+            ...row,
+            photo_count: Number.isFinite(count) && count > 0 ? count : 1,
+            cell_precision: precision,
+            ..._cellCenter(cell),
+          });
         }
       } catch (_) {
         batchOk = false;

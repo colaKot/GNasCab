@@ -7,9 +7,11 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customColors = Theme.of(context).extension<CustomColors>();
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：搜索框被 Spacer 推到最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Container(
       height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.fromLTRB(16, 0, 16 + ctrlW, 0),
       decoration: BoxDecoration(color: customColors?.mainContentBgColor),
       child: Row(
         children: [

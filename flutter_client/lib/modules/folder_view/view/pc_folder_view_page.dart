@@ -7,6 +7,7 @@ import '../../base/components/custom_expandable_search_bar.dart';
 import '../../files/controllers/pc_file_explorer_controller.dart';
 import '../../files/views/pc_components/pc_file_breadcrumb.dart';
 import '../../files/views/pc_components/pc_file_right_area.dart';
+import '../../home/views/pc_components/pc_app_window.dart';
 import '../controller/pc_folder_view_controller.dart';
 import '../folder_view_module_type.dart';
 
@@ -124,12 +125,14 @@ class _PcFolderViewPageState extends State<PcFolderViewPage> {
       builder: (ctrl) {
         ctrl.onlyShowDir.value = false;
         final theme = Theme.of(context);
+        // ⭐ 右侧给窗口按钮组让位（2026-10-09）：顶部栏搜索框贴最右
+        final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
         return Column(
           children: [
             SizedBox(
               height: _topBarHeight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.only(left: 12, right: 12 + ctrlW),
                 child: Row(
                   children: [
                     Expanded(

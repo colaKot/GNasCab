@@ -242,6 +242,9 @@ class PhotoTimeLineService {
       const search = params.search.trim();
       if (search) {
         const aiOcrEnable = await tableConfig.getConfigByKey('ai_ocr_enable');
+        // ⭐ 场景识别开关：标签是 places365 的 115 类场景（已中文化）。
+        // 注意：builder 回调是同步的，开关必须在这里先查好。
+        const aiPlaceEnable = await tableConfig.getConfigByKey('ai_place_enable').catch(() => null);
         query.where(builder => {
           builder.where('photo_index.path', 'like', `%${search}%`).orWhere('photo_index.filename', 'like', `%${search}%`).orWhere('photo_index.camera', 'like', `%${search}%`);
           if (aiOcrEnable === '1') {
@@ -256,6 +259,13 @@ class PhotoTimeLineService {
               console.log('finalQuery', finalQuery);
               builder.orWhereRaw('photo_index.file_hash IN (SELECT file_hash FROM photo_info_fts WHERE ocr MATCH ?)', [finalQuery]);
             }
+          }
+          // ⭐ 场景标签参与主搜索框：搜「海边 / 雪山 / 森林」能命中对应场景的照片。
+          // 标签在写库时已中文化（placesUtil 把 labelByIndex 换成中文），所以中文直接可匹配。
+          // 用 LIKE 而非等值，让「海」能同时命中「海滩 / 海岸 / 海滨小屋」。
+          // 场景识别未开启时 photo_places2filehash 为空 ⇒ 子查询自然返回空，不会误伤结果。
+          if (aiPlaceEnable === '1') {
+            builder.orWhereRaw('photo_index.file_hash IN (SELECT file_hash FROM photo_places2filehash WHERE place_name LIKE ?)', [`%${search}%`]);
           }
         });
       }

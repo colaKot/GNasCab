@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/bg/background_controller.dart';
-import '../../../../core/theme/dark_theme.dart';
+import '../../../base/components/auth_theme_background.dart';
 import 'admin_create_controller.dart';
 import 'admin_create_view.dart';
 
@@ -21,18 +20,12 @@ class AdminCreatePage extends GetView<AdminCreateController> {
 
   Widget _buildContent(BuildContext context, AdminCreateController controller) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           return Scaffold(
             body: Obx(
-              () => Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(BackgroundController.instance.loginBgUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              () => AuthThemeBackground(
                 child: _buildCenterView(context),
               ),
             ),

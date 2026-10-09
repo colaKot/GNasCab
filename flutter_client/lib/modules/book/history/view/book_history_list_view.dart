@@ -5,6 +5,7 @@ import '../../list/controller/book_list_controller.dart';
 import '../../list/service/book_list_api_service.dart';
 import '../../list/view/parts/book_item_card.dart';
 import '../../../base/components/custom_no_data.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import '../controller/book_history_controller.dart';
 
 class BookHistoryListView extends StatelessWidget {
@@ -15,6 +16,8 @@ class BookHistoryListView extends StatelessWidget {
     BookListController.ensureSharedCoverScaleLoaded();
     final controller = Get.put(BookHistoryController());
     final isDesktop = DeviceUtils.isDesktopOrWeb;
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：顶部「清空」按钮贴最右
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
 
     return Obx(() {
       if (!controller.firstLoaded.value && controller.loading.value) {
@@ -29,7 +32,7 @@ class BookHistoryListView extends StatelessWidget {
       if (isDesktop) {
         header = SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            padding: EdgeInsets.fromLTRB(16, 16, 16 + ctrlW, 16),
             child: Row(
               children: [
                 Text(

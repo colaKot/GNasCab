@@ -2,9 +2,7 @@ import 'package:GNasCab/utils/device_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../modules/base/components.dart';
-import '../../../../core/theme/dark_theme.dart';
 import 'login_controller.dart';
-import '../../../../core/bg/background_controller.dart';
 import '../../../../utils/dimens_util.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:url_launcher/url_launcher.dart';
@@ -26,18 +24,12 @@ class LoginView extends GetView<LoginController> {
 
   Widget _buildContent(BuildContext context, LoginController controller) {
     return Theme(
-      data: darkTheme,
+      data: Theme.of(context),
       child: Builder(
         builder: (context) {
           return Scaffold(
             body: Obx(
-              () => Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(BackgroundController.instance.loginBgUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              () => AuthThemeBackground(
                 child: Column(
                   children: [
                     Expanded(child: _buildCenterView(context)),
@@ -81,7 +73,10 @@ class LoginView extends GetView<LoginController> {
       fontSize: 12,
       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
     );
-    const linkStyle = TextStyle(fontSize: 12, color: Colors.white);
+    final linkStyle = TextStyle(
+      fontSize: 12,
+      color: theme.colorScheme.onSurface,
+    );
 
     return SafeArea(
       child: Padding(
@@ -261,14 +256,14 @@ class LoginView extends GetView<LoginController> {
                                   : controller.handleLogin,
                               isDisabled: controller.isLoading.value,
                               icon: controller.isLoading.value
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       width: 20,
                                       height: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
+                                              theme.colorScheme.onPrimary,
                                             ),
                                       ),
                                     )

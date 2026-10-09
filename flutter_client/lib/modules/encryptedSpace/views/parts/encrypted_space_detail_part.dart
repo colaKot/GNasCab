@@ -279,7 +279,11 @@ class _EncryptedSpaceDetailSortSearchBarState
     return SizedBox(
       height: 40,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        // ⭐ 右侧给窗口按钮组让位（2026-10-09）：搜索/排序贴最右
+        padding: EdgeInsets.only(
+          left: 8,
+          right: 8 + (PcWindowScope.of(context)?.titleBarControlsWidth ?? 0),
+        ),
         child: Row(
           children: [
             CustomBorderedIconButton(

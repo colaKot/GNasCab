@@ -1,6 +1,40 @@
 part of '../video_player_controller.dart';
 
 extension PlayerStreamInfo on PlayerController {
+  /// ffprobe 的 bit_rate 可能是字符串/数字/缺失。
+  static int? _parseBitrateBps(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is num) {
+      final v = raw.toInt();
+      return v > 0 ? v : null;
+    }
+    final n = int.tryParse(raw.toString().trim());
+    if (n == null || n <= 0) return null;
+    return n;
+  }
+
+  /// 原始文件（未转码）的视频码率。取主视频流的 bit_rate；
+  /// ffprobe 没给时退回「文件大小 ÷ 总时长」的粗算值。
+  String? get sourceBitrateText {
+    for (final t in _rawVideoTracks) {
+      final bps = _parseBitrateBps(t['bit_rate']);
+      if (bps != null && bps > 0) return PlayQuality.formatBitrate(bps);
+    }
+    final size = _sourceFileSizeBytes;
+    final dur = _sourceDurationSeconds;
+    if (size != null && dur != null && dur > 0 && size > 0) {
+      return PlayQuality.formatBitrate((size * 8 / dur).round());
+    }
+    return null;
+  }
+
+  /// 当前转码的目标码率。与发给 transcode 接口的那套换算同源（[PlayQuality.bitrateBpsOf]）。
+  /// 原画时返回 null。
+  String? get transcodeBitrateText {
+    final bps = PlayQuality.bitrateBpsOf(currentQuality.value);
+    return bps == null ? null : PlayQuality.formatBitrate(bps);
+  }
+
   String currentSourcePathForInfo() {
     if (playlist.isEmpty ||
         currentIndex.value < 0 ||

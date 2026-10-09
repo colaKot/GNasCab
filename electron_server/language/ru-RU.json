@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "Настройки TMDB сохранены",
       "TRANSCODE_CONFIG_SAVED": "Директория временных файлов транскодирования сохранена",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "Качество воспроизведения по умолчанию сохранено",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "Директория временных файлов транскодирования не существует",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "Путь временных файлов транскодирования не является директорией",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "Директория временных файлов транскодирования недоступна для записи",

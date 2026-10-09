@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/video_player_controller.dart';
 import '../components/video_info_drawer.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 
 class PcVideoPlayerTopBar extends GetView<PlayerController> {
   const PcVideoPlayerTopBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 右侧给窗口按钮组让位（2026-10-09）：[帮助][信息][关闭] 图标靠右，
+    // 会被窗口右上角的最小化/最大化/关闭按钮压住。
+    final ctrlW = PcWindowScope.of(context)?.titleBarControlsWidth ?? 0;
     return Obx(
       () => AnimatedOpacity(
         opacity: controller.showControls.value ? 1.0 : 0.0,
@@ -81,7 +85,7 @@ class PcVideoPlayerTopBar extends GetView<PlayerController> {
                 icon: const Icon(Icons.close, color: Colors.white),
                 onPressed: () => Get.back(),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8 + ctrlW),
             ],
           ),
         ),

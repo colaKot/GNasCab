@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "Pengaturan TMDB disimpan",
       "TRANSCODE_CONFIG_SAVED": "Direktori sementara transkode disimpan",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "Kualitas pemutaran default disimpan",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "Direktori sementara transkode tidak ada",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "Path sementara transkode bukan direktori",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "Direktori sementara transkode tidak dapat ditulis",

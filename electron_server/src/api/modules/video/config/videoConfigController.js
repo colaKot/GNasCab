@@ -15,8 +15,38 @@ const {
   normalizeAvailableHwAccelList,
   pickEffectiveHwAccelConfig,
 } = require('../../../../utils/transcodeHwAccelUtil');
+// 默认播放画质白名单。必须与客户端 `flutter_client/lib/modules/video/base/video_utils/play_quality.dart`
+// 的 `PlayQuality.options` 保持一致（客户端那边是唯一真源，改档位要两边同一次改完）：
+// 键格式为 `<分辨率>_<码率>`，客户端按 `_` 拆分后换算成 transcode 接口的 width / bitrate。
+const PLAY_QUALITY_OPTIONS = [
+  'original',
+  '4k_20m',
+  '4k_15m',
+  '4k_10m',
+  '1080p_8m',
+  '1080p_5m',
+  '1080p_3m',
+  '1080p_2m',
+  '720p_3m',
+  '720p_2m',
+  '720p_1m',
+  '480p_1m',
+];
+
+// 配置键（通用配置 uid=0）
+const KEY_VIDEO_DEFAULT_PLAY_QUALITY = 'videoDefaultPlayQuality';
+// 音频降混：开启后每次转码都把非双声道的音轨降混成双声道（默认关闭，保持源声道数）
+const KEY_VIDEO_AUDIO_DOWNMIX = 'videoAudioDownmix';
+
 function _parseBoolTo01(v) {
   return v === 1 || v === '1' || v === true ? 1 : 0;
+}
+
+// 归一化默认播放画质：空/非法一律回退 'original'（原画）。
+function _normalizePlayQuality(raw) {
+  const v = raw === undefined || raw === null ? '' : String(raw).trim();
+  if (!v) return 'original';
+  return PLAY_QUALITY_OPTIONS.includes(v) ? v : '';
 }
 
 function _parseText(v) {
@@ -417,6 +447,68 @@ class VideoConfigController {
       const ok = await tableConfig.setConfigByKey('subtitlePreExtractEnable', String(preExtractEnable));
       if (!ok) return ResponseUtil.error(req, res, 'common.ERROR', 500);
       return ResponseUtil.success(req, res, { preExtractEnable }, 'video.SUBTITLE_CONFIG_SAVED', 200);
+    } catch (_) {
+      return ResponseUtil.error(req, res, 'common.ERROR', 500);
+    }
+  }
+
+  /**
+   * 读取「默认播放画质」。
+   * 注意：该接口不加 requireAdmin —— 服务端级的默认码率需要被包括子账号在内的
+   * 所有播放端读取，否则设置了默认码率对非管理员无效。
+   */
+  async getPlayQuality(req, res) {
+    try {
+      const [raw, downmixRaw] = await Promise.all([
+        tableConfig.getConfigByKey(KEY_VIDEO_DEFAULT_PLAY_QUALITY),
+        tableConfig.getConfigByKey(KEY_VIDEO_AUDIO_DOWNMIX),
+      ]);
+      const quality = _normalizePlayQuality(raw) || 'original';
+      return ResponseUtil.success(
+        req,
+        res,
+        {
+          quality,
+          // 未配置过时默认关闭（保持源声道数）
+          audioDownmix: _parseBoolTo01(downmixRaw),
+          options: PLAY_QUALITY_OPTIONS,
+        },
+        'common.SUCCESS',
+        200
+      );
+    } catch (_) {
+      return ResponseUtil.error(req, res, 'common.ERROR', 500);
+    }
+  }
+
+  async setPlayQuality(req, res) {
+    try {
+      const body = req.body || {};
+      const raw = _parseText(body.quality ?? body.playQuality ?? body.play_quality);
+      const quality = _normalizePlayQuality(raw);
+      if (!quality) return ResponseUtil.error(req, res, 'common.PARAM_ERROR', 400);
+      // audioDownmix 为可选字段：老客户端不带该字段时不改动已有配置
+      const hasDownmixField =
+        Object.prototype.hasOwnProperty.call(body, 'audioDownmix') ||
+        Object.prototype.hasOwnProperty.call(body, 'videoAudioDownmix') ||
+        Object.prototype.hasOwnProperty.call(body, 'audio_downmix');
+      const audioDownmix = hasDownmixField
+        ? _parseBoolTo01(body.audioDownmix ?? body.videoAudioDownmix ?? body.audio_downmix)
+        : null;
+
+      const savePairs = [tableConfig.setConfigByKey(KEY_VIDEO_DEFAULT_PLAY_QUALITY, quality)];
+      if (audioDownmix !== null) {
+        savePairs.push(tableConfig.setConfigByKey(KEY_VIDEO_AUDIO_DOWNMIX, String(audioDownmix)));
+      }
+      const results = await Promise.all(savePairs);
+      if (!results.every(Boolean)) return ResponseUtil.error(req, res, 'common.ERROR', 500);
+      return ResponseUtil.success(
+        req,
+        res,
+        audioDownmix === null ? { quality } : { quality, audioDownmix },
+        'video.PLAY_QUALITY_CONFIG_SAVED',
+        200
+      );
     } catch (_) {
       return ResponseUtil.error(req, res, 'common.ERROR', 500);
     }

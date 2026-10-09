@@ -16,7 +16,21 @@ try {
 // 模型路径配置：默认放在 userData/onnx_models/faces 或安装包 onnx_models/faces。
 const MODELS_DIR = () => path.join(remoteAssets.resolveOnnxModelsRoot(), 'faces');
 const FACE_LMK_E2E_MODEL_PATH = () => path.join(MODELS_DIR(), 'faceLandMark', 'faceLandMark.onnx');
-const FACE_FEAT_MODEL_PATH = () => path.join(MODELS_DIR(), 'insightFace', 'model.onnx');
+/**
+ * 特征提取模型路径。
+ *
+ * ⭐ 默认 EdgeFace（Idiap 研究所，BSD-3-Clause，**允许商用**），112x112 输入 / 512 维输出。
+ * 旧版本用的是 insightFace 的 ArcFace R50（249MB）：体积大 36 倍、慢 16 倍，
+ * 且权重是「仅限非商用研究」许可。这里保留目录探测只是为了能一键回退：
+ * 把 insightFace/model.onnx 放回去、删掉 edgeface 目录即可，预处理参数会自动跟着切。
+ */
+const FACE_FEAT_MODEL_PATH = () => {
+  const edgeface = path.join(MODELS_DIR(), 'edgeface', 'model.onnx');
+  try {
+    if (fs.existsSync(edgeface)) return edgeface;
+  } catch (_) {}
+  return path.join(MODELS_DIR(), 'insightFace', 'model.onnx');
+};
 
 const E2E_INPUT_SIZE = Math.max(256, Number(process.env.FACE_LMK_E2E_INPUT_SIZE ?? 960));
 // 检测置信度阈值：低于该 score 的候选框直接丢弃；越高越少误检，但也更容易漏检。
@@ -25,14 +39,32 @@ const DET_SCORE_THRESH = Math.max(0, Math.min(1, Number(process.env.FACE_DET_SCO
 // 该限制基于检测框的 width/height 的较小值。
 const FACE_MIN_BOX_SIZE_PX = Math.max(0, Math.min(4096, Number(process.env.FACE_MIN_BOX_SIZE_PX ?? 80)));
 
-// 特征提取输入尺寸：绝大多数 insightFace/arcface 模型都使用 112x112 对齐人脸。
+// 特征提取输入尺寸：EdgeFace 与 insightFace/arcface 都用 112x112 对齐人脸。
 const FEAT_INPUT_SIZE = 112;
-// 特征模型归一化均值：按通道减去该值；127.5/128 与常见 insighthFace 预处理对齐。
-const FEAT_MEAN = Number(process.env.FACE_FEAT_MEAN ?? 127.5);
-// 特征模型归一化标准差：按通道除以该值；配合 FEAT_MEAN 控制到模型训练时的分布。
-const FEAT_STD = Number(process.env.FACE_FEAT_STD ?? 128.0);
-// 特征模型使用的通道顺序：有的 ONNX 是 BGR，有的是 RGB；需与模型训练设置一致，否则相似度会明显下降。
-const FEAT_ORDER = (process.env.FACE_FEAT_ORDER || 'BGR').toUpperCase() === 'RGB' ? 'RGB' : 'BGR';
+
+/**
+ * ⭐ 预处理参数按「实际加载的模型」自动选择，避免换了模型却忘了改参数
+ * （通道序或归一化不匹配会让相似度明显下降，且很难察觉）。
+ *
+ *   EdgeFace  : RGB + (x-127.5)/127.5   —— 官方 transforms.Normalize(mean=0.5,std=0.5)
+ *   ArcFace   : BGR + (x-127.5)/128.0   —— InsightFace 系惯例
+ *
+ * 环境变量仍然可以覆盖（用于实验），不给就用模型对应的那套。
+ * 实测（33 张真实人脸，同人扰动相似度）：
+ *   EdgeFace XS + RGB/127.5 → mean 0.9930 / min 0.9520
+ *   ArcFace R50 + BGR/128   → mean 0.9926 / min 0.9281
+ */
+function _resolveFeatProfile(modelPath) {
+  const isEdgeFace = /edgeface/i.test(String(modelPath || ''));
+  return isEdgeFace
+    ? { order: 'RGB', mean: 127.5, std: 127.5 }
+    : { order: 'BGR', mean: 127.5, std: 128.0 };
+}
+
+// 下面三个值在 FaceEngine.init() 里按模型确定；这里只给默认值。
+let FEAT_MEAN = Number(process.env.FACE_FEAT_MEAN ?? 127.5);
+let FEAT_STD = Number(process.env.FACE_FEAT_STD ?? 127.5);
+let FEAT_ORDER = (process.env.FACE_FEAT_ORDER || 'RGB').toUpperCase() === 'RGB' ? 'RGB' : 'BGR';
 const FEAT_LUMA_NORM_ENABLED = String(process.env.FACE_FEAT_LUMA_NORM ?? '1') !== '0';
 const FEAT_LUMA_NORM_MODE = String(process.env.FACE_FEAT_LUMA_NORM_MODE ?? 'MEAN').toUpperCase();
 const FEAT_LUMA_TARGET_MEAN = Number(process.env.FACE_FEAT_LUMA_TARGET_MEAN ?? 127.5);
@@ -352,20 +384,55 @@ class FaceEngine {
 
   async init() {
     if (this._sessions) return;
-    const sessionOptions = {
-      executionProviders: ['cpu'],
-      enableCpuMemArena: false,
-      enableMemPattern: false,
-      graphOptimizationLevel: 'all',
+    // ⚠️ 这里以前硬编码 ['cpu']，而 placesUtil / ocrOnnxUtil 早就用
+    // getBestExecutionProviders() 了 —— 三处不一致，人脸是唯一没吃上 GPU 的。
+    // 本机实测（onnxruntime-node 1.20.0 + DirectML）：
+    //   EdgeFace XS 单张推理  CPU ~2.8ms  → DML 更快
+    //   （旧 ArcFace R50 参考值：CPU 52.7ms → DML 24.7ms，快 2.1 倍）
+    // 但 DML 首次建会话要多花约 1.2s，且在「无独立/核显驱动异常」的机器上可能直接抛异常。
+    // ⇒ 优先 GPU，失败自动退回纯 CPU，绝不让 AI 功能整体挂掉。
+    const buildSessions = async (providers) => {
+      const sessionOptions = {
+        executionProviders: providers,
+        enableCpuMemArena: false,
+        enableMemPattern: false,
+        graphOptimizationLevel: 'all',
+      };
+      const [align, feat] = await Promise.all([
+        onnx.InferenceSession.create(FACE_LMK_E2E_MODEL_PATH(), sessionOptions),
+        onnx.InferenceSession.create(FACE_FEAT_MODEL_PATH(), sessionOptions),
+      ]);
+      return { align, feat, sessionOptions };
     };
-    const [align, feat] = await Promise.all([
-      onnx.InferenceSession.create(FACE_LMK_E2E_MODEL_PATH(), sessionOptions),
-      onnx.InferenceSession.create(FACE_FEAT_MODEL_PATH(), sessionOptions),
-    ]);
 
+    let loaded = null;
+    const wanted = getBestExecutionProviders();
+    if (wanted.length > 1) {
+      try {
+        loaded = await buildSessions(wanted);
+      } catch (e) {
+        Logger.warn(`[faceUtil] GPU providers failed (${wanted.join(',')}), fallback to CPU: ${e && e.message ? e.message : e}`);
+        loaded = null;
+      }
+    }
+    if (!loaded) {
+      loaded = await buildSessions(['cpu']);
+    }
+
+    const { align, feat, sessionOptions } = loaded;
     this._sessions = { align, feat };
+
+    // ⭐ 预处理参数跟着实际加载的特征模型走（EdgeFace=RGB/127.5，ArcFace=BGR/128）。
+    // 环境变量显式给了就尊重环境变量，否则按模型自动选。
+    const featPath = FACE_FEAT_MODEL_PATH();
+    const profile = _resolveFeatProfile(featPath);
+    if (process.env.FACE_FEAT_ORDER === undefined) FEAT_ORDER = profile.order;
+    if (process.env.FACE_FEAT_MEAN === undefined) FEAT_MEAN = profile.mean;
+    if (process.env.FACE_FEAT_STD === undefined) FEAT_STD = profile.std;
+
     Logger.info(`[faceUtil] Selected providers: ${sessionOptions.executionProviders.join(', ')}`);
     Logger.info(`[faceUtil] Loaded backends: ${getLoadedBackends()}`);
+    Logger.info(`[faceUtil] Feature model: ${path.basename(path.dirname(featPath))} (${FEAT_ORDER}, mean=${FEAT_MEAN}, std=${FEAT_STD})`);
     this._alignInputName = _getFirstName(align && align.inputNames ? align.inputNames : null, 'input');
     this._featInputName = _getFirstName(feat && feat.inputNames ? feat.inputNames : null, 'input.1');
     this._featOutputName = _pickFeatOutputName(feat);

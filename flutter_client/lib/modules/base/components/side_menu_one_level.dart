@@ -45,7 +45,7 @@ class _CollapsedMenuItemState extends State<_CollapsedMenuItem> {
                 ? theme.colorScheme.onSurface.withValues(alpha: 0.06)
                 : Colors.transparent);
       final fg = selected
-          ? Colors.white
+          ? theme.colorScheme.onPrimary
           : theme.colorScheme.onSurface.withValues(
               alpha: _hovered ? 0.9 : 0.75,
             );
@@ -101,9 +101,11 @@ class _MenuTileState extends State<_MenuTile> {
           : (_hovered
                 ? theme.colorScheme.onSurface.withValues(alpha: 0.01)
                 : Colors.transparent);
-      final fg = selected ? Colors.white : theme.colorScheme.onSurface;
+      final fg = selected
+          ? theme.colorScheme.onPrimary
+          : theme.colorScheme.onSurface;
       final iconColor = selected
-          ? Colors.white
+          ? theme.colorScheme.onPrimary
           : fg.withValues(alpha: _hovered ? 0.9 : 0.75);
 
       return Padding(
@@ -182,7 +184,9 @@ class OneLevelSideMenu extends StatelessWidget {
   final String? toggleExpandTooltip;
   final String? toggleCollapseTooltip;
   final Widget? headerTrailing;
-  final double topPlaceholderHeight;
+
+  /// 顶部让位高度。null = 跟随当前皮肤的标题栏高度（换肤后自动同步）。
+  final double? topPlaceholderHeight;
   final List<OneLevelSideMenuItem> items;
 
   const OneLevelSideMenu({
@@ -196,7 +200,7 @@ class OneLevelSideMenu extends StatelessWidget {
     this.toggleExpandTooltip,
     this.toggleCollapseTooltip,
     this.headerTrailing,
-    this.topPlaceholderHeight = PcAppWindow.titleBarHeight,
+    this.topPlaceholderHeight,
   });
 
   @override
@@ -207,7 +211,10 @@ class OneLevelSideMenu extends StatelessWidget {
       color: customColors?.leftTreeBgColor,
       child: Column(
         children: [
-          SizedBox(height: topPlaceholderHeight),
+          SizedBox(
+            height:
+                topPlaceholderHeight ?? PcAppWindow.titleBarHeightFor(context),
+          ),
           if (showHeader)
             SizedBox(
               height: AppSize.sideItemHeight,

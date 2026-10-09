@@ -15,6 +15,7 @@ import '../../../../utils/dialog_util.dart';
 import '../controller/photo_smart_album_controller.dart';
 import '../models/photo_smart_album_model.dart';
 import '../../timeline/view/pc_photo_timeline.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 part 'parts/photo_smart_album_list_card.dart';
 part 'parts/photo_smart_album_list_dialogs.dart';
 part 'parts/photo_smart_album_list_top_bar.dart';

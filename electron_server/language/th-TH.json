@@ -247,6 +247,7 @@
       "TMDB_CONFIG_SAVED": "การตั้งค่า TMDB ถูกบันทึกแล้ว",
       "TRANSCODE_CONFIG_SAVED": "ไดเรกทอรีชั่วคราวสำหรับการแปลงรหัสถูกบันทึกแล้ว",
       "SUBTITLE_CONFIG_SAVED": "Subtitle settings saved",
+      "PLAY_QUALITY_CONFIG_SAVED": "บันทึกคุณภาพการเล่นเริ่มต้นแล้ว",
       "TRANSCODE_TEMP_DIR_NOT_EXIST": "ไม่มีไดเรกทอรีชั่วคราวสำหรับการแปลงรหัส",
       "TRANSCODE_TEMP_DIR_NOT_DIR": "พาธชั่วคราวสำหรับการแปลงรหัสไม่ใช่ไดเรกทอรี",
       "TRANSCODE_TEMP_DIR_NOT_WRITABLE": "ไดเรกทอรีชั่วคราวสำหรับการแปลงรหัสไม่สามารถเขียนได้",

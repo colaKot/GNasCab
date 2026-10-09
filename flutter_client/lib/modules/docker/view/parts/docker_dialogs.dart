@@ -1428,7 +1428,7 @@ class _CreateModeOption extends StatelessWidget {
                 icon,
                 size: 18,
                 color: selected
-                    ? Colors.white
+                    ? theme.colorScheme.onPrimary
                     : theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 8),
@@ -1438,7 +1438,7 @@ class _CreateModeOption extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: selected
-                        ? Colors.white
+                        ? theme.colorScheme.onPrimary
                         : theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1590,12 +1590,12 @@ class _CreateAddTag extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add, size: 18, color: Colors.white),
+              Icon(Icons.add, size: 18, color: theme.colorScheme.onPrimary),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
