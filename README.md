@@ -6,6 +6,28 @@ GNasCab is a cross-platform NAS software that lets you remotely manage your phot
 
 Official website: <https://nas.cab>
 
+## Changes From Upstream
+
+> This repository is a **modified version** of [NasCabOS](https://github.com/nascab/NasCabOS),
+> released under GPL-3.0. Listed below are the changes relative to upstream (2026-10; see the commit history).
+> Feature-level changes come first, followed by project-wide housekeeping.
+
+### Features
+
+- **Multi-device folder sync**: a standalone Windows sync client (`sync_client`) plus a shared core package (`packages/nascab_sync_core`), so the desktop client and the standalone client run the same sync engine and transfer protocol. The backend gains a dedicated `/api/sync` namespace and two new tables (`tableSyncTask`, `tableSyncRecord`).
+- **Sub-account permission system**: an app-level access policy (`appAccessGuard`) together with fine-grained path permissions, letting you restrict each user's accessible folders and operations (`/api/user/access-policy`). See `docs/子账号权限方案.md`.
+- **Multi-library media support**: a new `video_library` entity allows separate movie / TV / photo / mixed libraries, each with its own "show on home" switch; image and mixed libraries get their own grid + full-screen browser. Existing rows are backfilled by `media_type` on upgrade.
+- **Standalone Photos / Music clients**: `photo_client` and `music_client` build `NasCabPhoto.exe` / `NasCabMusic.exe`. They depend on the main client by path and add **zero duplicated business code** — `main.dart` is three lines that set a launch mode (`AppLaunchMode.photo` / `.music`), so each app boots straight into Photos or Music with its own icon and title.
+- **Theme system**: 26 named color schemes selectable at runtime (Settings → Theme), plus a design-token layer (`app_tokens.dart`) that centralizes spacing / corner-radius / control sizes previously scattered as hard-coded numbers.
+- **Content-level dedup for photo backup**: backup now compares size **and content MD5** against the NAS, so re-uploading an unchanged file is skipped instead of transferred again.
+
+### Project-wide
+
+- **Renamed**: the project and every client display name is now **GNasCab** (GNasCabServer for the Windows server, GNasCab TV for the TV clients); the Flutter package name changed from `NasCabOS` to `GNasCab`.
+- **Backward compatible**: application identifiers such as `applicationId`, the iOS Bundle ID and the HarmonyOS `bundleName` are **left unchanged**, so existing installs can upgrade in place; network protocols, device fingerprints and encrypted data formats are untouched.
+- **Slimmed repository**: third-party runtime binaries (sftpgo, openlist, ffmpeg, ffprobe, rclone, transmission), AI models (`onnx_models`), CocoaPods trees and the geonames database are no longer bundled; run `tool/fetch_nascab_assets.py` to fetch them from the official manifest.
+- **Contact & donations**: updated to the maintainer's QR code and email.
+
 ## Built-in Apps
 
 Every feature in GNasCab is a **standalone app**: its own icon, its own page stack and its own
@@ -42,28 +64,6 @@ main shell. The default app list is served by the backend (`defaultApps` in
 > are hidden from regular users by default and visible only to administrators. If an app is missing
 > from the home screen, it is most likely filtered out by the "hidden apps" setting — restore it in
 > Settings.
-
-## Changes From Upstream
-
-> This repository is a **modified version** of [NasCabOS](https://github.com/nascab/NasCabOS),
-> released under GPL-3.0. Listed below are the changes relative to upstream (2026-10; see the commit history).
-> Feature-level changes come first, followed by project-wide housekeeping.
-
-### Features
-
-- **Multi-device folder sync**: a standalone Windows sync client (`sync_client`) plus a shared core package (`packages/nascab_sync_core`), so the desktop client and the standalone client run the same sync engine and transfer protocol. The backend gains a dedicated `/api/sync` namespace and two new tables (`tableSyncTask`, `tableSyncRecord`).
-- **Sub-account permission system**: an app-level access policy (`appAccessGuard`) together with fine-grained path permissions, letting you restrict each user's accessible folders and operations (`/api/user/access-policy`). See `docs/子账号权限方案.md`.
-- **Multi-library media support**: a new `video_library` entity allows separate movie / TV / photo / mixed libraries, each with its own "show on home" switch; image and mixed libraries get their own grid + full-screen browser. Existing rows are backfilled by `media_type` on upgrade.
-- **Standalone Photos / Music clients**: `photo_client` and `music_client` build `NasCabPhoto.exe` / `NasCabMusic.exe`. They depend on the main client by path and add **zero duplicated business code** — `main.dart` is three lines that set a launch mode (`AppLaunchMode.photo` / `.music`), so each app boots straight into Photos or Music with its own icon and title.
-- **Theme system**: 26 named color schemes selectable at runtime (Settings → Theme), plus a design-token layer (`app_tokens.dart`) that centralizes spacing / corner-radius / control sizes previously scattered as hard-coded numbers.
-- **Content-level dedup for photo backup**: backup now compares size **and content MD5** against the NAS, so re-uploading an unchanged file is skipped instead of transferred again.
-
-### Project-wide
-
-- **Renamed**: the project and every client display name is now **GNasCab** (GNasCabServer for the Windows server, GNasCab TV for the TV clients); the Flutter package name changed from `NasCabOS` to `GNasCab`.
-- **Backward compatible**: application identifiers such as `applicationId`, the iOS Bundle ID and the HarmonyOS `bundleName` are **left unchanged**, so existing installs can upgrade in place; network protocols, device fingerprints and encrypted data formats are untouched.
-- **Slimmed repository**: third-party runtime binaries (sftpgo, openlist, ffmpeg, ffprobe, rclone, transmission), AI models (`onnx_models`), CocoaPods trees and the geonames database are no longer bundled; run `tool/fetch_nascab_assets.py` to fetch them from the official manifest.
-- **Contact & donations**: updated to the maintainer's QR code and email.
 
 ## Project Structure
 
