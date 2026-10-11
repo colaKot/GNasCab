@@ -27,7 +27,7 @@
 		<string>ar</string>
 	</array>
 	<key>CFBundleName</key>
-	<string>GNasCab TV</string>
+	<string>WaterNasOS TV</string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
@@ -37,7 +37,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>GNasCab TV does not use the camera. This key is required because the embedded WebRTC library links camera-related system APIs for peer-to-peer data channels; no camera data is accessed on Apple TV.</string>
+	<string>WaterNasOS TV does not use the camera. This key is required because the embedded WebRTC library links camera-related system APIs for peer-to-peer data channels; no camera data is accessed on Apple TV.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

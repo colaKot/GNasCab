@@ -110,15 +110,19 @@ class _LivePhotoInlinePlayerState extends State<LivePhotoInlinePlayer> {
         widget.fallbackVideoUrl!,
     ];
     for (final url in urls) {
+      VideoPlayerController? c;
       try {
-        final c = await video_platform.createVideoController(url);
+        c = await video_platform.createVideoController(url);
         if (!mounted) {
           video_platform.disposeVideoController(c);
           unawaited(c.dispose());
           return;
         }
-        await c.setLooping(true);
         await c.initialize();
+        // ⚠️ setLooping 必须在 initialize **之后**：
+        //    之前是 create 完就调，此时 textureId 还是 kUninitializedTextureId(-1)，
+        //    在原生端会直接抛 PlatformException（Web 端只是静默失效、根本不循环）。
+        await c.setLooping(true);
         if (!mounted) {
           video_platform.disposeVideoController(c);
           unawaited(c.dispose());
@@ -136,6 +140,14 @@ class _LivePhotoInlinePlayerState extends State<LivePhotoInlinePlayer> {
         });
         return;
       } catch (e) {
+        // 失败的那次必须自己回收：不回收的话每点一次播放就漏一个
+        // <video> 元素 + 一个 controller（Web 端还会挂着 P2P 资源表）。
+        if (c != null) {
+          try {
+            video_platform.disposeVideoController(c);
+          } catch (_) {}
+          unawaited(c.dispose());
+        }
         if (!mounted) return;
         if (url == urls.last) {
           setState(() => _error = e.toString());

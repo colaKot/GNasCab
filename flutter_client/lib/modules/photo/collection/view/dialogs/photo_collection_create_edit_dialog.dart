@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
-import 'package:GNasCab/modules/base/components/custom_icon_button.dart';
-import 'package:GNasCab/modules/files/views/folder_picker_dialog.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
+import 'package:WaterNasOS/modules/base/components/custom_icon_button.dart';
+import 'package:WaterNasOS/modules/files/views/folder_picker_dialog.dart';
 import '../../controller/photo_collection_controller.dart';
 import '../../models/photo_collection_model.dart';
 import '../../service/photo_collection_api_service.dart';

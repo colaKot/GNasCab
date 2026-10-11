@@ -1,6 +1,6 @@
 # nascab_sync_core
 
-GNasCab 目录同步核心。**PC 主客户端与 Windows 独立同步客户端共用这一份实现。**
+WaterNasOS 目录同步核心。**PC 主客户端与 Windows 独立同步客户端共用这一份实现。**
 
 ## 为什么要抽出来
 

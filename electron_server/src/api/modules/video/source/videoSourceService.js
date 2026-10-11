@@ -196,6 +196,10 @@ class VideoSourceService {
         await trx('video_index')
           .delete()
           .catch(() => {});
+        // 图片独立表 image_index 一并清空
+        await trx('image_index')
+          .delete()
+          .catch(() => {});
         return affected;
       }
 
@@ -204,6 +208,13 @@ class VideoSourceService {
 
       const scanPrefix = resolved.endsWith(path.sep) ? resolved : `${resolved}${path.sep}`;
       await trx('video_index')
+        .where(qb => {
+          qb.where('path', resolved).orWhere('path', 'like', `${scanPrefix}%`);
+        })
+        .delete()
+        .catch(() => {});
+      // 图片独立表：同一子树一并清理
+      await trx('image_index')
         .where(qb => {
           qb.where('path', resolved).orWhere('path', 'like', `${scanPrefix}%`);
         })
@@ -379,6 +390,19 @@ class VideoSourceService {
         .update({ path: newParent, filename: newName })
         .catch(() => 0);
 
+      // 图片独立表 image_index：同源搬迁，path 前缀一并改写
+      const updatedImageDirect = await trx('image_index')
+        .where({ path: oldPath })
+        .update({ path: normalizedNewPath })
+        .catch(() => 0);
+
+      const updatedImageSubtree = await trx('image_index')
+        .where('path', 'like', `${oldPrefix}%`)
+        .update({
+          path: trx.raw(`? || substr(path, ?)`, [newPrefix, startAt]),
+        })
+        .catch(() => 0);
+
       return {
         source_id: sourceId,
         old_path: oldPath,
@@ -386,6 +410,7 @@ class VideoSourceService {
         updated: 1,
         updated_index_paths: Number(updatedDirect || 0) + Number(updatedSubtree || 0),
         updated_root_dir_index: Number(updatedRootDirIndex || 0),
+        updated_image_paths: Number(updatedImageDirect || 0) + Number(updatedImageSubtree || 0),
       };
     });
   }

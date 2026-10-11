@@ -1,4 +1,4 @@
-# GNasCab 开发速查（客户端 / 鸿蒙 / 独立端）
+# WaterNasOS 开发速查（客户端 / 鸿蒙 / 独立端）
 
 > 从 `.workbuddy/memory/MEMORY.md` 搬出来的**速查明细**。MEMORY.md 只留硬规则与指针，
 > 具体 API 备忘、字段清单、落地步骤看这里。两份文件要同步维护。
@@ -23,7 +23,7 @@
 ### 1.2 其他约定
 - 模块四层：`lib/modules/<name>/{models,service,controller,view,engine}`；状态用 GetX（`Obx` / `Rx*`）。
 - 多语言 `lib/core/languages/<locale>.dart`：键是**扁平 map**（**无二级嵌套**），**13 个语言文件必须全加**。
-- ⭐⭐ **新代码一律 `package:GNasCab/...` 包导入**，别用相对路径。
+- ⭐⭐ **新代码一律 `package:WaterNasOS/...` 包导入**，别用相对路径。
   `lib/` 本有 ~62 处相对 import 解析不到 —— 属既有问题，**别顺手修**。
 - GetX 控制器防「dispose 后回调」用 `if (isClosed) return;`。
   **不是 `mounted`** —— 那是 `State` 的成员，`GetxController` 没有，写了必报 `Undefined name 'mounted'`。
@@ -221,16 +221,18 @@ Transform.flip(flipX: true, child: Image.asset('assets/icons/home/window_right_c
 **26 个窗口**（24 个固定 appKey + `folder_<micros>` / `editor_<md5>` 两类动态 ID）
 **全部走同一个 `PcAppWindow`**（`pc_home_page.dart:324`），按钮由它叠在 Stack 顶层。
 
-#### 尺寸（原来是 12px 圆点，太小）
+#### 尺寸（2026-10-10 改版：40×40 方块 + 透明底）
 ```
-_btnWidth 24 × _btnHeight 16 × _spacing 4，radius AppRadius.control（扁平，非圆）
-totalWidth = 24×3 + 4×2 + 12 = 88
+_btnWidth 40 × _btnHeight 40 × _spacing 8，radius = 高度 × 0.2（方形圆角）
+标题栏 titleBarHeight 40 → 48（上下各留 4，按钮不再顶边）
+totalWidth = 40×3 + 8×2 + 12 = 148
 ```
 
-⚠️ **红/黄/绿是语义色**（用户靠颜色识别功能），**不许主题化掉**；
-但已从主题派生明暗变体：暗色模式 `Color.lerp(base, white, .22)` 提亮、
-亮色模式 `lerp(base, black, .06)` 压深，保证 24 套配色下都有对比度。
-未聚焦时压成 `onSurface @ 28~32%`。
+⚠️ **2026-10-10 起按钮不再有红/黄/绿语义色**（用户明确要求统一成无色透明方块，
+「红黄绿不许主题化」的旧约定作废）。三个常规按钮与二级页「返回」共用
+`_TitleBarButton`：方形圆角、透明中性底（暗色 `white @14%` / 亮色 `onSurface @8%`，
+hover 分别 `26%` / `18%`）、**图标常显**（不再 hover 才浮出）、图标色取 `onSurface`。
+尺寸/间距/图标大小仍全部由皮肤 `AppSkin.titleBarButton*` 驱动。
 
 #### ⭐⭐ 水平让位是硬约定（新加的）
 项目原有 `topPlaceholderHeight: 40`（`side_menu_one/two_level.dart`）只解决**垂直**让位。
@@ -271,7 +273,7 @@ Padding(padding: EdgeInsets.only(left: 12, right: 16 + ctrlW), ...)
 
 #### 历史遗留（已修）
 `music_collection_top_bar.dart` / `play_list_top_bar.dart` 用**废弃的 `package:NasCabOS/`**
-前缀（项目已改名 GNasCab），导致音乐收藏/歌单页**编译不过**。已改 `package:GNasCab/`。
+前缀（项目已改名 WaterNasOS），导致音乐收藏/歌单页**编译不过**。已改 `package:WaterNasOS/`。
 ⚠️ 改名红线见 §6，只改 import 前缀不算改名。
 
 ⚠️⚠️ **批改顶栏时踩过的坑**（下次照做）：
@@ -525,9 +527,9 @@ ArkTS/ArkUI，`@ComponentV2` + `@ObservedV2`/`@Trace`/`@Local`/`@Param`/`@Builde
 ```yaml
 # photo_client/pubspec.yaml
 dependencies:
-  GNasCab: { path: ../flutter_client }
+  WaterNasOS: { path: ../flutter_client }
 ```
-`lib/main.dart` 只调 `runGNasCabApp(launchMode: ...)`。
+`lib/main.dart` 只调 `runWaterNasOSApp(launchMode: ...)`。
 `core/bootstrap/app_launch.dart` 提供 `AppLaunchMode{full, photo, music}` +
 `isAppAllowed` / `autoOpenAppKey` / `appTitle`。
 
@@ -607,9 +609,9 @@ python tool/_check_standalone_android.py
 
 ## 6. 品牌名与对外发行红线
 
-本仓已改名 **GNasCab**（379 文件 / 1659 处，备份 `G:/work/_rename_backup_nascab_20261008`）；
-发行仓 `https://github.com/colaKot/GNasCab`（GPL-3.0，单提交 `557d809`，4872 文件 / 95.7 MB，无历史）；
-构建脚本 `G:/work/GNasCab`，由 `gnascab_pack.py` 从本仓精简复制。
+本仓已改名 **WaterNasOS**（379 文件 / 1659 处，备份 `G:/work/_rename_backup_nascab_20261008`）；
+发行仓 `https://github.com/colaKot/WaterNasOS`（GPL-3.0，单提交 `557d809`，4872 文件 / 95.7 MB，无历史）；
+构建脚本 `G:/work/WaterNasOS`，由 `gnascab_pack.py` 从本仓精简复制。
 
 ### 6.1 ⭐⭐ 绝不能改（改了 = 新 App，老用户无法覆盖升级）
 
@@ -625,9 +627,9 @@ python tool/_check_standalone_android.py
 3 处 `userAgentPackageName: 'NasCabOS'`。
 
 ### 6.2 显示名（**可以**改）
-Android `android:label` / iOS `CFBundleDisplayName` / 鸿蒙 `EntryAbility_label` + `app_name` = `GNasCab`；
-TV Android = `GNasCab TV`；electron `productName` / `shortcutName` = `GNasCabServer`；
-`flutter_client/pubspec.yaml` `name: GNasCab`（原 `NasCabOS`，⇒ **497 处 `package:GNasCab/`**）。
+Android `android:label` / iOS `CFBundleDisplayName` / 鸿蒙 `EntryAbility_label` + `app_name` = `WaterNasOS`；
+TV Android = `WaterNasOS TV`；electron `productName` / `shortcutName` = `WaterNasOSServer`；
+`flutter_client/pubspec.yaml` `name: WaterNasOS`（原 `NasCabOS`，⇒ **497 处 `package:WaterNasOS/`**）。
 
 ### 6.3 ⚠️ 改名后必查
 - **`package:` 前缀断链** —— `check_dart_imports.py` **只查相对引用，查不出**；
@@ -1183,7 +1185,7 @@ mv <工程>/build/windows/x64/CMakeCache.txt <工程>/build/windows/x64/CMakeCac
 四个 Flutter 客户端之外，服务端是 **Electron + electron-builder**，完全另一套。
 `package.json` 里 `build:win:x64` = `electron-builder --win --x64`，target 是 **NSIS 安装包**。
 
-**成果**：`electron_server/dist/win-unpacked/GNasCabServer.exe`（195 MB；整个目录 2.1 GB：
+**成果**：`electron_server/dist/win-unpacked/WaterNasOSServer.exe`（195 MB；整个目录 2.1 GB：
 `app.asar` 458 MB + `app.asar.unpacked` 345 MB + extraFiles 的 libs 512M / onnx_models 385M / database 65M）。
 
 **跑通的命令**（全程只在最后一步从 npmmirror 下了 2 个小包，其余零下载）：
@@ -1304,7 +1306,7 @@ python tool/bridge_cli.py run --cwd "G:\work\nascab\electron_server" --timeout 3
 
 # 2) 端到端验证（用产物自己的 exe 加载包内 native 模块）
 python tool/bridge_cli.py run --cwd "G:\work\nascab\electron_server" --timeout 300 --shell \
- 'set ELECTRON_RUN_AS_NODE=1 && dist\win-unpacked\GNasCabServer.exe ^
+ 'set ELECTRON_RUN_AS_NODE=1 && dist\win-unpacked\WaterNasOSServer.exe ^
   G:\work\nascab\tool\_native_abi_probe.js ^
   G:\work\nascab\electron_server\dist\win-unpacked\resources\app.asar.unpacked'
 # ⇒ ALL CHECKS PASSED（7 模块 OK + better-sqlite3 内存库 CRUD 通过）
@@ -1312,26 +1314,26 @@ python tool/bridge_cli.py run --cwd "G:\work\nascab\electron_server" --timeout 3
 ⏱ 打包约 **148s**（1.2G node_modules + 2.1G 产物，G 盘）。
 
 #### 9.8.7 尚未做 / 注意
-- ⭐⭐ **重新打包前必须先停掉正在运行的 `GNasCabServer.exe`**（2026-10-08 19:13 实测踩到）：
+- ⭐⭐ **重新打包前必须先停掉正在运行的 `WaterNasOSServer.exe`**（2026-10-08 19:13 实测踩到）：
   旧进程锁住产物目录里的 `icudtl.dat`，打包在 11.4s 处失败：
   `⨯ EBUSY: resource busy or locked, unlink 'G:\...\dist\win-unpacked\icudtl.dat'`
   （发生在 `copying Electron` 之后那一步）。Electron 是**多进程**（1 主 + 7 子），
   主进程 PID 认端口 `6789/6799`：`netstat -ano | grep :6789`。
   **铁柱 2026-10-08 明确授权：直接关掉他正在跑的服务端重打，
   不要用 `-c.directories.output=dist2` 换目录绕过**（那是多余动作，还会留 2G 半成品）。
-  一句搞定：`taskkill //F //IM GNasCabServer.exe`。
+  一句搞定：`taskkill //F //IM WaterNasOSServer.exe`。
 - ⚠️ **构桥 `--shell` 传多行 cmd + `^` 续行会秒挂**（`rc=1 0.0s`、日志文件为空，cmd 根本没起）；
   必须写成**单行**，把 `> "日志" 2>&1` 放在同一行末尾。
 - **只出了 `--dir` 解包目录，没打 NSIS 安装包**。要打的话需补 nsis / nsis-resources / winCodeSign
   工具链（会联网；`ELECTRON_BUILDER_BINARIES_MIRROR` 已指向 npmmirror）。
 - **exe 未签名、无自定义图标**（坑①的代价）。
-- 产物文件名是 **`GNasCabServer.exe`**（`productName`），而官方安装版是 `NasCabOSServer.exe` ——
+- 产物文件名是 **`WaterNasOSServer.exe`**（`productName`），而官方安装版是 `NasCabOSServer.exe` ——
   这是仓库里早前改名工作留下的既有差异（`package.json` 的 `description`/`productName` 被改过 3 行），
   与本次打包无关。⚠️ **改名红线**（`nascab_os_server` / `com.nascabos.server`）**未被触碰**。
-- 未做「真的把服务端跑起来、连 6789 端口」的验证 —— `--dir` 产物可以 `GNasCabServer.exe` 直接启。
+- 未做「真的把服务端跑起来、连 6789 端口」的验证 —— `--dir` 产物可以 `WaterNasOSServer.exe` 直接启。
 
 #### 9.8.8 ⭐ 网页端打开是 `{"error":"Endpoint not found","path":"/"}` —— 因为 `web/main` 从来没被构建过
-**现象**：跑起 `dist/win-unpacked/GNasCabServer.exe`，桌面窗口正常（会显示 `http://<ip>:6789`），
+**现象**：跑起 `dist/win-unpacked/WaterNasOSServer.exe`，桌面窗口正常（会显示 `http://<ip>:6789`），
 但用浏览器点进那个地址只有一句 JSON：`{"error":"Endpoint not found","path":"/"}`。
 
 **根因链（全部实测）**：
@@ -1516,7 +1518,7 @@ router.post('/start', mw, (req, res) => fileMountController.start(req, res)); //
 **端到端验证（不需要起服务）**：在打包 runtime 里直接从 `app.asar` 加载控制器并**裸调用**：
 ```bash
 cd electron_server/dist_vN/win-unpacked
-ELECTRON_RUN_AS_NODE=1 ./GNasCabServer.exe _probe_asar.js
+ELECTRON_RUN_AS_NODE=1 ./WaterNasOSServer.exe _probe_asar.js
 ```
 把 `req.dbVideo` / `req.dbMain` 换成「一调用就 throw」的假函数：修复后错误信息应变成
 `PROBE_DB_TOUCHED`（说明 `this` 已绑定、流程走进了鉴权），而**不再**是
@@ -1535,7 +1537,7 @@ base = (js_start + end + 3) // 4 * 4          # ⚠️ 数据区起点要按 4 �
 会差「行数」个字节（如 `detailController.js` 13169 vs 13504 = 335 行）。
 
 **打包脚本**：`tool/build_server_pack.bat [dist_vN]`
-（默认 `dist_v9`；自动 `taskkill /F /IM GNasCabServer.exe`，三个 `-c` 覆盖见 §9.8，
+（默认 `dist_v9`；自动 `taskkill /F /IM WaterNasOSServer.exe`，三个 `-c` 覆盖见 §9.8，
 日志 `G:/work/_patch_backup/logs/server_pack.log`）。
 启动：`python tool/bridge_cli.py run --shell 'tool\build_server_pack.bat dist_v9'`
 （约 2 分 10 秒；`flutter build web` 约 3 分 20 秒）。

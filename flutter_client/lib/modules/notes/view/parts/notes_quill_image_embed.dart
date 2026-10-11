@@ -1,6 +1,6 @@
 // ignore_for_file: implementation_imports
 
-import 'package:GNasCab/modules/transfer/controllers/download_controller.dart';
+import 'package:WaterNasOS/modules/transfer/controllers/download_controller.dart';
 import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';

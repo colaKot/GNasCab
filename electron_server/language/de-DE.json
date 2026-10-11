@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "Netzwerkanfrage zeitüberschreitung",
       "NETWORK_ERROR": "Netzwerkanfrage fehlgeschlagen",
       "REMOTE_AUTH_FAILED": "Remote-Authentifizierung fehlgeschlagen",
-      "NASCAB_LOGIN_REQUIRED": "Bitte melden Sie sich bei GNasCab an, bevor Sie den Remote-Zugriff aktivieren",
+      "NASCAB_LOGIN_REQUIRED": "Bitte melden Sie sich bei WaterNasOS an, bevor Sie den Remote-Zugriff aktivieren",
       "NASCAB_SESSION_EXPIRED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
       "PAIR_CODE_RESET_FAILED": "Zurücksetzen des Pair-Codes fehlgeschlagen",
       "USER_SERIALIZE_FAILED": "Serialisierung der Benutzerinformationen fehlgeschlagen",

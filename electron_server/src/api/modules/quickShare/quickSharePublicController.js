@@ -302,7 +302,7 @@ class QuickSharePublicController {
       if (!qs) return ResponseUtil.error(req, res, 'common.ERROR', 500);
       const size = req.query && req.query.size;
       const targetPath = qs.targetPath;
-      const targetTinyPath = await fileService.getTinyImgByPath(targetPath, size);
+      const targetTinyPath = await fileService.getTinyImgByPath(targetPath, size, { deferImages: false });
       if (fs.existsSync(targetTinyPath)) {
         return await res.sendFile(targetTinyPath);
       }

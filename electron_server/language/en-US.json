@@ -334,7 +334,7 @@
       "NETWORK_TIMEOUT": "Network request timed out",
       "NETWORK_ERROR": "Network request failed",
       "REMOTE_AUTH_FAILED": "Remote authentication failed",
-      "NASCAB_LOGIN_REQUIRED": "Please log in to GNasCab before enabling remote access",
+      "NASCAB_LOGIN_REQUIRED": "Please log in to WaterNasOS before enabling remote access",
       "NASCAB_SESSION_EXPIRED": "Your session has expired. Please log in again.",
       "PAIR_CODE_RESET_FAILED": "Failed to reset pair code",
       "USER_SERIALIZE_FAILED": "Failed to serialize user info",

@@ -224,7 +224,7 @@ export class HomeViewModel {
       return true; // 加密空间已迁移（Flutter 端 app id 为 encrypted），由页面接线路由
     }
     if (app === 'nascab_service') {
-      return true; // 服务模块已迁移（GNasCab 账号/远程访问/DDNS），由页面接线路由
+      return true; // 服务模块已迁移（WaterNasOS 账号/远程访问/DDNS），由页面接线路由
     }
     return false;
   }

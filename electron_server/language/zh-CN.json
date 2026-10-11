@@ -334,7 +334,7 @@
       "NETWORK_TIMEOUT": "网络请求超时",
       "NETWORK_ERROR": "网络请求失败",
       "REMOTE_AUTH_FAILED": "远程认证失败",
-      "NASCAB_LOGIN_REQUIRED": "未登录 GNasCab 账号，无法开启远程访问",
+      "NASCAB_LOGIN_REQUIRED": "未登录 WaterNasOS 账号，无法开启远程访问",
       "NASCAB_SESSION_EXPIRED": "您的账号登录状态已过期，请重新登陆",
       "PAIR_CODE_RESET_FAILED": "重置配对码失败",
       "USER_SERIALIZE_FAILED": "用户信息序列化失败",

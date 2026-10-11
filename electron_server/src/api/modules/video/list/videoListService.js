@@ -2,9 +2,10 @@ const path = require('path');
 const fs = require('fs');
 const VideoSourceService = require('../source/videoSourceService');
 const userUtil = require('../../../../utils/userUtil');
+const Logger = require('../../../../utils/logger');
 const { intersectPaths, parsePathListText } = require('../../photo/timeline/photoPathQueryUtil');
 const smartAlbumFilterUtil = require('../smartAlbum/videoSmartAlbumFilterUtil');
-const { applyVisibleIndexFilter } = require('../videoVisibilityUtil');
+const { applyVisibleIndexFilter, escapeLikeValue, LIKE_ESCAPE } = require('../videoVisibilityUtil');
 
 /**
  * 列表页的可见性过滤。
@@ -27,6 +28,199 @@ function _resolveArtworkAbsolute({ baseDir, maybeRelative }) {
   const base = baseDir === undefined || baseDir === null ? '' : String(baseDir).trim();
   if (!base) return '';
   return path.resolve(base, p);
+}
+
+/* ==========================================================================
+ * 同名图片兜底封面（2026-10-10）
+ *
+ * 需求：图片视频混合库、以及普通影视库里，如果目录里存在**与视频同名的图片**，
+ *      这张图片就是这个视频的封面图 / 缩略图；如果既没有封面图也没有缩略图，
+ *      那么不管前端选「封面图」还是「缩略图」，都显示这张同名图片。
+ *
+ * 扫描期其实已经做过这件事 —— workers/videoIndex/videoIndexIndexUtil.js 的
+ * `resolveArtworkPaths` 会把 `videoBase` 本身放进 poster 候选列表。但它只在
+ * **扫描那一刻**生效：若同名图片是后来才放进目录的（或视频先被扫到、图片后到），
+ * `poster_path` 就一直空着。所以列表返回前这里再兜底一次。
+ *
+ * ⚠️ 只在 poster_path 与 fanart_path **都为空**时才填，并且**两个一起填**：
+ *    抢已有封面（比如 TMDB 刮下来的 poster.jpg）会很难解释；
+ *    而只填一个的话，另一种模式仍然空白，就不满足「不管选哪个都显示它」。
+ *
+ * 成本：一页至多 pageSize 个目录，每目录 1 次 readdir，按目录缓存 60s。
+ * ========================================================================*/
+const _SAME_NAME_IMAGE_TTL_MS = 60 * 1000;
+const _SAME_NAME_IMAGE_CACHE_MAX = 2000;
+/** dir → { at, map }；map: 归一化基名 → 文件名 */
+const _sameNameImageDirCache = new Map();
+
+function _isSameNameImageExt(ext) {
+  const e = String(ext || '').toLowerCase();
+  return (
+    e === '.jpg' ||
+    e === '.jpeg' ||
+    e === '.png' ||
+    e === '.webp' ||
+    e === '.gif' ||
+    e === '.bmp' ||
+    e === '.avif'
+  );
+}
+
+/** 与扫描期 `_normalizeSimpleName` 完全同一套规则（lower + 去空白 + 去 _-），
+ *  否则「扫描期认得出、列表期认不出」会变成最难查的那种不一致。 */
+function _normalizeSameNameKey(s) {
+  return String(s || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[_-]+/g, '');
+}
+
+/* ==========================================================================
+ * 同名图片「隐身」（2026-10-11）
+ *
+ * 需求：图片视频混合库里，如果某张图片与同目录下的**影片同名**，这张图片就
+ *      不再单独出现在列表里 —— 它已经作为那张影片的封面 / 缩略图了
+ *      （扫描期 `resolveArtworkPaths` 就把 `videoBase` 当 poster 候选，
+ *        列表期 `_fillSameNameImageFallback` 再兜一次底）。
+ *      否则同一张图会出现两次：一次是图片卡片、一次是影片的封面。
+ *
+ * 实现要点：
+ *  * 判定放在 **SQL 里**（`NOT EXISTS`），不能只在 JS 里过滤已经取回的那一页 ——
+ *    那样 `total` 会偏大、而且每页会少若干条，翻页时数量对不上。
+ *  * 视频侧的 scope 与混合库取数**共用同一套**（exactPaths / prefixPaths）：
+ *    只有在影片真的会展示出来时才藏图片，否则图片会凭空消失、又没有影片顶上。
+ *  * SQL 与 JS 的归一化必须**结果一致**（同一个 `_normalizeSameNameKey` 语义），
+ *    否则会出现「列表里藏了图、文件夹卡片还在数它」这种最难查的一类不一致。
+ *
+ * 成本：`image_index` 每行一次 `v.path = i.path` 索引查找（走
+ *      `uidx_video_index_path_filename` 前缀）+ 一次归一化比较。
+ *      实测库5（991 影片 / 3740 图）`count(*)` ≈ 74ms（后缀表按命中率排序后
+ *      从 102ms 降下来；不排序分支平均要跑 11 次 LIKE，排完只要 3~4 次）。
+ * ========================================================================*/
+
+/** 判「同名」时剥掉的后缀。**按实际命中率排序** —— SQLite 的 CASE 是按顺序
+ *  求值的，把 .jpg/.png/.mp4 放前面能显著减少 LIKE 次数（实测 102ms → 74ms）。
+ *  ⚠️ 不要加入含 LIKE 通配符（`%` / `_`）的后缀。 */
+const _SAME_NAME_STRIP_EXTS = [
+  '.jpg',
+  '.png',
+  '.mp4',
+  '.jpeg',
+  '.webp',
+  '.gif',
+  '.bmp',
+  '.mov',
+  '.m4v',
+  '.mkv',
+  '.avi',
+  '.avif',
+  '.wmv',
+  '.flv',
+  '.webm',
+  '.mpg',
+  '.mpeg',
+  '.3gp',
+  '.ts',
+  '.m2ts',
+  '.rmvb',
+  '.rm',
+  '.heic',
+];
+
+/** SQL 侧「剥掉一个后缀 + 归一化」表达式，等价于 JS 的
+ *  `_normalizeSameNameKey(path.basename(name, path.extname(name)))`。 */
+function _normBaseSqlExpr(col) {
+  const cases = _SAME_NAME_STRIP_EXTS.map(
+    ext => `WHEN lower(${col}) LIKE '%${ext}' THEN substr(${col}, 1, length(${col}) - ${ext.length})`
+  ).join(' ');
+  const stripped = `CASE ${cases} ELSE ${col} END`;
+  return `replace(replace(replace(lower(${stripped}), ' ', ''), '_', ''), '-', '')`;
+}
+
+/** 给图片查询加上「与影片同名 ⇒ 不出现」的过滤。
+ *  scope 形状与 `_resolveFolderScope` 的返回值一致：(exactPaths | prefixPaths) */
+function _applyHideSameNameImageFilter(query, knex, scope) {
+  const exprI = _normBaseSqlExpr('i.filename');
+  const exprV = _normBaseSqlExpr('v.filename');
+  const exact = scope ? scope.exactPaths : null;
+  const prefix = scope ? scope.prefixPaths : null;
+
+  query.whereNotExists(function () {
+    this.select(knex.raw('1')).from('video_index as v');
+    this.whereIn('v.media_type', VIDEO_INDEX_MEDIA_TYPES);
+    if (Array.isArray(exact)) {
+      if (exact.length > 0) this.whereIn('v.path', exact);
+      else this.whereRaw('1 = 0');
+    } else if (Array.isArray(prefix) && prefix.length > 0) {
+      applyVisibleIndexFilter(this, prefix, { alias: 'v' });
+    } else {
+      this.whereRaw('1 = 0');
+    }
+    this.whereRaw('v.path = i.path');
+    this.whereRaw(`${exprV} = ${exprI}`);
+  });
+  return query;
+}
+
+function _readDirImageBaseMap(dir) {
+  const key = String(dir || '');
+  if (!key) return null;
+  const now = Date.now();
+  const hit = _sameNameImageDirCache.get(key);
+  if (hit && now - hit.at < _SAME_NAME_IMAGE_TTL_MS) return hit.map;
+
+  const map = new Map();
+  try {
+    const entries = fs.readdirSync(key, { withFileTypes: true });
+    for (const ent of entries || []) {
+      if (!ent || !ent.isFile()) continue;
+      const name = ent.name;
+      if (name.startsWith('.')) continue;
+      // ⚠️ 剥后缀必须用**原样大小写**的 ext：`path.basename('a.JPG', '.jpg')`
+      //    返回的是 'a.JPG'（不剥），于是归一化键变成 'ajpg'、永远匹配不上。
+      const extRaw = path.extname(name);
+      if (!_isSameNameImageExt(extRaw)) continue;
+      const norm = _normalizeSameNameKey(path.basename(name, extRaw));
+      if (!norm) continue;
+      if (!map.has(norm)) map.set(norm, name);
+    }
+  } catch (_) {
+    // 目录不可读（挂载掉线 / 权限）⇒ 缓存一张空表，避免每页都去 stat 同一批目录
+  }
+
+  if (_sameNameImageDirCache.size >= _SAME_NAME_IMAGE_CACHE_MAX) {
+    _sameNameImageDirCache.clear();
+  }
+  _sameNameImageDirCache.set(key, { at: now, map });
+  return map;
+}
+
+/** 就地给一页视频行补「同名图片」，返回补上的条数（仅用于日志/自检） */
+function _fillSameNameImageFallback(items) {
+  const list = Array.isArray(items) ? items : [];
+  let filled = 0;
+  for (const item of list) {
+    if (!item || typeof item !== 'object') continue;
+    if (item.media_type === 'image') continue; // 图片自己不需要封面
+    const poster = item.poster_path ? String(item.poster_path).trim() : '';
+    const fanart = item.fanart_path ? String(item.fanart_path).trim() : '';
+    if (poster || fanart) continue; // 已有封面 / 缩略图：不抢
+    const dir = item.path ? String(item.path).trim() : '';
+    const name = item.filename ? String(item.filename).trim() : '';
+    if (!dir || !name) continue;
+    const base = _normalizeSameNameKey(path.basename(name, path.extname(name)));
+    if (!base) continue;
+    const map = _readDirImageBaseMap(dir);
+    const hit = map ? map.get(base) : '';
+    if (!hit) continue;
+    // 绝对路径：_normalizeListRow 的 _resolveArtworkAbsolute 对绝对路径原样返回
+    const abs = path.join(dir, hit);
+    item.poster_path = abs;
+    item.fanart_path = abs;
+    filled += 1;
+  }
+  return filled;
 }
 
 function _normalizeListRow(row) {
@@ -158,6 +352,64 @@ function _normalizeIntList(input) {
   return [...new Set(nums)];
 }
 
+/* =========================================================================
+ * 文件夹视图（图片库 / 混合库）用的路径工具
+ * -------------------------------------------------------------------------
+ * ⚠️ 这里的「本级」口径与 `photoPathQueryUtil.intersectPaths` 那套
+ *    「前缀 = 整棵子树」是**两回事**，不要混用：
+ *      * 前缀口径 → 搜索 / 来源筛选 / 平铺视图（要看子孙）
+ *      * 本级口径 → 文件夹列表 + 目录内文件（只看直接子项，
+ *                   否则点进上层目录会把几万张子孙图片一次性倒出来）
+ * =======================================================================*/
+function _stripTrailingSep(input) {
+  let s = input === undefined || input === null ? '' : String(input).trim();
+  while (s.length > 1 && (s.endsWith('/') || s.endsWith('\\'))) {
+    if (/^[a-zA-Z]:[\\/]$/.test(s)) break; // 保留盘符根 "D:\"，否则会变成 "D:"
+    s = s.slice(0, -1);
+  }
+  return s;
+}
+
+/** Windows 下盘符与大小写不敏感，Linux/macOS 严格区分 —— 三种比较都要走这里 */
+function _pathEquals(a, b) {
+  return process.platform === 'win32'
+    ? String(a).toLowerCase() === String(b).toLowerCase()
+    : String(a) === String(b);
+}
+
+/** child 是否位于 parent 之内（含两者相等） */
+function _isPathInside(child, parent) {
+  const c = _stripTrailingSep(child);
+  const p = _stripTrailingSep(parent);
+  if (!c || !p) return false;
+  if (_pathEquals(c, p)) return true;
+  const rootWithSep = p.endsWith('/') || p.endsWith('\\') ? p : `${p}${path.sep}`;
+  if (c.length <= rootWithSep.length) return false;
+  return _pathEquals(c.slice(0, rootWithSep.length), rootWithSep);
+}
+
+/** dir 相对 root 的路径：'' = 就是 root 本身；null = 不在 root 内 */
+function _relToRoot(dir, root) {
+  const d = _stripTrailingSep(dir);
+  const r = _stripTrailingSep(root);
+  if (!d || !r) return null;
+  if (_pathEquals(d, r)) return '';
+  const rootWithSep = r.endsWith('/') || r.endsWith('\\') ? r : `${r}${path.sep}`;
+  if (d.length <= rootWithSep.length) return null;
+  if (!_pathEquals(d.slice(0, rootWithSep.length), rootWithSep)) return null;
+  return d.slice(rootWithSep.length);
+}
+
+/** 在 roots 里挑出包含 target 的**最长**根（多个来源相互嵌套时的正确归属） */
+function _matchRoot(target, roots) {
+  let best = null;
+  for (const r of roots || []) {
+    if (!_isPathInside(target, r)) continue;
+    if (!best || _stripTrailingSep(r).length > _stripTrailingSep(best).length) best = r;
+  }
+  return best;
+}
+
 // 列表层支持的 media_type：movie/tv 为影视，image 为图片（图片库 / 混合库使用）
 const LIST_MEDIA_TYPES = ['movie', 'tv', 'image'];
 const VIDEO_INDEX_MEDIA_TYPES = ['movie', 'tv', 'bdmv', 'video_ts'];
@@ -280,9 +532,572 @@ class VideoListService {
     return allowImage ? [...base, 'image'] : base;
   }
 
+  /* ==========================================================================
+   * 图片库 / 混合库：走独立的 image_index 表
+   *
+   * 拆表理由与表结构见 db/table/tableImageIndex.js。
+   * 这里的关键差异：
+   *   * 用 `library_id` **等值**过滤（不再靠 `path LIKE '前缀%'`）
+   *   * 排序主键是 `taken_at` + `id`，配 (library_id, taken_at DESC, id DESC) 走索引
+   *     ⇒ 实测 7 万条深分页 2ms（原来 OFFSET 到 6 万要扫全表）
+   *   * 混合库把图片和视频**各自取够页数后在内存归并**（两边都有序，成本很低）
+   * ========================================================================*/
+
+  /** 图片表的路径可见性过滤。
+   *  ⚠️ 不能复用 applyVisibleIndexFilter：它带「目录行特判」，会引用 image_index
+   *     并不存在的 `is_file` 列 → SQL 直接报错。 */
+  _applyImagePathPrefixFilter(query, paths, alias = 'i') {
+    const list = Array.isArray(paths) ? paths.map(p => String(p || '').trim()).filter(Boolean) : [];
+    if (list.length === 0) {
+      query.whereRaw('1 = 0');
+      return query;
+    }
+    const sep = path.sep;
+    query.where(builder => {
+      for (const p of list) {
+        const prefix = p.endsWith(sep) ? p : `${p}${sep}`;
+        builder.orWhere(function () {
+          this.where(`${alias}.path`, p).orWhereRaw('?? LIKE ? ESCAPE ?', [
+            `${alias}.path`,
+            `${escapeLikeValue(prefix)}%`,
+            LIKE_ESCAPE,
+          ]);
+        });
+      }
+    });
+    return query;
+  }
+
+  _applyImageSearch(query, search, alias = 'i') {
+    const s = String(search === undefined || search === null ? '' : search).trim();
+    if (!s) return query;
+    const isSingleLetterFilter = s.length === 1 && (s === '#' || /^[a-zA-Z]$/.test(s));
+    if (isSingleLetterFilter) {
+      query.andWhere(`${alias}.filename_fl`, s.toUpperCase());
+    } else {
+      query.andWhere(`${alias}.filename`, 'like', `%${s}%`);
+    }
+    return query;
+  }
+
+  /** 仅匹配**目录自身**（不含任何子目录）的图片行。
+   *  与 _applyImagePathPrefixFilter（前缀 = 整棵子树）互补：文件夹视图里
+   *  「这个目录里有哪些文件」必须用这个，否则会把所有子孙目录的图一起倒出来。
+   *  走 idx_image_index_lib_path (library_id, path) 索引，whereIn 成本很低。 */
+  _applyImageExactPathFilter(query, paths, alias = 'i') {
+    const list = Array.isArray(paths) ? paths.map(p => String(p || '').trim()).filter(Boolean) : [];
+    if (list.length === 0) {
+      query.whereRaw('1 = 0');
+      return query;
+    }
+    query.whereIn(`${alias}.path`, list);
+    return query;
+  }
+
+  /** 把「文件夹浏览」参数解析成实际查询口径。
+   *  folderMode:
+   *    'exact'   → 只看本目录自身的文件（folderPath 为空 = 各来源根目录自身）
+   *    'subtree' → 看整棵子树（搜索用；folderPath 为空 = 整库）
+   *    其他/缺省 → 完全保持原行为（整库前缀过滤，即平铺视图）—— 向后兼容
+   *  ⚠️ folderPath 必须落在 validPaths 之内，否则直接 403：
+   *     这是防「拿任意路径去探库」的唯一一道闸门。 */
+  _resolveFolderScope({ folderPath, folderMode, validPaths }) {
+    const mode = String(folderMode || '').trim().toLowerCase();
+    const cur = _stripTrailingSep(folderPath);
+    if (mode !== 'exact' && mode !== 'subtree') {
+      return { exactPaths: null, prefixPaths: validPaths };
+    }
+    if (!cur) {
+      if (mode === 'exact') {
+        const roots = Array.isArray(validPaths)
+          ? validPaths.map(p => _stripTrailingSep(p)).filter(Boolean)
+          : [];
+        return { exactPaths: roots, prefixPaths: validPaths };
+      }
+      return { exactPaths: null, prefixPaths: validPaths };
+    }
+    if (!_matchRoot(cur, validPaths)) {
+      const err = new Error('auth.PERMISSION_DENIED');
+      err.statusCode = 403;
+      throw err;
+    }
+    return mode === 'exact'
+      ? { exactPaths: [cur], prefixPaths: validPaths }
+      : { exactPaths: null, prefixPaths: [cur] };
+  }
+
+  /** 构造图片查询（每次调用返回全新 query，便于 count / select 各用一份）。
+   *  `hideSameNameVideo` 非空时（混合库）：与影片同名的图片不再出现。 */
+  _makeImageQuery({ libraryId, search, sortBy, sortOrder, paths, exactPaths, hideSameNameVideo }) {
+    const q = this.knexVideo('image_index as i').where('i.library_id', Number(libraryId) || 0);
+    this._applyImageSearch(q, search);
+    if (Array.isArray(exactPaths)) {
+      this._applyImageExactPathFilter(q, exactPaths);
+    } else {
+      this._applyImagePathPrefixFilter(q, paths);
+    }
+    if (hideSameNameVideo) {
+      _applyHideSameNameImageFilter(q, this.knexVideo, hideSameNameVideo);
+    }
+
+    const order = sortOrder === 'asc' ? 'asc' : 'desc';
+    if (sortBy === 'name') {
+      q.orderByRaw(`lower(i.filename) ${order}`);
+    } else if (sortBy === 'view_time') {
+      q.orderBy('i.view_time', order);
+    } else {
+      q.orderBy('i.taken_at', order);
+    }
+    q.orderBy('i.id', 'desc');
+    return q;
+  }
+
+  /** image_index 行 → 与 video_index 行同构的结构（前端 VideoHomeItemBean 直接复用） */
+  _imageRowToListItem(row) {
+    const pathDir = row && row.path ? String(row.path) : '';
+    const name = row && row.filename ? String(row.filename) : '';
+    return {
+      id: Number(row && row.id) || 0,
+      media_type: 'image',
+      path: pathDir,
+      filename: name,
+      ext: row && row.ext ? String(row.ext) : '',
+      is_file: 1,
+      width: Number(row && row.width) || 0,
+      height: Number(row && row.height) || 0,
+      duration: 0,
+      nfo_name: name,
+      nfo_year: 0,
+      nfo_score: 0,
+      nfo_regions: '',
+      nfo_genres: '',
+      poster_path: '',
+      fanart_path: '',
+      logo_path: '',
+      play_rel_path: '',
+      view_time: row ? row.view_time : null,
+      create_time: row ? row.create_time : null,
+      taken_at: Number(row && row.taken_at) || 0,
+      size: Number(row && row.size) || 0,
+      full_path: pathDir && name ? path.join(pathDir, name) : '',
+      play_file_path: '',
+    };
+  }
+
+  _imageSelectColumns() {
+    return [
+      'i.id',
+      'i.path',
+      'i.filename',
+      'i.ext',
+      'i.width',
+      'i.height',
+      'i.size',
+      'i.taken_at',
+      'i.view_time',
+      'i.create_time',
+      'i.is_favorite',
+    ];
+  }
+
+  /** 图片库（lib_type = 'image'）：整库只查 image_index */
+  async _listImageOnlyPaged({ library, safePage, safeLimit, offset, search, sortBy, sortOrder, uid, validPaths, sourceList, folderPath, folderMode }) {
+    const libId = Number(library && library.id) || 0;
+    let paths = validPaths;
+    if (Array.isArray(sourceList) && sourceList.length > 0) {
+      paths = intersectPaths(paths, sourceList);
+    }
+    const scope = this._resolveFolderScope({ folderPath, folderMode, validPaths: paths });
+    const imgArgs = {
+      libraryId: libId,
+      search,
+      sortBy,
+      sortOrder,
+      paths: scope.prefixPaths,
+      exactPaths: scope.exactPaths,
+    };
+
+    const countRow = await this._makeImageQuery(imgArgs)
+      .clearSelect()
+      .clearOrder()
+      .count({ cnt: '*' })
+      .first()
+      .catch(() => null);
+    const total = Math.max(0, Number(countRow && (countRow.cnt ?? countRow['count(*)'])) || 0);
+
+    const rows = await this._makeImageQuery(imgArgs)
+      .select(this._imageSelectColumns())
+      .limit(safeLimit)
+      .offset(offset)
+      .catch(() => []);
+
+    const items = (rows || []).map(r => _normalizeListRow(this._imageRowToListItem(r)));
+
+    if (uid && items.length > 0) {
+      const ids = items.map(r => Number(r && r.id) || 0).filter(v => v > 0);
+      const favSet = await this._loadImageFavoriteSet(ids);
+      for (const item of items) {
+        item.is_favorite = favSet.has(Number(item.id) || 0);
+      }
+    } else {
+      for (const item of items) item.is_favorite = false;
+    }
+
+    const totalPages = Math.ceil(total / safeLimit);
+    return {
+      items,
+      filters: { years: [], regions: [], genres: [] },
+      validPaths: (validPaths || []).map(p => ({ path: p, valid: fs.existsSync(p) })),
+      pagination: {
+        total,
+        page: safePage,
+        limit: safeLimit,
+        totalPages,
+        hasNextPage: safePage < totalPages,
+        hasPrevPage: safePage > 1,
+      },
+    };
+  }
+
+  /** 混合库（lib_type = 'mixed'）：图片与视频各取够页数后在内存归并 */
+  async _listMixedPaged({ library, safePage, safeLimit, offset, search, sortBy, sortOrder, uid, validPaths, sourceList, folderPath, folderMode }) {
+    const libId = Number(library && library.id) || 0;
+    const knex = this.knexVideo;
+    let paths = validPaths;
+    if (Array.isArray(sourceList) && sourceList.length > 0) {
+      paths = intersectPaths(paths, sourceList);
+    }
+    const scope = this._resolveFolderScope({ folderPath, folderMode, validPaths: paths });
+    // ⭐ 混合库里「与影片同名的图片」不再单独出现（需求 2026-10-11）：
+    //    它已经作为那张影片的封面 / 缩略图了。判定走 SQL，口径与视频侧完全一致。
+    const imgArgs = {
+      libraryId: libId,
+      search,
+      sortBy,
+      sortOrder,
+      paths: scope.prefixPaths,
+      exactPaths: scope.exactPaths,
+      hideSameNameVideo: { exactPaths: scope.exactPaths, prefixPaths: scope.prefixPaths },
+    };
+
+    // 归并上限：避免深分页时两边各拉几十万行（超过则退化为「各自前 N 条」）
+    const MERGE_CAP = 3000;
+    const take = Math.max(safeLimit, Math.min(offset + safeLimit, MERGE_CAP));
+
+    // ---- 图片侧 ----
+    const imgCountRow = await this._makeImageQuery(imgArgs)
+      .clearSelect()
+      .clearOrder()
+      .count({ cnt: '*' })
+      .first()
+      .catch(() => null);
+    const imageTotal = Math.max(0, Number(imgCountRow && (imgCountRow.cnt ?? imgCountRow['count(*)'])) || 0);
+
+    const imgRows = await this._makeImageQuery(imgArgs)
+      .select(this._imageSelectColumns())
+      .limit(take)
+      .catch(() => []);
+
+    // ---- 视频侧（简化：混合库不做 genres/actors 这类影视专属筛选）----
+    const vidBase = () => {
+      const q = knex('video_index as v').whereIn('v.media_type', VIDEO_INDEX_MEDIA_TYPES);
+      if (Array.isArray(scope.exactPaths)) {
+        // 本级：只取直接放在这些目录里的视频（与图片侧口径一致）
+        if (scope.exactPaths.length > 0) q.whereIn('v.path', scope.exactPaths);
+        else q.whereRaw('1 = 0');
+      } else if (scope.prefixPaths && scope.prefixPaths.length > 0) {
+        applyVisibleIndexFilter(q, scope.prefixPaths, { alias: 'v' });
+      } else {
+        q.whereRaw('1 = 0');
+      }
+      if (search) {
+        const s = String(search).trim();
+        const isSingleLetterFilter = s.length === 1 && (s === '#' || /^[a-zA-Z]$/.test(s));
+        if (isSingleLetterFilter) q.andWhere(b => b.where('v.nfo_name_fl', s.toUpperCase()).orWhere('v.filename_fl', s.toUpperCase()));
+        else q.andWhere(b => b.where('v.nfo_name', 'like', `%${s}%`).orWhere('v.filename', 'like', `%${s}%`));
+      }
+      return q;
+    };
+
+    const vidCountRow = await vidBase().clearSelect().clearOrder().countDistinct({ cnt: 'v.id' }).first().catch(() => null);
+    const videoTotal = Math.max(0, Number(vidCountRow && (vidCountRow.cnt ?? vidCountRow['count(*)'])) || 0);
+
+    const vidRows = await vidBase()
+      .select(
+        'v.id', 'v.media_type', 'v.path', 'v.filename', 'v.ext', 'v.is_file', 'v.width', 'v.height',
+        'v.duration', 'v.nfo_name', 'v.nfo_year', 'v.nfo_score', 'v.nfo_regions', 'v.nfo_genres',
+        'v.poster_path', 'v.fanart_path', 'v.logo_path', 'v.play_rel_path', 'v.view_time', 'v.create_time',
+      )
+      .orderBy('v.create_time', 'desc')
+      .orderBy('v.id', 'desc')
+      .limit(take)
+      .catch(() => []);
+
+    // ---- 归并：统一排序键（图片用 taken_at，视频用 create_time，都归一到 ms）----
+    const merged = [];
+    for (const r of imgRows || []) {
+      const it = this._imageRowToListItem(r);
+      it._sortTime = Number(r.taken_at) || Number(r.create_time) || 0;
+      merged.push(it);
+    }
+    for (const r of vidRows || []) {
+      const d = r.create_time instanceof Date ? r.create_time.getTime() : Number(r.create_time) || 0;
+      merged.push({ ...r, _sortTime: d });
+    }
+    merged.sort((a, b) => {
+      if (b._sortTime !== a._sortTime) return b._sortTime - a._sortTime;
+      return (Number(b.id) || 0) - (Number(a.id) || 0);
+    });
+
+    const pageSlice = merged.slice(offset, offset + safeLimit).map(r => {
+      const c = { ...r };
+      delete c._sortTime;
+      return _normalizeListRow(c);
+    });
+
+    // 视频侧没有封面 / 缩略图时，用同目录的同名图片兜底（见 _fillSameNameImageFallback）
+    _fillSameNameImageFallback(pageSlice);
+
+    const total = imageTotal + videoTotal;
+
+    if (uid && pageSlice.length > 0) {
+      const favSet = await this._loadImageFavoriteSet(pageSlice.filter(r => r.media_type === 'image').map(r => Number(r.id) || 0));
+      for (const item of pageSlice) {
+        if (item.media_type === 'image') item.is_favorite = favSet.has(Number(item.id) || 0);
+      }
+    }
+
+    const totalPages = Math.ceil(total / safeLimit);
+    return {
+      items: pageSlice,
+      filters: { years: [], regions: [], genres: [] },
+      validPaths: (validPaths || []).map(p => ({ path: p, valid: fs.existsSync(p) })),
+      pagination: {
+        total,
+        page: safePage,
+        limit: safeLimit,
+        totalPages,
+        hasNextPage: safePage < totalPages,
+        hasPrevPage: safePage > 1,
+      },
+    };
+  }
+
+  /** 图片收藏集合（video_favorite 仍按 index_id 存，图片 id 与 video_index id 可能撞号，
+   *  所以这一版**不做图片收藏**，统一返回空集合，等设计好独立收藏表再开。 */
+  async _loadImageFavoriteSet(_ids) {
+    return new Set();
+  }
+
+  /* =======================================================================
+   * 文件夹视图（图片库 / 混合库）：只列**直接子文件夹** + 本级文件数
+   * -----------------------------------------------------------------------
+   * 先按目录 GROUP BY 把整棵子树压成「一行一目录」，再在内存里上卷到直接
+   * 子文件夹 —— 成本与**目录数**同阶，而不是与文件数同阶
+   * （实测库6：70,978 张图只对应 1,242 个目录）。
+   * 封面用每个目录的 min(id) 再一次性回查，不做 N+1。
+   * ===================================================================== */
+  async listImageFolders(params, user) {
+    const libraryId = Number(params && (params.library_id ?? params.libraryId)) || 0;
+    const library = await this._ensureLibraryExists(libraryId);
+    const libType = library && library.lib_type ? String(library.lib_type).trim().toLowerCase() : '';
+    const libId = Number(library && library.id) || 0;
+    const validPaths = await this.getValidPaths(user, libId);
+    const roots = (validPaths || []).map(p => _stripTrailingSep(p)).filter(Boolean);
+
+    const rawPath = String((params && (params.folderPath ?? params.folder_path ?? params.path)) || '').trim();
+    const currentPath = _stripTrailingSep(rawPath);
+    // ⭐ 唯一一道「不许拿任意路径来探库」的闸门
+    if (currentPath && !_matchRoot(currentPath, roots)) {
+      const err = new Error('auth.PERMISSION_DENIED');
+      err.statusCode = 403;
+      throw err;
+    }
+
+    const matchedRoot = currentPath ? _matchRoot(currentPath, roots) : null;
+    const atRoot = !currentPath || (matchedRoot && _pathEquals(currentPath, matchedRoot));
+    const parentPath = atRoot ? null : path.dirname(currentPath);
+
+    const base = {
+      path: currentPath,
+      parentPath,
+      segments: [],
+      roots,
+      folders: [],
+      selfCount: 0,
+      selfImageCount: 0,
+      selfVideoCount: 0,
+      hasSubFolders: false,
+    };
+
+    // 非图片 / 混合库：本接口不适用。**刻意不抛错** ——
+    // `video.VIDEO_LIBRARY_TYPE_UNSUPPORTED` 在客户端没有对应翻译，
+    // 抛出去只会把原始 key 甩到用户脸上；这里记日志并返回空结果，
+    // 让前端自然退化成它原来的视图。
+    if (libType !== 'image' && libType !== 'mixed') {
+      Logger.warn('[video/image/folders] 非图片/混合库，返回空结果', { libraryId: libId, libType });
+      return base;
+    }
+    if (roots.length === 0) return base;
+
+    const scopeRoots = currentPath ? [currentPath] : roots;
+    const sep = path.sep;
+
+    // ---- ① 图片侧：每个目录一行（数量 + 该目录的最小 id 当封面）----
+    // ⭐ 混合库要跟列表页同一口径：与影片同名的图片**不计入**，否则文件夹卡片
+    //    上的数量会比点进去看到的多，而且多出来的正好是「已经当封面那张图」。
+    const imageDirsQuery = this.knexVideo('image_index as i')
+      .where('i.library_id', libId)
+      .modify(qb => this._applyImagePathPrefixFilter(qb, scopeRoots));
+    if (libType === 'mixed') {
+      _applyHideSameNameImageFilter(imageDirsQuery, this.knexVideo, { prefixPaths: scopeRoots });
+    }
+    const imageDirs = await imageDirsQuery
+      .select('i.path')
+      .count({ cnt: '*' })
+      .min({ coverId: 'i.id' })
+      .groupBy('i.path')
+      .orderBy('i.path', 'asc')
+      .catch(() => []);
+
+    // ---- ② 视频侧（仅混合库）----
+    let videoDirs = [];
+    if (libType === 'mixed') {
+      videoDirs = await this.knexVideo('video_index as v')
+        .whereIn('v.media_type', VIDEO_INDEX_MEDIA_TYPES)
+        .modify(qb => {
+          if (scopeRoots.length > 0) applyVisibleIndexFilter(qb, scopeRoots, { alias: 'v' });
+          else qb.whereRaw('1 = 0');
+        })
+        .select('v.path')
+        .count({ cnt: '*' })
+        .min({ coverId: 'v.id' })
+        .groupBy('v.path')
+        .orderBy('v.path', 'asc')
+        .catch(() => []);
+    }
+
+    const folderMap = new Map(); // childPath -> entry
+    const imageCoverIds = [];
+    const videoCoverIds = [];
+    let selfImageCount = 0;
+    let selfVideoCount = 0;
+
+    // dirRows 已按 path 升序，所以「第一个非 0 的 coverId」是确定性的，
+    // 不会因为扫描顺序变化导致封面来回跳。
+    const fold = (dirRows, kind) => {
+      for (const r of dirRows || []) {
+        const dir = _stripTrailingSep(r && r.path);
+        const count = Number(r && r.cnt) || 0;
+        if (!dir || count <= 0) continue;
+        const root = _matchRoot(dir, scopeRoots);
+        if (!root) continue;
+        const rel = _relToRoot(dir, root);
+        if (rel === null) continue;
+        if (rel === '') {
+          // 直接躺在当前目录（或来源根）里的文件 —— 不算子文件夹
+          if (kind === 'image') selfImageCount += count;
+          else selfVideoCount += count;
+          continue;
+        }
+        const seg = rel.split(sep).filter(Boolean)[0];
+        if (!seg) continue;
+        const childPath = path.join(currentPath || root, seg);
+        let entry = folderMap.get(childPath);
+        if (!entry) {
+          entry = {
+            name: seg,
+            path: childPath,
+            imageCount: 0,
+            videoCount: 0,
+            coverKind: kind,
+            coverId: 0,
+          };
+          folderMap.set(childPath, entry);
+        }
+        if (kind === 'image') entry.imageCount += count;
+        else entry.videoCount += count;
+        const coverId = Number(r && r.coverId) || 0;
+        if (entry.coverId <= 0 && coverId > 0) {
+          entry.coverId = coverId;
+          entry.coverKind = kind;
+          if (kind === 'image') imageCoverIds.push(coverId);
+          else videoCoverIds.push(coverId);
+        }
+      }
+    };
+    fold(imageDirs, 'image');
+    fold(videoDirs, 'video');
+
+    // ---- ③ 封面回查：两张表各一次 whereIn，不做 N+1 ----
+    const coverOf = new Map();
+    const loadCovers = async (ids, kind) => {
+      const uniq = [...new Set(ids.filter(v => v > 0))];
+      if (uniq.length === 0) return;
+      const isImage = kind === 'image';
+      const rows = await this.knexVideo(isImage ? 'image_index' : 'video_index')
+        .whereIn('id', uniq)
+        .select(
+          isImage
+            ? ['id', 'path', 'filename', 'ext', 'width', 'height', 'taken_at', 'view_time', 'create_time', 'size']
+            : ['id', 'media_type', 'path', 'filename', 'ext', 'is_file', 'width', 'height', 'duration', 'nfo_name', 'nfo_year', 'nfo_score', 'nfo_regions', 'nfo_genres', 'poster_path', 'fanart_path', 'logo_path', 'play_rel_path', 'view_time', 'create_time'],
+        )
+        .catch(() => []);
+      for (const row of rows || []) coverOf.set(`${kind}:${Number(row.id)}`, row);
+    };
+    await loadCovers(imageCoverIds, 'image');
+    await loadCovers(videoCoverIds, 'video');
+
+    const folders = [];
+    for (const entry of folderMap.values()) {
+      const row = coverOf.get(`${entry.coverKind}:${entry.coverId}`) || null;
+      let cover = null;
+      if (row) {
+        cover = entry.coverKind === 'image'
+          ? _normalizeListRow(this._imageRowToListItem(row))
+          : _normalizeListRow(row);
+      }
+      folders.push({
+        name: entry.name,
+        path: entry.path,
+        count: entry.imageCount + entry.videoCount,
+        imageCount: entry.imageCount,
+        videoCount: entry.videoCount,
+        cover,
+      });
+    }
+    folders.sort((a, b) => String(a.name).localeCompare(String(b.name), 'zh'));
+
+    // ---- ④ 面包屑：从所属来源根一层层走到当前目录 ----
+    const segments = [];
+    if (currentPath && matchedRoot) {
+      const rel = _relToRoot(currentPath, matchedRoot);
+      if (rel !== null) {
+        let acc = _stripTrailingSep(matchedRoot);
+        for (const seg of rel.split(sep).filter(Boolean)) {
+          acc = path.join(acc, seg);
+          segments.push({ name: seg, path: acc });
+        }
+      }
+    }
+
+    return {
+      path: currentPath,
+      parentPath,
+      segments,
+      roots,
+      folders,
+      selfCount: selfImageCount + selfVideoCount,
+      selfImageCount,
+      selfVideoCount,
+      hasSubFolders: folders.length > 0,
+    };
+  }
+
   async getVisibleIndexCounts(params, user) {
     const libraryId = Number(params && (params.library_id ?? params.libraryId)) || 0;
-    if (libraryId > 0) await this._ensureLibraryExists(libraryId);
+    let library = null;
+    if (libraryId > 0) library = await this._ensureLibraryExists(libraryId);
     const validPaths = await this.getValidPaths(user, libraryId);
     let finalPaths = validPaths;
     const knex = this.knexVideo;
@@ -310,6 +1125,36 @@ class VideoListService {
 
     if (!finalPaths || finalPaths.length === 0) {
       return { movie: 0, tv: 0, image: 0, total: 0 };
+    }
+
+    // ⭐ 图片库 / 混合库：图片数量从 image_index 取（video_index 里已不再写图片行）
+    const countLibType = library && library.lib_type ? String(library.lib_type).trim().toLowerCase() : '';
+    if (countLibType === 'image' || countLibType === 'mixed') {
+      const imgQ = knex('image_index as i').where('i.library_id', libraryId);
+      this._applyImagePathPrefixFilter(imgQ, finalPaths);
+      // 影集（album）目前不支持图片，带了就当 0，避免多算
+      if (Number.isFinite(albumId) && albumId > 0) imgQ.whereRaw('1 = 0');
+      const imgRow = await imgQ.count({ cnt: '*' }).first().catch(() => null);
+      const imageCount = Math.max(0, Number(imgRow && (imgRow.cnt ?? imgRow['count(*)'])) || 0);
+
+      let movie = 0;
+      let tv = 0;
+      if (countLibType === 'mixed') {
+        const vRows = await knex('video_index as v')
+          .whereIn('v.media_type', VIDEO_INDEX_MEDIA_TYPES)
+          .modify(qb => _applyVideoIndexPathPrefixFilter(qb, finalPaths))
+          .groupBy('v.media_type')
+          .select('v.media_type')
+          .count({ total: '*' })
+          .catch(() => []);
+        for (const r of vRows || []) {
+          const mt = r && r.media_type ? String(r.media_type).trim() : '';
+          const v = Number(r && r.total) || 0;
+          if (mt === 'movie' || mt === 'bdmv' || mt === 'video_ts') movie += v;
+          if (mt === 'tv') tv += v;
+        }
+      }
+      return { movie, tv, image: imageCount, total: movie + tv + imageCount };
     }
 
     const rows = await knex('video_index as v')
@@ -375,6 +1220,43 @@ class VideoListService {
 
     const validPaths = await this.getValidPaths(user, libraryId);
     let finalPaths = validPaths;
+
+    // ⭐ 图片库 / 混合库：走独立的 image_index 表（见 db/table/tableImageIndex.js）。
+    //    收藏 / 影集 / 智能影集是影视专属筛选，图片侧尚未实现 —— 带了这些参数就
+    //    退回原 video_index 逻辑，避免"筛选后一片空白"这种更难排查的现象。
+    const earlyLibType = library && library.lib_type ? String(library.lib_type).trim().toLowerCase() : '';
+    const earlyListType = String((params && (params.listType ?? params.list_type)) || '').trim().toLowerCase();
+    const wantsSpecialFilter =
+      Number(params && (params.album_id ?? params.albumId)) > 0 ||
+      Number(params && (params.collection_id ?? params.collectionId)) > 0 ||
+      Number(params && (params.smart_album_id ?? params.smartAlbumId)) > 0 ||
+      earlyListType === 'favorite';
+    if ((earlyLibType === 'image' || earlyLibType === 'mixed') && !wantsSpecialFilter) {
+      const earlySourceList = Array.isArray(params && params.sourceList)
+        ? params.sourceList
+        : Array.isArray(params && params.source_list)
+          ? params.source_list
+          : null;
+      const folderPath = String((params && (params.folderPath ?? params.folder_path)) || '').trim();
+      const folderMode = String((params && (params.folderMode ?? params.folder_mode)) || '').trim();
+      const common = {
+        library,
+        safePage,
+        safeLimit,
+        offset,
+        search,
+        sortBy,
+        sortOrder,
+        uid,
+        validPaths,
+        sourceList: earlySourceList,
+        // 文件夹视图：exact = 只看本目录自身，subtree = 看整棵子树（搜索用）
+        folderPath,
+        folderMode,
+      };
+      if (earlyLibType === 'image') return await this._listImageOnlyPaged(common);
+      return await this._listMixedPaged(common);
+    }
 
     const albumId = Number(params && (params.album_id ?? params.albumId));
     if (Number.isFinite(albumId) && albumId > 0) {
@@ -569,6 +1451,8 @@ class VideoListService {
       .offset(offset)
       .catch(() => []);
     const items = (rows || []).map(r => _normalizeListRow(r));
+    // 普通影视库同样兜底：视频没有封面 / 缩略图时用同目录同名图片顶上
+    _fillSameNameImageFallback(items);
     if (isFavoriteList) {
       for (const item of items) {
         if (item && typeof item === 'object') item.is_favorite = true;

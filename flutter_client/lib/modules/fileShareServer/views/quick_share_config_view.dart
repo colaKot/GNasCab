@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
 
 import '../../base/components.dart';
 import '../../base/components/custom_glass_card.dart';

@@ -453,7 +453,7 @@ class ServiceMainController extends GetxController {
     }
   }
 
-  /// 绑定当前设备到 GNasCab 账号（用于 P2P 远程连接）
+  /// 绑定当前设备到 WaterNasOS 账号（用于 P2P 远程连接）
   /// 返回 Map: {'success': bool, 'errorCode': String?}
   Future<Map<String, dynamic>> bindP2pDevice() async {
     if (remoteAccessLoading.value) return {'success': false};

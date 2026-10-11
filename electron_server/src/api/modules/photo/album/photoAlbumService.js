@@ -22,9 +22,8 @@ class PhotoAlbumService {
       throw err;
     }
 
-    if (userUtil.isAdmin(user)) {
-      return { album, role: 'admin', share: null };
-    }
+    // 按归属隔离：管理员也不绕过 owner 校验（不要再加 isAdmin 提前 return）。
+    // 公开相册 / 显式分享仍按 owner 的授权生效。
 
     if (Number(album.uid) === Number(uid)) {
       return { album, role: 'owner', share: null };

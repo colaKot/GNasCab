@@ -11,7 +11,7 @@ class SyncTranslations extends Translations {
 
 const Map<String, String> _zh = {
   // ── 通用 ──
-  'app_name': 'GNasCab 同步',
+  'app_name': 'WaterNasOS 同步',
   'ok': '确定',
   'cancel': '取消',
   'save': '保存',
@@ -159,5 +159,5 @@ const Map<String, String> _zh = {
   'tray_resume_auto': '恢复自动同步',
   'tray_settings': '设置',
   'tray_exit_app': '退出',
-  'tray_running_hint': 'GNasCab 同步正在后台运行',
+  'tray_running_hint': 'WaterNasOS 同步正在后台运行',
 };

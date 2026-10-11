@@ -15,7 +15,7 @@ import { ServiceDdnsView } from './ServiceDdnsView';
 
 /**
  * 服务主页（对齐 Flutter ServiceMobileView）：底部 3 页签
- * （GNasCab 账号 / 远程访问 / DDNS），顶栏标题随页签切换。
+ * （WaterNasOS 账号 / 远程访问 / DDNS），顶栏标题随页签切换。
  * 进入页面时启动配对码轮询并初始化 DDNS（对齐 Flutter IndexedStack 三个子页同时挂载的 initState 行为）。
  */
 @ComponentV2
@@ -117,12 +117,12 @@ export struct ServiceMainPage {
     if (index === 1) {
       return L10n.t('service_menu_remote_access', '远程访问');
     }
-    return L10n.t('service_menu_account_nascab', 'GNasCab 账号');
+    return L10n.t('service_menu_account_nascab', 'WaterNasOS 账号');
   }
 
   private tabItems(): BottomTabItem[] {
     return [
-      new BottomTabItem($r('sys.symbol.person_crop_circle_fill'), L10n.t('service_menu_account_nascab', 'GNasCab 账号')),
+      new BottomTabItem($r('sys.symbol.person_crop_circle_fill'), L10n.t('service_menu_account_nascab', 'WaterNasOS 账号')),
       new BottomTabItem($r('sys.symbol.cloud'), L10n.t('service_menu_remote_access', '远程访问')),
       new BottomTabItem($r('sys.symbol.computer'), L10n.t('service_menu_remote_access_ddns', '远程访问 DDNS'))
     ];

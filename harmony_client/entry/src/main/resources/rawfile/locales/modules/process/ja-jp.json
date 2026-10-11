@@ -31,7 +31,7 @@
   "process.worker.express.name": "API サービスプロセス",
   "process.worker.express.purpose": "API サービスを提供する基盤プロセス。停止するとアプリにアクセスできなくなります",
   "process.worker.expressBroadcast.name": "API LAN ブロードキャストプロセス",
-  "process.worker.expressBroadcast.purpose": "クライアントが LAN 内の GNasCab サーバーを自動検出できるようにします",
+  "process.worker.expressBroadcast.purpose": "クライアントが LAN 内の WaterNasOS サーバーを自動検出できるようにします",
   "process.worker.ffmpegHwTest.name": "FFmpeg ハードウェア加速検出プロセス",
   "process.worker.ffmpegHwTest.purpose": "現在のホストでの FFmpeg ハードウェア加速の対応状況を検出します",
   "process.worker.fileAllIndex.name": "全体ファイルインデックスプロセス",

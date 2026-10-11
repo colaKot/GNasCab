@@ -55,8 +55,8 @@ def _uri_normpath(base_segments, uri):
     """按 **URI 语义**解析相对引用（不是文件系统语义）。
 
     ⭐ 关键差异：URI 引用**不能越过基准向上逃逸**，多余的 `../` 会被静默吞掉。
-        基准 `package:GNasCab/core/user/` + `../../../core/api/x.dart`
-        -> `package:GNasCab/core/api/x.dart`
+        基准 `package:WaterNasOS/core/user/` + `../../../core/api/x.dart`
+        -> `package:WaterNasOS/core/api/x.dart`
     而 `os.path.normpath` 会逃逸到 `<项目根>/core/api/x.dart`（不存在）—— **误报的根源**。
     做法：把基准拼成以 `/` 开头的绝对 POSIX 路径，再 normpath；
     `posixpath.normpath('/a/../../b')` == `/b`，正好复现「越不过根」。

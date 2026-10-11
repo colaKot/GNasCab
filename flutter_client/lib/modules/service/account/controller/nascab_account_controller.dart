@@ -1,5 +1,5 @@
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/core/languages/language_service.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/languages/language_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';

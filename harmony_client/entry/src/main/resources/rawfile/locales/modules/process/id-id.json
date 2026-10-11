@@ -31,7 +31,7 @@
   "process.worker.express.name": "Layanan API",
   "process.worker.express.purpose": "Proses dasar layanan API; jika dihentikan aplikasi tidak dapat diakses",
   "process.worker.expressBroadcast.name": "Siaran LAN API",
-  "process.worker.expressBroadcast.purpose": "Memungkinkan klien menemukan server GNasCab di LAN",
+  "process.worker.expressBroadcast.purpose": "Memungkinkan klien menemukan server WaterNasOS di LAN",
   "process.worker.ffmpegHwTest.name": "Deteksi akselerasi FFmpeg",
   "process.worker.ffmpegHwTest.purpose": "Memeriksa dukungan akselerasi perangkat keras FFmpeg di host ini",
   "process.worker.fileAllIndex.name": "Indeks file global",

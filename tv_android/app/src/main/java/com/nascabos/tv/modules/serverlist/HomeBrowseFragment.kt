@@ -126,7 +126,7 @@ class HomeBrowseFragment : BrowseSupportFragment() {
         headersState = HEADERS_DISABLED
         brandColor = Color.parseColor("#121212")
         searchAffordanceColor = Color.parseColor("#1E88E5")
-        badgeDrawable = buildTextBadgeDrawable("GNasCab TV")
+        badgeDrawable = buildTextBadgeDrawable("WaterNasOS TV")
         adapter = rowsAdapter
 
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
@@ -544,7 +544,7 @@ class HomeBrowseFragment : BrowseSupportFragment() {
                     .build()
             }
 
-            val serverName = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "GNasCab" } }
+            val serverName = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "WaterNasOS" } }
             actions += androidx.leanback.widget.GuidedAction.Builder(requireContext())
                 .id(ID_LOGOUT)
                 .title(getString(R.string.action_logout))
@@ -676,7 +676,7 @@ class HomeBrowseFragment : BrowseSupportFragment() {
         }
 
         override fun onCreateGuidance(savedInstanceState: Bundle?): androidx.leanback.widget.GuidanceStylist.Guidance {
-            val serverName = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "GNasCab" } }
+            val serverName = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "WaterNasOS" } }
             return androidx.leanback.widget.GuidanceStylist.Guidance(
                 getString(R.string.logout_title),
                 getString(R.string.logout_confirm_message, serverName),

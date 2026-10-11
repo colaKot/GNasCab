@@ -79,7 +79,7 @@ class ServerCardPresenter(
     }
 
     private fun bindServer(cardView: ImageCardView, server: ServerInfo) {
-        val title = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "GNasCab" } }
+        val title = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "WaterNasOS" } }
         val primary = when {
             server.isP2p || server.pairCode.trim().isNotEmpty() && server.serverUrl.trim().isEmpty() -> "P2P"
             server.serverUrl.trim().isNotEmpty() -> normalizeUrlPort(server.serverUrl.trim())

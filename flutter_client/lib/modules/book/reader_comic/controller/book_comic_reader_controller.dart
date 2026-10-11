@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
 import '../../../../utils/cache_manager.dart';
 import '../service/book_comic_reader_api_service.dart';
 

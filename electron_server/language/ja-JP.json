@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "ネットワークリクエストがタイムアウトしました",
       "NETWORK_ERROR": "ネットワークリクエストに失敗しました",
       "REMOTE_AUTH_FAILED": "リモート認証に失敗しました",
-      "NASCAB_LOGIN_REQUIRED": "GNasCabアカウントにログインしていないため、リモートアクセスを有効にできません",
+      "NASCAB_LOGIN_REQUIRED": "WaterNasOSアカウントにログインしていないため、リモートアクセスを有効にできません",
       "NASCAB_SESSION_EXPIRED": "アカウントのログイン状態の有効期限が切れました。再度ログインしてください",
       "PAIR_CODE_RESET_FAILED": "ペアコードのリセットに失敗しました",
       "USER_SERIALIZE_FAILED": "ユーザー情報のシリアル化に失敗しました",

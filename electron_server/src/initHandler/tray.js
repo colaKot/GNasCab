@@ -107,7 +107,7 @@ module.exports = {
 
     const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
     try {
-      this.tray.setToolTip('GNasCab');
+      this.tray.setToolTip('WaterNasOS');
     } catch {}
     try {
       this.tray.setContextMenu(contextMenu);

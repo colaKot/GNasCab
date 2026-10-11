@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">الخوادم</string>
     <string name="server_discovered_section">تم اكتشافه</string>
@@ -350,7 +350,7 @@
     <string name="error_twofa_too_many_attempts">محاولات كثيرة جدًا، حاول مرة أخرى لاحقًا</string>
     <string name="error_twofa_invalid_token">رمز 2FA غير صالح، يرجى تسجيل الدخول مرة أخرى</string>
     <string name="error_network_failed">فشل طلب الشبكة</string>
-    <string name="error_not_nascab_server">ليس خادم GNasCab</string>
+    <string name="error_not_nascab_server">ليس خادم WaterNasOS</string>
     <string name="error_not_logged_in">يرجى تسجيل الدخول أولاً</string>
     <string name="error_server_unreachable">لا يمكن الوصول إلى الخادم، يرجى التحقق من حالة الخادم</string>
     <string name="error_no_direct_url">لا يوجد رابط مباشر متاح</string>

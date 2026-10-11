@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">服务器</string>
     <string name="server_discovered_section">自动发现</string>
@@ -356,7 +356,7 @@
     <string name="error_twofa_too_many_attempts">尝试次数过多，请稍后再试</string>
     <string name="error_twofa_invalid_token">2FA 已过期，请重新登录</string>
     <string name="error_network_failed">网络请求失败</string>
-    <string name="error_not_nascab_server">不是 GNasCab 服务器</string>
+    <string name="error_not_nascab_server">不是 WaterNasOS 服务器</string>
     <string name="error_not_logged_in">请先登录</string>
     <string name="error_server_unreachable">服务器无法连接，请检查服务器状态</string>
     <string name="error_no_direct_url">没有可用的直连地址</string>

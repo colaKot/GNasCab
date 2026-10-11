@@ -1,6 +1,6 @@
-import 'package:GNasCab/modules/base/components.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
-import 'package:GNasCab/modules/notes/controller/notes_controller.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/modules/notes/controller/notes_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';

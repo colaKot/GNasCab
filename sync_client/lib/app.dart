@@ -16,7 +16,7 @@ class SyncApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'GNasCab 同步',
+      title: 'WaterNasOS 同步',
       debugShowCheckedModeBanner: false,
       translations: SyncTranslations(),
       locale: const Locale('zh', 'CN'),

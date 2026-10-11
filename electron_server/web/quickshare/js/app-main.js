@@ -33,7 +33,7 @@ const state = {
 const I18N = {
   zh: {
     title: '快速分享',
-    welcome: '欢迎使用GNasCab',
+    welcome: '欢迎使用WaterNasOS',
     sub: '无需登录，通过链接访问文件',
     name: '名称',
     time: '时间',
@@ -72,7 +72,7 @@ const I18N = {
   },
   en: {
     title: 'Quick Share',
-    welcome: 'Welcome to GNasCab',
+    welcome: 'Welcome to WaterNasOS',
     sub: 'Access files by link without login',
     name: 'Name',
     time: 'Time',
@@ -186,7 +186,7 @@ function t(k) {
   }
   const fallback = {
     title: '快速分享',
-    welcome: '欢迎使用 GNasCab',
+    welcome: '欢迎使用 WaterNasOS',
     sub: '无需登录，通过链接访问文件',
     name: '名称',
     time: '时间',

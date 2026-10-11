@@ -31,7 +31,7 @@
   "process.worker.express.name": "Служба API",
   "process.worker.express.purpose": "Базовый процесс API; при остановке приложение становится недоступным",
   "process.worker.expressBroadcast.name": "LAN-трансляция API",
-  "process.worker.expressBroadcast.purpose": "Позволяет клиентам находить серверы GNasCab в локальной сети",
+  "process.worker.expressBroadcast.purpose": "Позволяет клиентам находить серверы WaterNasOS в локальной сети",
   "process.worker.ffmpegHwTest.name": "Проверка аппаратного ускорения FFmpeg",
   "process.worker.ffmpegHwTest.purpose": "Проверяет поддержку аппаратного ускорения FFmpeg на этом узле",
   "process.worker.fileAllIndex.name": "Глобальный индекс файлов",

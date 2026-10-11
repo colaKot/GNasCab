@@ -2,16 +2,16 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>GNasCab Server</title>
+    <title>WaterNasOS Server</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="sidebar">
       <div class="sidebar-header">
         <div class="logo-icon">
-          <img src="assets/logo.png" alt="GNasCab" />
+          <img src="assets/logo.png" alt="WaterNasOS" />
         </div>
-        <span>GNasCab</span>
+        <span>WaterNasOS</span>
       </div>
       <ul class="sidebar-menu">
         <li class="active" data-target="status-tab">
@@ -52,7 +52,7 @@
           <div class="card-header" data-i18n="status.title">Service Status</div>
           <div class="status-item">
             <span class="status-label">
-              <span data-i18n="status.express">GNasCab Service</span>
+              <span data-i18n="status.express">WaterNasOS Service</span>
               <span class="status-value status-badge" id="status-express" data-i18n="status.expressChecking">Checking...</span>
             </span>
             <div class="status-value">
@@ -223,6 +223,33 @@
           </div>
           <div style="margin-top: 20px">
             <button id="save-settings-btn" class="btn btn-primary" data-i18n="settings.save">Save Settings</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" data-i18n="cacheLocation.title">Cache Directory</div>
+          <div class="settings-description" data-i18n="cacheLocation.description">Caches (thumbnails, map tiles, posters, subtitles ...) are stored in the user data directory by default. You can move them to another disk to free up space.</div>
+          <div class="form-group">
+            <label data-i18n="cacheLocation.current">Current location</label>
+            <div class="mono" id="cache-location-effective" style="font-size: 13px; color: var(--text-sec); word-break: break-all">—</div>
+          </div>
+          <div class="form-group">
+            <label for="cache-location-input" data-i18n="cacheLocation.target">Cache storage directory</label>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <input type="text" id="cache-location-input" class="form-control mono" readonly placeholder="—" />
+              <button type="button" id="cache-location-choose-btn" class="btn btn-secondary" style="white-space: nowrap" data-i18n="cacheLocation.choose">Browse…</button>
+              <button type="button" id="cache-location-reset-btn" class="btn btn-secondary" style="white-space: nowrap" data-i18n="cacheLocation.useDefault">Default</button>
+            </div>
+            <div class="checkbox-subtitle" style="margin-top: 8px" data-i18n="cacheLocation.subdirHint">The cache itself is stored in the nascabos_cache subdirectory of the directory you choose.</div>
+          </div>
+          <div id="cache-location-notice" class="hidden" style="margin-bottom: 12px; padding: 10px 12px; border-radius: var(--radius-sm); background: rgba(79, 142, 247, 0.12); border: 1px solid rgba(79, 142, 247, 0.35); color: var(--text-sec); font-size: 13px; line-height: 1.6"></div>
+          <div id="cache-location-progress" class="hidden" style="margin-bottom: 12px">
+            <div class="cache-stats-progress-bar"><div class="cache-stats-progress-fill" id="cache-location-progress-fill"></div></div>
+            <div class="cache-stats-progress-text" id="cache-location-progress-text"></div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px">
+            <button type="button" id="cache-location-save-btn" class="btn btn-primary" data-i18n="cacheLocation.saveAndMigrate">Save and migrate</button>
+            <button type="button" id="cache-location-cancel-btn" class="btn btn-secondary hidden" data-i18n="cacheLocation.cancelPending">Cancel pending migration</button>
           </div>
         </div>
       </div>

@@ -60,7 +60,7 @@ class AdminCreateController extends GetxController {
         serverInfo = ServerInfoBean(
           serverId: '',
           serverUrl: baseUrl,
-          serverName: 'GNasCabServer',
+          serverName: 'WaterNasOSServer',
           serverHost: Uri.parse(baseUrl).host,
           serverPortHttp: '',
           serverPortHttps: '',

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">เซิร์ฟเวอร์</string>
     <string name="server_discovered_section">ค้นพบแล้ว</string>
@@ -350,7 +350,7 @@
     <string name="error_twofa_too_many_attempts">พยายามมากเกินไป ลองใหม่ในภายหลัง</string>
     <string name="error_twofa_invalid_token">โทเคน 2FA ไม่ถูกต้อง เข้าสู่ระบบอีกครั้ง</string>
     <string name="error_network_failed">คำขอเครือข่ายไม่สำเร็จ</string>
-    <string name="error_not_nascab_server">ไม่ใช่เซิร์ฟเวอร์ GNasCab</string>
+    <string name="error_not_nascab_server">ไม่ใช่เซิร์ฟเวอร์ WaterNasOS</string>
     <string name="error_not_logged_in">เข้าสู่ระบบก่อน</string>
     <string name="error_server_unreachable">เข้าถึงเซิร์ฟเวอร์ไม่ได้ ตรวจสอบสถานะเซิร์ฟเวอร์</string>
     <string name="error_no_direct_url">ไม่มี URL โดยตรงที่ใช้ได้</string>

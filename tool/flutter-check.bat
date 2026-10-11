@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  GNasCab Flutter toolchain + project self-check
+REM  WaterNasOS Flutter toolchain + project self-check
 REM
 REM  Run this in a NORMAL cmd / PowerShell window.
 REM  It will NOT work from an IDE/agent piped shell, because Dart

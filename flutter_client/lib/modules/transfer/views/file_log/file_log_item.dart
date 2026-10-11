@@ -1,8 +1,8 @@
-import 'package:GNasCab/utils/dialog_util.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:GNasCab/modules/base/components/custom_icon_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_icon_button.dart';
 import '../../controllers/file_log_controller.dart';
 import '../../models/file_operation_log.dart';
 import '../../../base/components/custom_tag.dart';

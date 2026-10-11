@@ -1,6 +1,7 @@
+const path = require('path');
 const userUtil = require('../../../../utils/userUtil');
 const VideoSourceService = require('../source/videoSourceService');
-const { applyVisibleIndexFilter, isPathVisibleTo } = require('../videoVisibilityUtil');
+const { applyVisibleIndexFilter, isPathVisibleTo, escapeLikeValue, LIKE_ESCAPE } = require('../videoVisibilityUtil');
 
 // 影视库类型（创建后不可修改）
 const LIB_TYPES = ['movie', 'tv', 'image', 'mixed'];
@@ -164,6 +165,34 @@ class VideoLibraryService {
     applyVisibleIndexFilter(query, paths);
   }
 
+  /**
+   * 图片表的路径可见性过滤。
+   * ⚠️ 不能复用 applyVisibleIndexFilter：它带「目录行特判」，会引用 image_index
+   *    并不存在的 `is_file` 列 → SQL 直接报错。图片行都是真实文件，本就无需该特判。
+   */
+  _applyImagePathFilter(query, paths, alias = '') {
+    const list = Array.isArray(paths) ? paths.map(p => String(p || '').trim()).filter(Boolean) : [];
+    if (list.length === 0) {
+      query.whereRaw('1 = 0');
+      return query;
+    }
+    const col = alias ? `${alias}.path` : 'path';
+    const sep = path.sep;
+    query.where(builder => {
+      for (const p of list) {
+        const prefix = p.endsWith(sep) ? p : `${p}${sep}`;
+        builder.orWhere(function () {
+          this.where(col, p).orWhereRaw('?? LIKE ? ESCAPE ?', [
+            col,
+            `${escapeLikeValue(prefix)}%`,
+            LIKE_ESCAPE,
+          ]);
+        });
+      }
+    });
+    return query;
+  }
+
   // 每个库的可见条目数：库内来源路径 ∩ 用户可见路径
   async listLibrariesWithCounts(user) {
     const libraries = await this.listLibraries();
@@ -208,6 +237,18 @@ class VideoLibraryService {
           if (VIDEO_MEDIA_TYPES.includes(mt)) counts.movie += cnt;
           if (mt === 'tv') counts.tv += cnt;
           if (mt === 'image') counts.image += cnt;
+        }
+
+        // ⭐ 图片改存独立表 image_index（video_index 里已不再写 image 行）。
+        //    用 library_id 等值统计 + 路径可见性过滤，走 (library_id, path) 索引。
+        const libTypeForCount = lib.lib_type ? String(lib.lib_type).trim().toLowerCase() : '';
+        if (libTypeForCount === 'image' || libTypeForCount === 'mixed') {
+          const imgQuery = this.knex('image_index').where('library_id', libId);
+          this._applyImagePathFilter(imgQuery, visiblePaths);
+          const imgRow = await imgQuery.count({ cnt: '*' }).first().catch(() => null);
+          const imgCnt = Number(imgRow && (imgRow.cnt ?? imgRow['count(*)'])) || 0;
+          counts.image += imgCnt;
+          counts.total += imgCnt;
         }
       }
 

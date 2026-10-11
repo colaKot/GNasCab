@@ -86,7 +86,6 @@ class MediaToolLeftMenu extends StatelessWidget {
       onToggleCollapse: onToggleCollapse,
       toggleExpandTooltip: 'sidebar_expand'.tr,
       toggleCollapseTooltip: 'sidebar_collapse'.tr,
-      topPlaceholderHeight: 45,
     );
   }
 }

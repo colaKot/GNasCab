@@ -293,14 +293,14 @@ class PtBr extends Translations {
       'api_code_notes_notebook_not_found':
           "A pasta do caderno não existe ou foi movida",
       'api_code_notes_notebook_invalid':
-          "A pasta selecionada não é um caderno GNasCab válido",
+          "A pasta selecionada não é um caderno WaterNasOS válido",
       'api_code_notes_notebook_folder_not_empty':
           "A pasta selecionada não está vazia e não pode ser inicializada como um novo caderno",
       'api_code_notes_group_not_empty':
           "Ainda há notas no grupo e ele não pode ser excluído",
       'notes_notebook_choose_title': "Escolher ou criar caderno",
       'notes_notebook_choose_desc':
-          "Na primeira abertura, selecione uma pasta vazia ou uma pasta de caderno GNasCab existente.",
+          "Na primeira abertura, selecione uma pasta vazia ou uma pasta de caderno WaterNasOS existente.",
       'notes_choose_folder': "Escolher pasta do caderno",
       'notes_original_path_missing':
           "O caminho original do caderno não existe mais: ",
@@ -752,7 +752,7 @@ class PtBr extends Translations {
           'Processo base da API; se encerrado, o app fica inacessível',
       'process.worker.expressBroadcast.name': 'Broadcast LAN da API',
       'process.worker.expressBroadcast.purpose':
-          'Permite que clientes descubram servidores GNasCab na LAN',
+          'Permite que clientes descubram servidores WaterNasOS na LAN',
       'process.worker.ffmpegHwTest.name': 'Detecção de aceleração FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
           'Verifica suporte a aceleração por hardware FFmpeg no host',
@@ -898,12 +898,12 @@ class PtBr extends Translations {
       'terminal_cursor_blink': 'Cursor piscar',
       'terminal_click_to_pick_color': 'Toque para escolher cor',
       'service_menu_account': 'Conta',
-      'service_menu_account_nascab': 'Conta GNasCab',
+      'service_menu_account_nascab': 'Conta WaterNasOS',
       'service_menu_remote_access': 'Acesso Remoto',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'NAT Traversal',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -932,7 +932,7 @@ class PtBr extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'Ativar acesso remoto',
       'service_remote_access_toggle_hint':
-          'Uma vez ativado, seu serviço GNasCab pode ser acessado com segurança em um ambiente remoto.',
+          'Uma vez ativado, seu serviço WaterNasOS pode ser acessado com segurança em um ambiente remoto.',
       'service_remote_access_pair_code_label': 'Código de pareamento',
       'service_remote_access_pair_code_empty': 'Sem código de pareamento',
       'service_remote_access_custom_pair_code_title':
@@ -970,7 +970,7 @@ class PtBr extends Translations {
       'P2P_TOO_MANY_REQUESTS':
           'Muitas solicitações. Por favor, tente novamente mais tarde.',
       'service_p2p_device_not_bind_message':
-          'Você precisa vincular o dispositivo atual à sua conta GNasCab para usar este recurso. Você pode desvincular quando não precisar mais.',
+          'Você precisa vincular o dispositivo atual à sua conta WaterNasOS para usar este recurso. Você pode desvincular quando não precisar mais.',
       'service_p2p_bind_device_button': 'Vincular',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Formato de código de pareamento inválido (6-30, apenas letras/números)',
@@ -990,16 +990,16 @@ class PtBr extends Translations {
       'service_remote_access_guide_title': 'Guia de acesso remoto',
       'service_remote_access_guide_how_title': 'Como funciona?',
       'service_remote_access_guide_how_body':
-          'Após ativar o acesso remoto, o GNasCab atribui um código de pareamento aleatório. Com ele, você pode se conectar ao seu host de qualquer aplicativo GNasCab ou cliente desktop. Ele prefere conexão direta P2P; se P2P não estiver disponível, um nó de relay global próximo será usado. Os dados são transmitidos com segurança via SSL + WebRTC.',
+          'Após ativar o acesso remoto, o WaterNasOS atribui um código de pareamento aleatório. Com ele, você pode se conectar ao seu host de qualquer aplicativo WaterNasOS ou cliente desktop. Ele prefere conexão direta P2P; se P2P não estiver disponível, um nó de relay global próximo será usado. Os dados são transmitidos com segurança via SSL + WebRTC.',
       'service_remote_access_guide_use_title':
           'Como usar o código de pareamento?',
       'service_remote_access_guide_use_body':
           'Ao adicionar um servidor no aplicativo ou cliente desktop, escolha "Adicionar com código de pareamento" e digite ou escaneie o código de pareamento.',
-      'service_nascab_title': 'Conta GNasCab',
+      'service_nascab_title': 'Conta WaterNasOS',
       'service_nascab_not_logged_in': 'Não conectado',
       'service_nascab_not_logged_in_hint':
-          'Faça login para usar recursos de serviço remoto GNasCab',
-      'service_nascab_login': 'Fazer login no GNasCab',
+          'Faça login para usar recursos de serviço remoto WaterNasOS',
+      'service_nascab_login': 'Fazer login no WaterNasOS',
       'service_nascab_logout': 'Sair',
       'service_nascab_switch_account': 'Alternar conta',
       'service_nascab_last_login': 'Último login: @time',
@@ -1013,7 +1013,7 @@ class PtBr extends Translations {
       'service_nascab_login_cancelled': 'Login cancelado',
       'service_nascab_app_not_supported':
           'O login não é suportado no aplicativo. Por favor, use o PC ou navegador web para fazer login.',
-      'service_nascab_login_title': 'Fazer login no GNasCab',
+      'service_nascab_login_title': 'Fazer login no WaterNasOS',
       'service_nascab_callback_success': 'Login bem-sucedido',
       'service_nascab_callback_success_hint':
           'Você pode fechar esta página e retornar ao aplicativo',
@@ -1042,9 +1042,9 @@ class PtBr extends Translations {
       'service_nascab_membership_vip_diff': 'Comparar planos',
       'service_nascab_membership_my_devices': 'Meus dispositivos',
       'service_nascab_membership_user_center': 'Central do usuário',
-      'service_nascab_promotion_title': 'Promover GNasCab',
+      'service_nascab_promotion_title': 'Promover WaterNasOS',
       'service_nascab_promotion_subtitle':
-          'Promova o GNasCab e ganhe comissão',
+          'Promova o WaterNasOS e ganhe comissão',
       'service_nascab_promotion_action': 'Promover agora',
 
       'service_menu_contact_us': 'Contate-nos',
@@ -1405,6 +1405,10 @@ class PtBr extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Pesquisar título',
       'video_list_cover_size': 'Tamanho da capa',
+      'video_list_image_poster': 'Pôster',
+      'video_list_image_fanart': 'Miniatura',
+      'video_list_waterfall': 'Cascata',
+      'video_list_grid': 'Grade',
       'filter': 'Filtrar',
       'video_list_filter_years': 'Ano',
       'video_list_filter_genres': 'Gêneros',
@@ -1608,7 +1612,7 @@ class PtBr extends Translations {
           'Se sua pasta de origem foi movida, você pode usar este recurso para atualizar índices para evitar reescaneamento. Certifique-se de que a pasta realocada tenha a mesma estrutura que a original.',
       'photo_source_delete_confirm': 'Excluir pasta de origem: @path?',
       'photo_source_help_scan_when_start':
-          'Quando ativado, esta pasta será escaneada quando o GNasCab iniciar.',
+          'Quando ativado, esta pasta será escaneada quando o WaterNasOS iniciar.',
       'photo_source_help_scan_when_change':
           'Quando ativado, as alterações na pasta serão detectadas automaticamente. Algumas plataformas não são suportadas (ex. Docker no Windows).',
       'photo_source_help_scan_interval':
@@ -1626,7 +1630,7 @@ class PtBr extends Translations {
       'book_source_unavailable': 'Indisponível',
       'book_source_delete_confirm': 'Excluir pasta de origem: @path?',
       'book_source_help_scan_when_start':
-          'Quando ativado, esta pasta será escaneada quando o GNasCab iniciar.',
+          'Quando ativado, esta pasta será escaneada quando o WaterNasOS iniciar.',
       'book_source_help_scan_when_change':
           'Quando ativado, as alterações na pasta serão detectadas automaticamente. Algumas plataformas não são suportadas (ex. Docker no Windows).',
       'book_source_help_scan_interval':
@@ -1646,7 +1650,7 @@ class PtBr extends Translations {
       'music_source_unavailable': 'Indisponível',
       'music_source_delete_confirm': 'Excluir pasta de origem: @path?',
       'music_source_help_scan_when_start':
-          'Quando ativado, esta pasta será escaneada quando o GNasCab iniciar.',
+          'Quando ativado, esta pasta será escaneada quando o WaterNasOS iniciar.',
       'music_source_help_scan_when_change':
           'Quando ativado, as alterações na pasta serão detectadas automaticamente. Algumas plataformas não são suportadas (ex. Docker no Windows).',
       'music_source_help_scan_interval':
@@ -1931,7 +1935,7 @@ class PtBr extends Translations {
       'video_source_unavailable': 'Indisponível',
       'video_source_delete_confirm': 'Excluir pasta de origem: @path?',
       'video_source_help_scan_when_start':
-          'Quando ativado, esta pasta será escaneada quando o GNasCab iniciar.',
+          'Quando ativado, esta pasta será escaneada quando o WaterNasOS iniciar.',
       'video_source_help_match_nfo':
           'Quando ativado, busca automaticamente informações do filme do TMDB.',
       'video_source_help_scan_when_change':
@@ -1956,7 +1960,7 @@ class PtBr extends Translations {
       'server_menu_select_channel': 'Selecionar Canal',
       'server_menu_edit_pair_code': 'Editar Código de Pareamento',
       'server_saved': 'Servidores salvos',
-      'server_listTitle': 'Selecionar servidor GNasCab para login',
+      'server_listTitle': 'Selecionar servidor WaterNasOS para login',
       'server_add': 'Adicionar Servidor',
       'server_localServer': 'Local',
       'server_scanned': 'Servidor escaneado',
@@ -1978,7 +1982,7 @@ class PtBr extends Translations {
       'server_need_input_password_every_time':
           'Exigir senha em todos os logins',
       'server_add_invalid_server':
-          'Este servidor não é um servidor GNasCab válido, por favor, verifique se o endereço do servidor está correto',
+          'Este servidor não é um servidor WaterNasOS válido, por favor, verifique se o endereço do servidor está correto',
       'server_connect_timeout':
           'Tempo de conexão esgotado, por favor, tente novamente mais tarde',
       'server_connect_failed_with_error': 'Falha na conexão: @error',
@@ -1999,7 +2003,7 @@ class PtBr extends Translations {
       'server_pair_code_how_link': 'Como obter um código de pareamento?',
       'server_pair_code_how_title': 'Como obter um código de pareamento?',
       'server_pair_code_how_content':
-          'Ative-o no GNasCab: Serviço -> Acesso Remoto. Então você pode obter o código de pareamento. O código de pareamento permite alcançar seu host em qualquer lugar.',
+          'Ative-o no WaterNasOS: Serviço -> Acesso Remoto. Então você pode obter o código de pareamento. O código de pareamento permite alcançar seu host em qualquer lugar.',
       'server_pair_code_scan_qr': 'Escanear QR',
       'server_pair_code_scan_invalid': 'Código de pareamento inválido',
       'server_edit_pair_code_title': 'Editar Código de Pareamento',
@@ -2059,7 +2063,7 @@ class PtBr extends Translations {
       'auth_token_refresh_failure': 'Falha na atualização do token',
       'auth_token_refresh_error':
           'Ocorreu um erro durante o processo de atualização do token',
-      'auth_welcome_title': 'Bem-vindo ao GNasCab',
+      'auth_welcome_title': 'Bem-vindo ao WaterNasOS',
       'auth_pair_code_label': 'Código de pareamento',
       'auth_pair_code_connect': 'Conectar',
       'auth_connected_host': 'Host conectado: @host',
@@ -2110,7 +2114,7 @@ class PtBr extends Translations {
       'admin_create_button': 'Criar Administrador',
       'admin_create_success': 'Criação Bem-Sucedida',
       'admin_create_success_message':
-          'Conta de administrador criada com sucesso. Esta conta é salva no disco do seu servidor GNasCab, não é uma conta de rede. Por favor, guarde-a com cuidado.',
+          'Conta de administrador criada com sucesso. Esta conta é salva no disco do seu servidor WaterNasOS, não é uma conta de rede. Por favor, guarde-a com cuidado.',
       'admin_create_failure': 'Criação Falhou',
       'admin_create_username_exists': 'Nome de usuário já existe',
 
@@ -2211,7 +2215,7 @@ class PtBr extends Translations {
       'logout_transfer_running_title': 'Tarefas de Transferência Inacabadas',
       'logout_transfer_running_content':
           'Você ainda tem tarefas de upload/download inacabadas. Sair irá parar e removê-las.',
-      'home_status_restart': 'Reiniciar GNasCab',
+      'home_status_restart': 'Reiniciar WaterNasOS',
       'home_status_monitor': 'Monitor',
       'home_status_message': 'Mensagens',
       'home_status_bg_tasks': 'Tarefas em Segundo Plano',
@@ -2632,7 +2636,7 @@ class PtBr extends Translations {
       'home_apps': 'Aplicativos',
       'home_no_message': 'Sem mensagens',
       'monitor_click_to_view': 'Clique para ver detalhes',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Centro de Tarefas',
       'recycle_bin_empty': 'Sem arquivos na lixeira',
 
@@ -2832,7 +2836,7 @@ class PtBr extends Translations {
       'transmission_no_files': 'Sem arquivos',
       'transmission_select_all_files': 'Selecionar tudo',
       'transmission_deselect_all_files': 'Desmarcar tudo',
-      'transmission_auto_start': 'Iniciar automaticamente com o GNasCab',
+      'transmission_auto_start': 'Iniciar automaticamente com o WaterNasOS',
       'transmission_dht_enabled': 'Ativar DHT',
       'transmission_pex_enabled': 'Ativar PEX',
       'transmission_utp_enabled': 'Ativar uTP',

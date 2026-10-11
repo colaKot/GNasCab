@@ -217,6 +217,106 @@ function register(ipcMain, app, shell, tableConfig, Logger, getExpressState, get
     }
   });
 
+  // ==================== 缓存目录：自定义位置与搬迁 ====================
+  // 说明：实际搬迁不在运行时执行，而是「写入配置 -> 重启服务 -> 启动阶段搬迁」。
+  // 这样搬迁期间 API 尚未对外提供服务，客户端无法操作，不存在边写边搬的竞争。
+  const appConfig = require('../config/config');
+  const cacheMigrator = require('../utils/cacheMigrator');
+  const path = require('path');
+
+  function buildCacheLocationPayload() {
+    const plan = cacheMigrator.getPlan();
+    const cfg = appConfig.readCacheLocationConfig() || { parent: '', effectiveParent: '' };
+    const defaultParent = appConfig.getUserDataPath();
+    const effectiveParent = appConfig.getEffectiveCacheParent();
+    return {
+      configuredParent: cfg.parent || '',
+      isDefault: !cfg.parent,
+      effectiveParent,
+      effectiveCachePath: process.env.PATH_CACHE || '',
+      defaultParent,
+      pending: plan.required,
+      migration: cacheMigrator.getStatusForUi(),
+      platform: process.platform,
+    };
+  }
+
+  ipcMain.handle('cacheLocation:get', async () => {
+    try {
+      return { success: true, data: buildCacheLocationPayload() };
+    } catch (err) {
+      return { success: false, error: err && err.message ? String(err.message) : String(err) };
+    }
+  });
+
+  ipcMain.handle('cacheLocation:choose', async evt => {
+    try {
+      const { dialog, BrowserWindow } = require('electron');
+      const currentWindow = BrowserWindow.fromWebContents(evt.sender);
+      const result = await dialog.showOpenDialog(currentWindow, {
+        properties: ['openDirectory', 'createDirectory'],
+      });
+      if (result.canceled || !result.filePaths || !result.filePaths.length) {
+        return { success: true, canceled: true };
+      }
+      return { success: true, path: result.filePaths[0] };
+    } catch (err) {
+      return { success: false, error: err && err.message ? String(err.message) : String(err) };
+    }
+  });
+
+  ipcMain.handle('cacheLocation:set', async (_evt, payload) => {
+    try {
+      const rawParent = payload && payload.parent !== undefined ? payload.parent : '';
+      const validated = cacheMigrator.validateTargetParent(rawParent);
+      if (!validated.ok) {
+        return { success: false, errorKey: `cacheLocation.error.${validated.error}` };
+      }
+      appConfig.writeCacheLocationConfig(validated.parent);
+      const plan = cacheMigrator.getPlan();
+      return {
+        success: true,
+        needRestart: plan.required,
+        pending: plan.required,
+        data: buildCacheLocationPayload(),
+      };
+    } catch (err) {
+      return { success: false, error: err && err.message ? String(err.message) : String(err) };
+    }
+  });
+
+  // 放弃尚未执行的搬迁：把「期望位置」改回当前实际生效位置
+  ipcMain.handle('cacheLocation:cancelPending', async () => {
+    try {
+      const effectiveParent = appConfig.getEffectiveCacheParent();
+      const defaultParent = appConfig.getUserDataPath();
+      const sameAsDefault = path.resolve(effectiveParent) === path.resolve(defaultParent);
+      appConfig.writeCacheLocationConfig(sameAsDefault ? '' : effectiveParent);
+      cacheMigrator.clearState();
+      return { success: true, data: buildCacheLocationPayload() };
+    } catch (err) {
+      return { success: false, error: err && err.message ? String(err.message) : String(err) };
+    }
+  });
+
+  // 重启服务以执行搬迁（Desktop 模式）；无界面模式需用户自行重启进程/容器
+  ipcMain.handle('cacheLocation:restart', async () => {
+    try {
+      if (!app || typeof app.relaunch !== 'function' || typeof app.exit !== 'function') {
+        return { success: false, error: 'NO_APP' };
+      }
+      setTimeout(() => {
+        try {
+          app.relaunch();
+          app.exit(0);
+        } catch (_) {}
+      }, 200);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err && err.message ? String(err.message) : String(err) };
+    }
+  });
+
   // UI 语言：获取与设置
   ipcMain.handle('ui:getLanguage', async () => {
     try {

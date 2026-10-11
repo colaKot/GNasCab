@@ -1,16 +1,19 @@
-# GNasCab
+# WaterNasOS
 
 > [简体中文](README.md) | **English**
 
-GNasCab is a cross-platform NAS software that lets you remotely manage your photos, videos, music, books, and files. It also supports file sharing, Transmission downloads, Docker management, remote terminal, multi-device folder sync, and more.
+WaterNasOS is a cross-platform NAS software that lets you remotely manage your photos, videos, music, books, and files. It also provides file sharing, Transmission downloads, Docker management, a remote terminal, multi-device folder sync, and more — with the same backend serving phone, desktop, TV, and web clients.
 
-Official website: <https://nas.cab>
+## Origin & License
 
-## Changes From Upstream
+> WaterNasOS is a **modified version** of [NasCabOS](https://github.com/nascab/NasCabOS), released and redistributed under the **GNU GPL v3.0**.
+> The copyright of the original work belongs to Beijing Yunpiao Piao Technology Co., Ltd. (© 2025); the copyright of the additions and modifications in this repository belongs to **colaKot** (© 2026).
+> Since **2026-10** this repository has applied the rename, feature changes and project-wide adjustments listed below to that work; the modifications are licensed under GPL-3.0 as well.
+> The full license text and the original copyright notices are kept unmodified in [LICENSE](LICENSE). Network protocols, device fingerprints and encrypted data formats remain compatible.
 
-> This repository is a **modified version** of [NasCabOS](https://github.com/nascab/NasCabOS),
-> released under GPL-3.0. Listed below are the changes relative to upstream (2026-10; see the commit history).
-> Feature-level changes come first, followed by project-wide housekeeping.
+## What This Version Changes
+
+Everything changed relative to upstream is listed below: features first, project-wide housekeeping second.
 
 ### Features
 
@@ -23,14 +26,14 @@ Official website: <https://nas.cab>
 
 ### Project-wide
 
-- **Renamed**: the project and every client display name is now **GNasCab** (GNasCabServer for the Windows server, GNasCab TV for the TV clients); the Flutter package name changed from `NasCabOS` to `GNasCab`.
+- **Renamed**: the project and every client display name is now **WaterNasOS** (WaterNasOSServer for the Windows server, WaterNasOS TV for the TV clients); the Flutter package name changed from `NasCabOS` to `WaterNasOS`.
 - **Backward compatible**: application identifiers such as `applicationId`, the iOS Bundle ID and the HarmonyOS `bundleName` are **left unchanged**, so existing installs can upgrade in place; network protocols, device fingerprints and encrypted data formats are untouched.
 - **Slimmed repository**: third-party runtime binaries (sftpgo, openlist, ffmpeg, ffprobe, rclone, transmission), AI models (`onnx_models`), CocoaPods trees and the geonames database are no longer bundled; run `tool/fetch_nascab_assets.py` to fetch them from the official manifest.
 - **Contact & donations**: updated to the maintainer's QR code and email.
 
 ## Built-in Apps
 
-Every feature in GNasCab is a **standalone app**: its own icon, its own page stack and its own
+Every feature in WaterNasOS is a **standalone app**: its own icon, its own page stack and its own
 server-side API namespace, and on desktop it can be opened in a separate window apart from the
 main shell. The default app list is served by the backend (`defaultApps` in
 `electron_server/src/config/config.js`); users can hide or reorder apps in Settings.
@@ -86,7 +89,7 @@ This repository contains the following projects:
 
 Server:
 
-First, download the dependency libraries and plugins provided in the releases (<https://github.com/colaKot/GNasCab/releases>), then extract the `libs` and `onnx_models` of the corresponding platform to the root directory of `electron_server`. `libs` contains third-party plugins, and `onnx_models` contains OCR model files used for image recognition.
+First, download the dependency libraries and plugins provided in the releases (<https://github.com/colaKot/WaterNasOS/releases>), then extract the `libs` and `onnx_models` of the corresponding platform to the root directory of `electron_server`. `libs` contains third-party plugins, and `onnx_models` contains OCR model files used for image recognition.
 
 ```bash
 npm i;
@@ -108,7 +111,7 @@ Build the flutter web version and place it under the electron_server/web/main di
 
 ## Donations
 
-If GNasCab is helpful to you, we welcome your support:
+If WaterNasOS is helpful to you, we welcome your support:
 
 <div align="center">
 
@@ -120,5 +123,13 @@ Business cooperation / Contact us: cola23@126.com
 
 ## License
 
-Released under the [GNU General Public License v3.0](LICENSE).
-Copyright (C) Beijing Yunpiao Piao Technology Co., Ltd.
+WaterNasOS is released under the [GNU General Public License v3.0](LICENSE).
+
+- The copyright of the original upstream work belongs to **Beijing Yunpiao Piao Technology Co., Ltd.** (© 2025) and is retained verbatim.
+- The copyright of the additions and modifications in this repository belongs to **colaKot** (© 2026).
+- The modifications made in this repository are licensed under GPL-3.0 as well; modification date **2026-10**.
+- Any redistributor must keep the copyright notices above and the full license text, and must make the source available under GPL-3.0.
+
+## Third-Party Assets & Acknowledgements
+
+- [Tabler Icons](https://github.com/tabler/tabler-icons): window control buttons and other UI icons (**MIT License**, © Paweł Kuna), consumed via the Dart package `tabler_icons_plus`.

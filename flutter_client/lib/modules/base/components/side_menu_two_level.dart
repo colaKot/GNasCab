@@ -1,7 +1,7 @@
-import 'package:GNasCab/core/theme/app_tokens.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/base/components.dart';
-import 'package:GNasCab/modules/home/views/pc_components/pc_app_window.dart';
+import 'package:WaterNasOS/core/theme/app_tokens.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
+import 'package:WaterNasOS/modules/home/views/pc_components/pc_app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -197,6 +197,11 @@ class TwoLevelSideMenu extends StatelessWidget {
   final Widget? headerTrailing;
 
   /// 顶部让位高度。null = 跟随当前皮肤的标题栏高度（换肤后自动同步）。
+  /// **额外**的顶部让位高度 —— 一般不要传。
+  ///
+  /// ⚠️ 2026-10-10 起：标题栏垂直让位已由 `PcAppWindow` **统一负责**，窗口内
+  /// `PcAppWindow.titleBarHeightFor(context)` 恒返回 0，所以 `null`（默认）
+  /// 就等于「框架已经让过了，这里不再重复让位」。
   final double? topPlaceholderHeight;
   final List<SideMenuTwoLevelGroup> groups;
   const TwoLevelSideMenu({
@@ -218,7 +223,8 @@ class TwoLevelSideMenu extends StatelessWidget {
     final flatItems = groups.expand((g) => g.items).toList(growable: false);
     final customColors = Theme.of(context).extension<CustomColors>();
 
-    return Container(
+    // ⭐ 左栏底色补画到窗口标题栏左侧（框架已把内容层整体下移，见 PcLeftRailTopExtend）
+    return PcLeftRailTopExtend(
       color: customColors?.leftTreeBgColor,
       child: Column(
         children: [

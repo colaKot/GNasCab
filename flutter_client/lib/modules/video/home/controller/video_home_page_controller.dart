@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:GNasCab/core/user/current_user_controller.dart';
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/core/user/current_user_controller.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import 'package:get/get.dart';
 import '../../../../utils/dialog_util.dart';
 import '../../base/beans/video_item_bean.dart';

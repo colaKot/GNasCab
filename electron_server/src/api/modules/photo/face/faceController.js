@@ -42,7 +42,9 @@ class FaceController {
         );
       }
       let validPaths;
-      if (req.user && !userUtil.isAdmin(req.user)) {
+      // 按归属隔离：所有用户（含管理员）都只能看到自己源目录下的照片。
+      // 不要再加 isAdmin 例外 —— 隐私设计要求超管也只看自己的。
+      if (req.user) {
         const validPathsRaw = await photoTimeLineService.getValidPaths(req.user);
         validPaths = (validPathsRaw || []).map(p => (p ? String(p) : '')).filter(Boolean);
       }
@@ -155,7 +157,9 @@ class FaceController {
     try {
       const query = req.query || {};
       let validPaths;
-      if (req.user && !userUtil.isAdmin(req.user)) {
+      // 按归属隔离：所有用户（含管理员）都只能看到自己源目录下的照片。
+      // 不要再加 isAdmin 例外 —— 隐私设计要求超管也只看自己的。
+      if (req.user) {
         const validPathsRaw = await photoTimeLineService.getValidPaths(req.user);
         validPaths = (validPathsRaw || []).map(p => (p ? String(p) : '')).filter(Boolean);
       }
@@ -180,7 +184,9 @@ class FaceController {
     try {
       const body = req.body || {};
       let validPaths;
-      if (req.user && !userUtil.isAdmin(req.user)) {
+      // 按归属隔离：所有用户（含管理员）都只能看到自己源目录下的照片。
+      // 不要再加 isAdmin 例外 —— 隐私设计要求超管也只看自己的。
+      if (req.user) {
         const validPathsRaw = await photoTimeLineService.getValidPaths(req.user);
         validPaths = (validPathsRaw || []).map(p => (p ? String(p) : '')).filter(Boolean);
       }

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:GNasCab/modules/base/components/custom_outlined_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_outlined_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lyric/flutter_lyric.dart';
 import 'package:flutter_lyric/core/lyric_model.dart';

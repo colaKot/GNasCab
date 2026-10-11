@@ -271,13 +271,13 @@ class JaJp extends Translations {
       'api_code_file_target_is_subdirectory': '対象パスを暗号化スペース内にできません',
       'api_code_notes_notebook_not_selected': "先にノートブックフォルダーを選択してください",
       'api_code_notes_notebook_not_found': "ノートブックフォルダーが存在しないか、移動されています",
-      'api_code_notes_notebook_invalid': "選択したフォルダーは有効な GNasCab ノートブックではありません",
+      'api_code_notes_notebook_invalid': "選択したフォルダーは有効な WaterNasOS ノートブックではありません",
       'api_code_notes_notebook_folder_not_empty':
           "選択したフォルダーは空ではないため、新しいノートブックとして初期化できません",
       'api_code_notes_group_not_empty': "グループ内にまだノートがあるため、削除できません",
       'notes_notebook_choose_title': "ノートブックを選択または作成",
       'notes_notebook_choose_desc':
-          "初回起動時は、空のフォルダーまたは既存の GNasCab ノートブックフォルダーを選択してください。",
+          "初回起動時は、空のフォルダーまたは既存の WaterNasOS ノートブックフォルダーを選択してください。",
       'notes_choose_folder': "ノートブックフォルダーを選択",
       'notes_original_path_missing': "元のノートブックパスは存在しません: ",
       'notes_recent_deleted': "最近削除した項目",
@@ -651,7 +651,7 @@ class JaJp extends Translations {
           'API サービスを提供する基盤プロセス。停止するとアプリにアクセスできなくなります',
       'process.worker.expressBroadcast.name': 'API LAN ブロードキャストプロセス',
       'process.worker.expressBroadcast.purpose':
-          'クライアントが LAN 内の GNasCab サーバーを自動検出できるようにします',
+          'クライアントが LAN 内の WaterNasOS サーバーを自動検出できるようにします',
       'process.worker.ffmpegHwTest.name': 'FFmpeg ハードウェア加速検出プロセス',
       'process.worker.ffmpegHwTest.purpose':
           '現在のホストでの FFmpeg ハードウェア加速の対応状況を検出します',
@@ -773,12 +773,12 @@ class JaJp extends Translations {
       'terminal_cursor_blink': 'カーソル点滅',
       'terminal_click_to_pick_color': 'タップして色を選択',
       'service_menu_account': 'アカウント',
-      'service_menu_account_nascab': 'GNasCab アカウント',
+      'service_menu_account_nascab': 'WaterNasOS アカウント',
       'service_menu_remote_access': 'リモートアクセス',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'NAT 通過',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -807,7 +807,7 @@ class JaJp extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'リモートアクセスを有効にする',
       'service_remote_access_toggle_hint':
-          '有効にすると、リモート環境で GNasCab サービスに安全にアクセスできます。',
+          '有効にすると、リモート環境で WaterNasOS サービスに安全にアクセスできます。',
       'service_remote_access_pair_code_label': 'ペアリングコード',
       'service_remote_access_pair_code_empty': 'ペアリングコードがありません',
       'service_remote_access_custom_pair_code_title': 'カスタムペアリングコード',
@@ -841,7 +841,7 @@ class JaJp extends Translations {
       'P2P.ERR_DEVICE_NOT_BIND': 'デバイスがバインドされていません',
       'P2P_TOO_MANY_REQUESTS': 'リクエストが多すぎます。しばらくしてから再試行してください',
       'service_p2p_device_not_bind_message':
-          'この機能を使用するには、現在のデバイスをGNasCabアカウントにバインドする必要があります。不要になったらバインドを解除できます。',
+          'この機能を使用するには、現在のデバイスをWaterNasOSアカウントにバインドする必要があります。不要になったらバインドを解除できます。',
       'service_p2p_bind_device_button': 'バインド',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT': 'ペアリングコード形式が無効（6-30、英数字のみ）',
       'P2P_CUSTOM_PAIR_CODE_REPEATED_DIGITS': 'ペアリングコードは繰り返し数字にできません',
@@ -855,14 +855,14 @@ class JaJp extends Translations {
       'service_remote_access_guide_title': 'リモートアクセスガイド',
       'service_remote_access_guide_how_title': 'どのように動作しますか？',
       'service_remote_access_guide_how_body':
-          'リモートアクセスを有効にすると、GNasCab はランダムなペアリングコードを割り当てます。このコードを使用して、任意の GNasCab アプリまたはデスクトップクライアントからホストに接続できます。P2P 直接接続を優先し、P2P が利用できない場合は、最寄りのグローバルリレーノードが中継します。データは SSL + WebRTC で暗号化され、安全に送信されます。',
+          'リモートアクセスを有効にすると、WaterNasOS はランダムなペアリングコードを割り当てます。このコードを使用して、任意の WaterNasOS アプリまたはデスクトップクライアントからホストに接続できます。P2P 直接接続を優先し、P2P が利用できない場合は、最寄りのグローバルリレーノードが中継します。データは SSL + WebRTC で暗号化され、安全に送信されます。',
       'service_remote_access_guide_use_title': 'ペアリングコードの使用方法は？',
       'service_remote_access_guide_use_body':
           'アプリまたはデスクトップクライアントでサーバーを追加する際、「ペアリングコードで追加」を選択し、ペアリングコードを入力またはスキャンします。',
-      'service_nascab_title': 'GNasCab アカウント',
+      'service_nascab_title': 'WaterNasOS アカウント',
       'service_nascab_not_logged_in': 'ログインしていません',
-      'service_nascab_not_logged_in_hint': 'ログインして GNasCab リモートサービス機能を使用',
-      'service_nascab_login': 'GNasCab にログイン',
+      'service_nascab_not_logged_in_hint': 'ログインして WaterNasOS リモートサービス機能を使用',
+      'service_nascab_login': 'WaterNasOS にログイン',
       'service_nascab_logout': 'ログアウト',
       'service_nascab_switch_account': 'アカウントを切り替え',
       'service_nascab_last_login': '最終ログイン：@time',
@@ -876,7 +876,7 @@ class JaJp extends Translations {
       'service_nascab_login_cancelled': 'ログインがキャンセルされました',
       'service_nascab_app_not_supported':
           'アプリではログインに対応していません。PCまたはウェブブラウザからログインしてください。',
-      'service_nascab_login_title': 'GNasCab にログイン',
+      'service_nascab_login_title': 'WaterNasOS にログイン',
       'service_nascab_callback_success': 'ログイン成功',
       'service_nascab_callback_success_hint': 'このページを閉じてアプリに戻ることができます',
       'service_nascab_callback_failed': 'ログイン失敗',
@@ -902,8 +902,8 @@ class JaJp extends Translations {
       'service_nascab_membership_vip_diff': 'バージョン比較',
       'service_nascab_membership_my_devices': 'マイデバイス',
       'service_nascab_membership_user_center': '個人センター',
-      'service_nascab_promotion_title': 'GNasCabを紹介',
-      'service_nascab_promotion_subtitle': 'GNasCabを紹介して報酬を獲得',
+      'service_nascab_promotion_title': 'WaterNasOSを紹介',
+      'service_nascab_promotion_subtitle': 'WaterNasOSを紹介して報酬を獲得',
       'service_nascab_promotion_action': '今すぐ紹介',
 
       'service_menu_contact_us': 'お問い合わせ',
@@ -1234,6 +1234,10 @@ class JaJp extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'タイトルを検索',
       'video_list_cover_size': 'カバーサイズ',
+      'video_list_image_poster': 'ポスター',
+      'video_list_image_fanart': 'サムネイル',
+      'video_list_waterfall': 'ウォーターフォール',
+      'video_list_grid': 'グリッド',
       'filter': 'フィルター',
       'video_list_filter_years': '年',
       'video_list_filter_genres': 'ジャンル',
@@ -1467,7 +1471,7 @@ class JaJp extends Translations {
           'ソースフォルダが移動された場合、この機能を使用してインデックスを更新し、再スキャンを回避できます。再配置されたフォルダが元のフォルダと同じ構造であることを確認してください。',
       'photo_source_delete_confirm': 'ソースフォルダを削除：@path？',
       'photo_source_help_scan_when_start':
-          '有効にすると、このフォルダは GNasCab 起動時にスキャンされます。',
+          '有効にすると、このフォルダは WaterNasOS 起動時にスキャンされます。',
       'photo_source_help_scan_when_change':
           '有効にすると、フォルダ変更が自動的に検出されます。一部のプラットフォームはサポートされていません（例：Windows の Docker）。',
       'photo_source_help_scan_interval': '有効にすると、変更が自動的に間隔でスキャンされます。',
@@ -1483,7 +1487,7 @@ class JaJp extends Translations {
       'book_source_available': '利用可能',
       'book_source_unavailable': '利用不可',
       'book_source_delete_confirm': 'ソースフォルダを削除：@path？',
-      'book_source_help_scan_when_start': '有効にすると、このフォルダは GNasCab 起動時にスキャンされます。',
+      'book_source_help_scan_when_start': '有効にすると、このフォルダは WaterNasOS 起動時にスキャンされます。',
       'book_source_help_scan_when_change':
           '有効にすると、フォルダ変更が自動的に検出されます。一部のプラットフォームはサポートされていません（例：Windows の Docker）。',
       'book_source_help_scan_interval': '有効にすると、変更が自動的に間隔でスキャンされます。',
@@ -1502,7 +1506,7 @@ class JaJp extends Translations {
       'music_source_unavailable': '利用不可',
       'music_source_delete_confirm': 'ソースフォルダを削除：@path？',
       'music_source_help_scan_when_start':
-          '有効にすると、このフォルダは GNasCab 起動時にスキャンされます。',
+          '有効にすると、このフォルダは WaterNasOS 起動時にスキャンされます。',
       'music_source_help_scan_when_change':
           '有効にすると、フォルダ変更が自動的に検出されます。一部のプラットフォームはサポートされていません（例：Windows の Docker）。',
       'music_source_help_scan_interval': '有効にすると、変更が自動的に間隔でスキャンされます。',
@@ -1778,7 +1782,7 @@ class JaJp extends Translations {
       'video_source_unavailable': '利用不可',
       'video_source_delete_confirm': 'ソースフォルダを削除：@path？',
       'video_source_help_scan_when_start':
-          '有効にすると、このフォルダは GNasCab 起動時にスキャンされます。',
+          '有効にすると、このフォルダは WaterNasOS 起動時にスキャンされます。',
       'video_source_help_match_nfo': '有効にすると、TMDB から映画情報を自動スクレイピング。',
       'video_source_help_scan_when_change':
           '有効にすると、フォルダ変更が自動的に検出されます。一部のプラットフォームはサポートされていません（例：Windows の Docker）。',
@@ -1801,7 +1805,7 @@ class JaJp extends Translations {
       'server_menu_select_channel': 'チャンネルを選択',
       'server_menu_edit_pair_code': 'ペアリングコードを編集',
       'server_saved': '保存されたサーバー',
-      'server_listTitle': 'ログインする GNasCab サーバーを選択',
+      'server_listTitle': 'ログインする WaterNasOS サーバーを選択',
       'server_add': 'サーバーを追加',
       'server_localServer': 'ローカル',
       'server_scanned': 'スキャンされたサーバー',
@@ -1821,7 +1825,7 @@ class JaJp extends Translations {
       'server_add_button': 'サーバーを追加',
       'server_need_input_password_every_time': 'ログインのたびにパスワード入力が必要',
       'server_add_invalid_server':
-          'このサーバーは有効な GNasCab サーバーではありません。サーバーアドレスが正しいか確認してください',
+          'このサーバーは有効な WaterNasOS サーバーではありません。サーバーアドレスが正しいか確認してください',
       'server_connect_timeout': '接続タイムアウト、後で再試行してください',
       'server_connect_failed_with_error': '接続失敗：@error',
       'server_add_exit_title': '終了確認',
@@ -1892,7 +1896,7 @@ class JaJp extends Translations {
       'auth_login_error': 'ログイン処理中にエラーが発生しました',
       'auth_token_refresh_failure': 'トークン更新に失敗しました',
       'auth_token_refresh_error': 'トークン更新処理中にエラーが発生しました',
-      'auth_welcome_title': 'GNasCab へようこそ',
+      'auth_welcome_title': 'WaterNasOS へようこそ',
       'auth_pair_code_label': 'ペアリングコード',
       'auth_pair_code_connect': '接続',
       'auth_connected_host': '接続済みホスト：@host',
@@ -1934,7 +1938,7 @@ class JaJp extends Translations {
       'admin_create_button': '管理者を作成',
       'admin_create_success': '作成成功',
       'admin_create_success_message':
-          '管理者アカウントが作成されました。このアカウントは GNasCab サーバーに保存され、ネットアカウントではありません。必ず覚えてください。',
+          '管理者アカウントが作成されました。このアカウントは WaterNasOS サーバーに保存され、ネットアカウントではありません。必ず覚えてください。',
       'admin_create_failure': '作成失敗',
       'admin_create_username_exists': 'ユーザー名は既に存在します',
 
@@ -2024,7 +2028,7 @@ class JaJp extends Translations {
       'logout_transfer_running_title': '未完了の転送タスク',
       'logout_transfer_running_content':
           '未完了のアップロード/ダウンロードタスクがあります。ログアウトするとタスクが停止・削除されます。',
-      'home_status_restart': 'GNasCab を再起動',
+      'home_status_restart': 'WaterNasOS を再起動',
       'home_status_monitor': 'モニター',
       'home_status_message': 'メッセージ',
       'home_status_bg_tasks': 'バックグラウンドタスク',
@@ -2415,7 +2419,7 @@ class JaJp extends Translations {
       'home_apps': 'アプリケーション',
       'home_no_message': '最新のメッセージがありません',
       'monitor_click_to_view': 'クリックして詳細を表示',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'タスクセンター',
       'recycle_bin_empty': 'ゴミ箱にファイルがありません',
 
@@ -2587,7 +2591,7 @@ class JaJp extends Translations {
       'transmission_no_files': 'ファイルがありません',
       'transmission_select_all_files': 'すべて選択',
       'transmission_deselect_all_files': 'すべて解除',
-      'transmission_auto_start': 'GNasCab 起動時に自動実行',
+      'transmission_auto_start': 'WaterNasOS 起動時に自動実行',
       'transmission_dht_enabled': 'DHT を有効化',
       'transmission_pex_enabled': 'PEX を有効化',
       'transmission_utp_enabled': 'uTP を有効化',

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:GNasCab/core/api/base_api_service.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/core/api/base_api_service.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
 
 class VideoLibraryApiService extends BaseApiService {
   static VideoLibraryApiService get instance =>

@@ -6,8 +6,32 @@ class PhotoSourceService {
     this.tableName = 'photo_source';
   }
 
-  async listSources() {
-    return this.knex(this.tableName).select('*').orderBy('id', 'asc');
+  normalizeUid(uid) {
+    const n = Number(uid);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
+
+  /**
+   * 列出源目录。传 uid 只列该用户自己的；传 null/undefined 列全部（仅内部/迁移使用）
+   */
+  async listSources(uid) {
+    const query = this.knex(this.tableName).select('*').orderBy('id', 'asc');
+    if (uid !== null && uid !== undefined) {
+      query.where({ uid: this.normalizeUid(uid) });
+    }
+    return query;
+  }
+
+  /**
+   * 校验源目录归属。非属主且非管理员时抛 403
+   */
+  assertOwner(row, uid, allowAnyOwner = false) {
+    if (allowAnyOwner) return;
+    if (this.normalizeUid(uid) !== this.normalizeUid(row && row.uid)) {
+      const err = new Error('auth.PERMISSION_DENIED');
+      err.statusCode = 403;
+      throw err;
+    }
   }
 
   normalizePath(inputPath) {
@@ -30,13 +54,19 @@ class PhotoSourceService {
     return this.isParentPath(parentPath, childPath);
   }
 
-  async addSource(inputPath) {
+  async addSource(inputPath, uid) {
+    const owner = this.normalizeUid(uid);
+    if (!owner) {
+      throw new Error('validation.VALIDATION_ERROR');
+    }
+
     const normalizedPath = this.normalizePath(inputPath);
     if (!normalizedPath) {
       throw new Error('validation.VALIDATION_ERROR');
     }
 
-    const rows = await this.knex(this.tableName).select('id', 'path').orderBy('id', 'asc');
+    // 父子目录冲突只在同一用户名下判断，不同用户各加各的互不影响
+    const rows = await this.knex(this.tableName).where({ uid: owner }).select('id', 'path').orderBy('id', 'asc');
 
     const exact = rows.find(r => r.path === normalizedPath);
     if (exact) {
@@ -72,6 +102,7 @@ class PhotoSourceService {
     const row = await this.knex.transaction(async trx => {
       const [id] = await trx(this.tableName).insert({
         path: normalizedPath,
+        uid: owner,
         scan_when_start: 1,
         ctime: new Date(),
       });
@@ -81,7 +112,8 @@ class PhotoSourceService {
     return { row, action: 'insert' };
   }
 
-  async deleteSource({ id, path: inputPath }) {
+  async deleteSource({ id, path: inputPath, uid, allowAnyOwner = false }) {
+    const owner = this.normalizeUid(uid);
     const deleteById = Number(id);
     const deleteByPath = this.normalizePath(inputPath);
     const shouldDeleteById = Number.isFinite(deleteById) && deleteById > 0;
@@ -91,36 +123,45 @@ class PhotoSourceService {
     }
 
     return this.knex.transaction(async trx => {
-      const totalRow = await trx(this.tableName)
-        .count({ cnt: 'id' })
-        .first()
-        .catch(() => ({ cnt: 0 }));
-      const totalCount = Number(totalRow && totalRow.cnt ? totalRow.cnt : 0) || 0;
-
-      const target = shouldDeleteById ? await trx(this.tableName).where({ id: deleteById }).first('id', 'path') : await trx(this.tableName).where({ path: deleteByPath }).first('id', 'path');
+      const target = shouldDeleteById
+        ? await trx(this.tableName).where({ id: deleteById }).first('id', 'path', 'uid')
+        : await trx(this.tableName).where({ path: deleteByPath, uid: owner }).first('id', 'path', 'uid');
 
       if (!target || !target.id) return 0;
+
+      this.assertOwner(target, owner, allowAnyOwner);
 
       const affected = await trx(this.tableName).where({ id: target.id }).delete();
       if (!affected) return 0;
 
-      if (totalCount <= 1) {
-        await trx('photo_index')
-          .delete()
-          .catch(() => {});
-        return affected;
-      }
-
       const resolved = target.path ? String(target.path) : '';
       if (!resolved) return affected;
 
+      // 隔离后同一物理路径可能被多个用户的源目录共同覆盖：
+      // 只有「删完之后再没有任何 source 覆盖该路径」时才清理索引，避免误删别人的照片
+      const remainingRows = await trx(this.tableName).select('path').catch(() => []);
+      const remaining = (remainingRows || [])
+        .map(r => (r && r.path ? String(r.path) : ''))
+        .filter(Boolean);
+
       const scanPrefix = resolved.endsWith(path.sep) ? resolved : `${resolved}${path.sep}`;
-      await trx('photo_index')
-        .where(qb => {
-          qb.where('path', resolved).orWhere('path', 'like', `${scanPrefix}%`);
-        })
-        .delete()
-        .catch(() => {});
+      const indexQuery = trx('photo_index').where(qb => {
+        qb.where('path', resolved).orWhere('path', 'like', `${scanPrefix}%`);
+      });
+
+      if (remaining.length > 0) {
+        indexQuery.whereNot(qb => {
+          for (const keep of remaining) {
+            const keepPrefix = keep.endsWith(path.sep) ? keep : `${keep}${path.sep}`;
+            qb.orWhere(function () {
+              this.where('path', keep).orWhere('path', 'like', `${keepPrefix}%`);
+            });
+          }
+        });
+      }
+
+      await indexQuery.delete().catch(() => {});
+
       //清除来源目录本身的索引
       const parentDir = path.dirname(resolved);
       const folderName = path.basename(resolved);
@@ -134,11 +175,17 @@ class PhotoSourceService {
     });
   }
 
-  async updateSource(id, payload = {}) {
+  async updateSource(id, payload = {}, uid, allowAnyOwner = false) {
     const sourceId = Number(id);
     if (!Number.isFinite(sourceId) || sourceId <= 0) {
       throw new Error('validation.VALIDATION_ERROR');
     }
+
+    const existing = await this.knex(this.tableName).where({ id: sourceId }).first('id', 'uid');
+    if (!existing || !existing.id) {
+      throw new Error('common.NOT_FOUND');
+    }
+    this.assertOwner(existing, uid, allowAnyOwner);
 
     const data = {};
 
@@ -163,7 +210,7 @@ class PhotoSourceService {
     return row;
   }
 
-  async relocateSource(id, newPath) {
+  async relocateSource(id, newPath, uid, allowAnyOwner = false) {
     const sourceId = Number(id);
     if (!Number.isFinite(sourceId) || sourceId <= 0) {
       throw new Error('validation.VALIDATION_ERROR');
@@ -175,10 +222,12 @@ class PhotoSourceService {
     }
 
     return this.knex.transaction(async trx => {
-      const source = await trx(this.tableName).where({ id: sourceId }).first('id', 'path');
+      const source = await trx(this.tableName).where({ id: sourceId }).first('id', 'path', 'uid');
       if (!source || !source.id) {
         throw new Error('common.NOT_FOUND');
       }
+
+      this.assertOwner(source, uid, allowAnyOwner);
 
       const oldPath = source.path ? this.normalizePath(source.path) : '';
       if (!oldPath) {
@@ -189,8 +238,11 @@ class PhotoSourceService {
         return { source_id: sourceId, old_path: oldPath, new_path: normalizedNewPath, updated: 0 };
       }
 
-      const rows = await trx(this.tableName).select('id', 'path').orderBy('id', 'asc');
-      const otherRows = (rows || []).filter(r => Number(r.id) !== sourceId);
+      // 冲突只在同一用户名下判断
+      const rows = await trx(this.tableName).select('id', 'path', 'uid').orderBy('id', 'asc');
+      const otherRows = (rows || []).filter(
+        r => Number(r.id) !== sourceId && this.normalizeUid(r.uid) === this.normalizeUid(source.uid)
+      );
 
       const exact = otherRows.find(r => r.path === normalizedNewPath);
       if (exact) {
@@ -213,13 +265,30 @@ class PhotoSourceService {
 
       await trx(this.tableName).where({ id: sourceId }).update({ path: normalizedNewPath });
 
+      const oldPrefix = oldPath.endsWith(path.sep) ? oldPath : `${oldPath}${path.sep}`;
+      const newPrefix = normalizedNewPath.endsWith(path.sep) ? normalizedNewPath : `${normalizedNewPath}${path.sep}`;
+
+      // 若旧路径仍被别人的源目录覆盖，物理索引不能跟着改，否则会连带影响对方看到的照片
+      const stillCovered = await trx(this.tableName)
+        .whereNot({ id: sourceId })
+        .where(qb => qb.where('path', oldPath).orWhere('path', 'like', `${oldPrefix}%`))
+        .first('id')
+        .catch(() => null);
+      if (stillCovered && stillCovered.id) {
+        return {
+          source_id: sourceId,
+          old_path: oldPath,
+          new_path: normalizedNewPath,
+          updated: 1,
+          updated_index_paths: 0,
+          updated_root_dir_index: 0,
+        };
+      }
+
       await trx('photo_scan_task')
         .where({ scan_path: oldPath })
         .update({ scan_path: normalizedNewPath })
         .catch(() => {});
-
-      const oldPrefix = oldPath.endsWith(path.sep) ? oldPath : `${oldPath}${path.sep}`;
-      const newPrefix = normalizedNewPath.endsWith(path.sep) ? normalizedNewPath : `${normalizedNewPath}${path.sep}`;
 
       const now = Date.now();
 

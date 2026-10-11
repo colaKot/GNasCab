@@ -31,7 +31,7 @@
   "process.worker.express.name": "Dịch vụ API",
   "process.worker.express.purpose": "Tiến trình nền cung cấp API; nếu dừng thì không thể truy cập ứng dụng",
   "process.worker.expressBroadcast.name": "Phát sóng LAN API",
-  "process.worker.expressBroadcast.purpose": "Cho phép client tự phát hiện máy chủ GNasCab trong LAN",
+  "process.worker.expressBroadcast.purpose": "Cho phép client tự phát hiện máy chủ WaterNasOS trong LAN",
   "process.worker.ffmpegHwTest.name": "Kiểm tra tăng tốc FFmpeg",
   "process.worker.ffmpegHwTest.purpose": "Kiểm tra hỗ trợ tăng tốc phần cứng FFmpeg trên máy chủ",
   "process.worker.fileAllIndex.name": "Chỉ mục tệp toàn cục",

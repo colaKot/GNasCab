@@ -31,7 +31,7 @@
   "process.worker.express.name": "บริการ API",
   "process.worker.express.purpose": "โปรเซสพื้นฐานสำหรับบริการ API หากหยุดจะเข้าแอปไม่ได้",
   "process.worker.expressBroadcast.name": "กระจาย API บน LAN",
-  "process.worker.expressBroadcast.purpose": "ให้ไคลเอนต์ค้นหาเซิร์ฟเวอร์ GNasCab ใน LAN ได้อัตโนมัติ",
+  "process.worker.expressBroadcast.purpose": "ให้ไคลเอนต์ค้นหาเซิร์ฟเวอร์ WaterNasOS ใน LAN ได้อัตโนมัติ",
   "process.worker.ffmpegHwTest.name": "ตรวจสอบการเร่ง FFmpeg",
   "process.worker.ffmpegHwTest.purpose": "ตรวจสอบการรองรับการเร่งฮาร์ดแวร์ FFmpeg บนเครื่องนี้",
   "process.worker.fileAllIndex.name": "ดัชนีไฟล์ทั้งระบบ",

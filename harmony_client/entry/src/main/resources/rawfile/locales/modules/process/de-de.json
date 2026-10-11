@@ -31,7 +31,7 @@
   "process.worker.express.name": "API-Dienst",
   "process.worker.express.purpose": "Basisprozess für den API-Dienst; bei Beendigung ist die App nicht erreichbar",
   "process.worker.expressBroadcast.name": "API-LAN-Broadcast",
-  "process.worker.expressBroadcast.purpose": "Ermöglicht Clients die automatische Erkennung von GNasCab-Servern im LAN",
+  "process.worker.expressBroadcast.purpose": "Ermöglicht Clients die automatische Erkennung von WaterNasOS-Servern im LAN",
   "process.worker.ffmpegHwTest.name": "FFmpeg-Hardwarebeschleunigungstest",
   "process.worker.ffmpegHwTest.purpose": "Prüft die FFmpeg-Hardwarebeschleunigung auf diesem Host",
   "process.worker.fileAllIndex.name": "Globaler Dateiindex",

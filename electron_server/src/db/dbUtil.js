@@ -298,7 +298,7 @@ class DbUtil {
         connection: this.getConnectVideoDb(),
       },
       {
-        fileName: 'tableVideoIndex', //影音库索引表
+        fileName: 'tableVideoIndex', //影音库索引表（同时维护图片独立表 image_index）
         connection: this.getConnectVideoDb(),
       },
       {

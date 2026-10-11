@@ -113,6 +113,43 @@ class UserService {
     };
   }
 
+  /**
+   * 为新用户自动分配私有相册目录（可选）
+   *
+   * 由 config.photoUserAutoDirRoot 控制：为空则不创建。
+   * 目录形如 <root>/<username>/相册，并登记为该用户私有的相册源目录，
+   * 配合手机相册备份实现「开箱即隔离」。
+   */
+  async _ensurePhotoSourceDir(userId, username) {
+    const root = config.photoUserAutoDirRoot ? String(config.photoUserAutoDirRoot).trim() : '';
+    if (!root) return;
+
+    const uid = Number(userId);
+    if (!Number.isFinite(uid) || uid <= 0) return;
+
+    const safeName = String(username || '')
+      .trim()
+      .replace(/[\\/:*?"<>|]/g, '_');
+    if (!safeName) return;
+
+    const dirPath = path.resolve(root, safeName, '相册');
+    await fs.ensureDir(dirPath);
+
+    const knexUtil = require('../../../db/knexUtil');
+    const dbUtil = require('../../../db/dbUtil');
+    const knex = knexUtil.getInstance(dbUtil.DB_PATHS.PHOTO_DB);
+
+    const exists = await knex('photo_source').where({ path: dirPath }).first('id').catch(() => null);
+    if (exists && exists.id) return;
+
+    await knex('photo_source').insert({
+      path: dirPath,
+      uid,
+      scan_when_start: 1,
+      ctime: new Date(),
+    });
+  }
+
   async createUser(payload) {
     const { username, password, user_remark: userRemark, phone } = payload;
 
@@ -138,6 +175,10 @@ class UserService {
       is_active: true,
       create_time: new Date(),
     });
+
+    // 可选：为新用户自动分配私有相册目录（失败不影响账号创建）
+    await this._ensurePhotoSourceDir(id, username).catch(() => {});
+
     return { id, username, type: tableUser.TYPE_USER };
   }
 

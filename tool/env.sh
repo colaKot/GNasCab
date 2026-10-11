@@ -1,4 +1,4 @@
-# GNasCab dev environment for Git Bash  (source it, do not exec)
+# WaterNasOS dev environment for Git Bash  (source it, do not exec)
 #   usage:  source /g/work/nascab/tool/env.sh
 export TOOLCHAIN="/g/work/_toolchain"
 # 2026-10-08 升级到 Flutter 3.47.5（Dart 3.13.4），旧版 3.38.10 仍在
@@ -16,6 +16,6 @@ export FLUTTER_SUPPRESS_ANALYTICS=true
 
 export PATH="$FLUTTER_ROOT/bin:$PATH"
 
-echo "[GNasCab] Flutter : $FLUTTER_ROOT"
-echo "[GNasCab] JDK     : $JAVA_HOME"
-echo "[GNasCab] Android : $ANDROID_HOME"
+echo "[WaterNasOS] Flutter : $FLUTTER_ROOT"
+echo "[WaterNasOS] JDK     : $JAVA_HOME"
+echo "[WaterNasOS] Android : $ANDROID_HOME"

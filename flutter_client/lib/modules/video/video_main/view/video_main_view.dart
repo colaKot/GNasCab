@@ -1,8 +1,9 @@
-import 'package:GNasCab/modules/base/components/custom_divider.dart';
-import 'package:GNasCab/modules/video/album/view/video_album_list_view.dart';
-import 'package:GNasCab/modules/video/media_browser/view/video_media_browser_page.dart';
-import 'package:GNasCab/modules/video/smart_album/view/video_smart_album_list_view.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/base/components/custom_divider.dart';
+import 'package:WaterNasOS/modules/home/views/pc_components/pc_app_window.dart';
+import 'package:WaterNasOS/modules/video/album/view/video_album_list_view.dart';
+import 'package:WaterNasOS/modules/video/media_browser/view/video_media_browser_page.dart';
+import 'package:WaterNasOS/modules/video/smart_album/view/video_smart_album_list_view.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/video_main_controller.dart';
@@ -23,6 +24,8 @@ class VideoMainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⭐ 窗口标题栏的导航层级容器（只有 PC 虚拟窗口内才有；手机端为 null）
+    final nav = PcWindowScope.of(context)?.nav;
     return GetBuilder<VideoMainController>(
       init: VideoMainController(),
       builder: (ctrl) {
@@ -32,6 +35,12 @@ class VideoMainView extends StatelessWidget {
           final detailIndexId = ctrl.activeDetailIndexId.value;
           final subDetailIndexId = ctrl.activeSubDetailIndexId.value;
           final filterOverlay = ctrl.activeFilterOverlay.value;
+
+          // ⭐ 上报窗口导航层级（2026-10-10）：影视首页 → 三个窗口按钮；
+          // 点进二级菜单/详情页 → 标题栏只剩一个「返回」按钮。
+          // ⚠️ 必须 post-frame 上报：这里正处于 build 中，直接写会触发
+          //    `setState() called during build`（标题栏按钮是内容层的兄弟节点）。
+          _syncWindowNav(nav, context, ctrl);
 
           return Stack(
             children: [
@@ -77,6 +86,28 @@ class VideoMainView extends StatelessWidget {
         });
       },
     );
+  }
+
+  /// ⭐ 把「当前是不是二级页 + 返回动作」上报给窗口标题栏（2026-10-10）。
+  ///
+  /// 只有 PC 虚拟窗口内才有 [PcWindowNav]（[nav] 为 null 时说明在手机端 / 网页端，
+  /// 那里没有窗口标题栏，不需要上报）。
+  void _syncWindowNav(
+    PcWindowNav? nav,
+    BuildContext context,
+    VideoMainController ctrl,
+  ) {
+    if (nav == null) return;
+    final next = ctrl.isSecondaryPage
+        ? PcWindowNavState.secondary(ctrl.navigateBack)
+        : const PcWindowNavState.home();
+    if (next == nav.value) return;
+    // ⚠️ 必须在 build 结束之后再写：标题栏按钮（PcAppWindow 的 Stack 兄弟节点）
+    //    在本帧的 build 阶段被标记重建会抛 `setState() called during build`。
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!context.mounted) return;
+      nav.update(next);
+    });
   }
 
   Widget _buildRight(VideoMainController ctrl) {

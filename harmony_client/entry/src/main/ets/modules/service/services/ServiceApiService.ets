@@ -18,11 +18,11 @@ export function svcBusinessCode(res: APIResponse<Object>): string {
 }
 
 /**
- * GNasCab 账号 / P2P 远程访问 / DDNS API（对齐 Flutter NasCabAccountApiService，
+ * WaterNasOS 账号 / P2P 远程访问 / DDNS API（对齐 Flutter NasCabAccountApiService，
  * 路径与请求参数完全一致；data 均取信封 data 字段原始 JSON 对象）。
  */
 export class ServiceApiService {
-  /** 查询 GNasCab 账号信息（未绑定时 data 为空对象） */
+  /** 查询 WaterNasOS 账号信息（未绑定时 data 为空对象） */
   static query(): Promise<APIResponse<Object>> {
     return APIClient.getInstance().apiGet<Object>('/api/service/nascab/query');
   }
@@ -77,7 +77,7 @@ export class ServiceApiService {
     return APIClient.getInstance().apiPost<Object>('/api/service/nascab/p2p/nodePreference', body);
   }
 
-  /** 绑定当前设备到 GNasCab 账号（用于 P2P 远程连接） */
+  /** 绑定当前设备到 WaterNasOS 账号（用于 P2P 远程连接） */
   static bindP2pDevice(): Promise<APIResponse<Object>> {
     const body: Record<string, Object> = {};
     return APIClient.getInstance().apiPost<Object>('/api/service/nascab/p2p/bindDevice', body);

@@ -1,13 +1,13 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/base/components/custom_bordered_icon_button.dart';
-import 'package:GNasCab/modules/base/components/custom_glass_card.dart';
-import 'package:GNasCab/modules/base/components/custom_switch.dart';
-import 'package:GNasCab/utils/device_utils.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/base/components/custom_bordered_icon_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_glass_card.dart';
+import 'package:WaterNasOS/modules/base/components/custom_switch.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/modules/video/library_setting/controller/video_library_settings_controller.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/modules/video/library_setting/controller/video_library_settings_controller.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
 
 /// 「影视库」管理页：每个影视库对应左侧栏的一个栏目
 ///紧凑布局：一个库一行，横向排布图标 / 名称 / 类型 / 计数 / 操作

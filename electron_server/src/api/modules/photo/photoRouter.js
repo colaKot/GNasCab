@@ -22,13 +22,14 @@ function createFileViewHandler(sourceType, action) {
     return fileListController[action](req, res);
   };
 }
-// 来源设置
-router.post('/source/list', authenticateJWT, requireAdmin, photoSourceController.listSources);
-router.post('/source/add', authenticateJWT, requireAdmin, photoSourceController.addSource);
-router.post('/source/delete', authenticateJWT, requireAdmin, photoSourceController.deleteSource);
-router.post('/source/update/:id', authenticateJWT, requireAdmin, photoSourceController.updateSource);
-router.post('/source/relocate/:id', authenticateJWT, requireAdmin, photoSourceController.relocateSource);
-router.post('/source/scan', authenticateJWT, requireAdmin, photoSourceController.scanSource);
+// 来源设置（按 owner 隔离：用户只能管理自己添加的源目录；管理员可用 body.uid 指定他人）
+router.post('/source/list', authenticateJWT, photoSourceController.listSources);
+router.post('/source/add', authenticateJWT, photoSourceController.addSource);
+router.post('/source/delete', authenticateJWT, photoSourceController.deleteSource);
+router.post('/source/update/:id', authenticateJWT, photoSourceController.updateSource);
+router.post('/source/relocate/:id', authenticateJWT, photoSourceController.relocateSource);
+router.post('/source/scan', authenticateJWT, photoSourceController.scanSource);
+// 缩略图重建是全库级操作，仍限管理员
 router.post('/source/regenerate_thumbnails', authenticateJWT, requireAdmin, photoSourceController.regenerateThumbnails);
 //是否启用ocr
 router.post('/setAiOcrEnable', authenticateJWT, requireAdmin, photoConfigController.setAiOcrEnable);

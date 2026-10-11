@@ -68,7 +68,7 @@
   "transmission_no_files": "Không có tệp",
   "transmission_select_all_files": "Chọn tất cả",
   "transmission_deselect_all_files": "Bỏ chọn tất cả",
-  "transmission_auto_start": "Tự khởi động cùng GNasCab",
+  "transmission_auto_start": "Tự khởi động cùng WaterNasOS",
   "transmission_dht_enabled": "Bật DHT",
   "transmission_pex_enabled": "Bật PEX",
   "transmission_utp_enabled": "Bật uTP",

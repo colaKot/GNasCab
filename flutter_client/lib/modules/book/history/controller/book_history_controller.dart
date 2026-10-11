@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:GNasCab/modules/book/list/service/book_list_api_service.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
-import 'package:GNasCab/utils/toast_util.dart';
+import 'package:WaterNasOS/modules/book/list/service/book_list_api_service.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
+import 'package:WaterNasOS/utils/toast_util.dart';
 
 class BookHistoryController extends GetxController {
   final RxList<BookListItem> items = <BookListItem>[].obs;

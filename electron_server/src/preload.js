@@ -60,6 +60,17 @@ contextBridge.exposeInMainWorld('nascab', {
     ipcRenderer.on('cache:cleanComplete', handler);
     return () => ipcRenderer.removeListener('cache:cleanComplete', handler);
   },
+  // 缓存目录：自定义位置与搬迁
+  getCacheLocation: () => ipcRenderer.invoke('cacheLocation:get'),
+  chooseCacheLocation: () => ipcRenderer.invoke('cacheLocation:choose'),
+  setCacheLocation: parent => ipcRenderer.invoke('cacheLocation:set', { parent }),
+  cancelCacheLocationPending: () => ipcRenderer.invoke('cacheLocation:cancelPending'),
+  restartService: () => ipcRenderer.invoke('cacheLocation:restart'),
+  onCacheMigration: cb => {
+    const handler = (_event, data) => cb(data);
+    ipcRenderer.on('cache:migration', handler);
+    return () => ipcRenderer.removeListener('cache:migration', handler);
+  },
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -161,5 +172,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
         cb(payload.filter(l => l && l.level !== 'debug'));
       }
     });
+  },
+  // 缓存目录：自定义位置与搬迁（兼容打包前的旧渲染代码）
+  getCacheLocation: () => ipcRenderer.invoke('cacheLocation:get'),
+  chooseCacheLocation: () => ipcRenderer.invoke('cacheLocation:choose'),
+  setCacheLocation: parent => ipcRenderer.invoke('cacheLocation:set', { parent }),
+  cancelCacheLocationPending: () => ipcRenderer.invoke('cacheLocation:cancelPending'),
+  restartService: () => ipcRenderer.invoke('cacheLocation:restart'),
+  onCacheMigration: cb => {
+    const handler = (_event, data) => cb(data);
+    ipcRenderer.on('cache:migration', handler);
+    return () => ipcRenderer.removeListener('cache:migration', handler);
   },
 });

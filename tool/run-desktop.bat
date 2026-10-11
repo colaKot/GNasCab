@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  GNasCab desktop debug launcher
+REM  WaterNasOS desktop debug launcher
 REM
 REM  IMPORTANT: run this in a NORMAL cmd / PowerShell window.
 REM             Double-clicking is fine too.

@@ -1,4 +1,4 @@
-import 'package:GNasCab/utils/dimens_util.dart';
+import 'package:WaterNasOS/utils/dimens_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

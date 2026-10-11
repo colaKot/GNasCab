@@ -1,6 +1,6 @@
-# GNasCab Sync — Windows 独立同步客户端
+# WaterNasOS Sync — Windows 独立同步客户端
 
-电脑 ↔ NAS 目录同步的**独立小程序**。不依赖整套 GNasCab 客户端，装完就一个托盘图标，
+电脑 ↔ NAS 目录同步的**独立小程序**。不依赖整套 WaterNasOS 客户端，装完就一个托盘图标，
 关窗不退出，后台按需 / 定时把指定的电脑目录与 NAS 目录保持一致。
 
 产物：`NasCabSync.exe`
@@ -11,7 +11,7 @@
 
 主客户端（`flutter_client`）里已经有一个「同步」App，但它得整个客户端装起来。
 这个程序只做同步这一件事：登录 → 列任务 → 同步 → 托盘常驻，砍掉了照片、音乐、影视、文件管理
-等全部其它模块，也不需要用户理解 GNasCab 的其它能力。
+等全部其它模块，也不需要用户理解 WaterNasOS 的其它能力。
 
 ---
 
@@ -127,7 +127,7 @@ flutter run -d windows
 | `windows/runner/utils.cpp` | 窗口类名 → `NASACB_SYNC_WIN32_WINDOW` | 避免单实例激活时误找主客户端窗口 |
 | `windows/runner/utils.cpp` | 单实例消息名 → `NasCabSync_ShowExistingInstance` | 同上 |
 | `windows/runner/main.cpp` | 窗口标题 `NasCabSync`，尺寸 1000×720 | |
-| `windows/runner/Runner.rc` | 产品名 / 文件名 → GNasCab Sync | 任务管理器、属性页显示 |
+| `windows/runner/Runner.rc` | 产品名 / 文件名 → WaterNasOS Sync | 任务管理器、属性页显示 |
 | `windows/runner/resources/app_icon.ico` | 换成同步专属图标 | |
 
 ---

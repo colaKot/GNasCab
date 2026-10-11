@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">서버</string>
     <string name="server_discovered_section">발견됨</string>
@@ -350,7 +350,7 @@
     <string name="error_twofa_too_many_attempts">시도 횟수가 너무 많습니다. 나중에 다시 시도하세요</string>
     <string name="error_twofa_invalid_token">2FA 토큰이 유효하지 않습니다. 다시 로그인하세요</string>
     <string name="error_network_failed">네트워크 요청 실패</string>
-    <string name="error_not_nascab_server">GNasCab 서버가 아닙니다</string>
+    <string name="error_not_nascab_server">WaterNasOS 서버가 아닙니다</string>
     <string name="error_not_logged_in">먼저 로그인하세요</string>
     <string name="error_server_unreachable">서버에 연결할 수 없습니다. 서버 상태를 확인하세요</string>
     <string name="error_no_direct_url">사용 가능한 직접 URL이 없습니다</string>

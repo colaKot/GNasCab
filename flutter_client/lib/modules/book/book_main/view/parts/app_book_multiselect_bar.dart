@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/modules/book/list/controller/book_list_controller.dart';
+import 'package:WaterNasOS/modules/book/list/controller/book_list_controller.dart';
 
 class AppBookMultiSelectBottomBar extends StatelessWidget {
   final BookListController controller;

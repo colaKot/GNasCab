@@ -1,6 +1,6 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../base/components/custom_bordered_icon_button.dart';

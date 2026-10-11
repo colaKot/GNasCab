@@ -1,5 +1,5 @@
 @echo off
-rem Pack the GNasCab Electron server into an unpacked directory (dist_vN).
+rem Pack the WaterNasOS Electron server into an unpacked directory (dist_vN).
 rem Usage: build_server_pack.bat [dist_vN]   (default dist_v9)
 rem
 rem Why the three -c overrides (see docs/ dev quickref, section 9.8):
@@ -8,7 +8,7 @@ rem                                       without this electron-builder tries si
 rem   -c.npmRebuild=false                 postinstall @electron/rebuild only accepts VS<=2022; this box has VS2026 (18)
 rem   -c.electronDist=node_modules\electron\dist   already-unpacked electron => zero download
 rem
-rem Standalone: kill any running GNasCabServer.exe first, it locks icudtl.dat (EBUSY unlink).
+rem Standalone: kill any running WaterNasOSServer.exe first, it locks icudtl.dat (EBUSY unlink).
 rem Output goes to a log file because tool/bridge_cli.py buffers the child's stdout until exit.
 setlocal
 set OUT=%~1
@@ -17,7 +17,7 @@ set LOG=G:\work\_patch_backup\logs\server_pack.log
 set ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/
 cd /d G:\work\nascab\electron_server
 rem 第 2 个参数传 nokill 可跳过 taskkill（打「新输出目录」时不需要关掉正在跑的实例）
-if /I not "%~2"=="nokill" taskkill /F /IM GNasCabServer.exe >nul 2>&1
+if /I not "%~2"=="nokill" taskkill /F /IM WaterNasOSServer.exe >nul 2>&1
 echo ==== pack start %DATE% %TIME% out=%OUT% ==== > "%LOG%"
 "C:\Program Files\nodejs\node.exe" node_modules\electron-builder\out\cli\cli.js --win --x64 --dir -c.win.signAndEditExecutable=false -c.npmRebuild=false -c.electronDist=node_modules\electron\dist -c.directories.output=%OUT% >> "%LOG%" 2>&1
 set RC=%ERRORLEVEL%

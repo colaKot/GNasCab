@@ -286,14 +286,14 @@ class ThTh extends Translations {
       'api_code_notes_notebook_not_found':
           "ไม่พบโฟลเดอร์สมุดบันทึกหรือถูกย้ายไปแล้ว",
       'api_code_notes_notebook_invalid':
-          "โฟลเดอร์ที่เลือกไม่ใช่สมุดบันทึก GNasCab ที่ถูกต้อง",
+          "โฟลเดอร์ที่เลือกไม่ใช่สมุดบันทึก WaterNasOS ที่ถูกต้อง",
       'api_code_notes_notebook_folder_not_empty':
           "โฟลเดอร์ที่เลือกไม่ว่างและไม่สามารถเริ่มต้นเป็นสมุดบันทึกใหม่ได้",
       'api_code_notes_group_not_empty':
           "ยังมีบันทึกอยู่ในกลุ่ม จึงไม่สามารถลบได้",
       'notes_notebook_choose_title': "เลือกหรือสร้างสมุดบันทึก",
       'notes_notebook_choose_desc':
-          "เมื่อเปิดใช้งานครั้งแรก โปรดเลือกโฟลเดอร์ว่างหรือโฟลเดอร์สมุดบันทึก GNasCab ที่มีอยู่แล้ว",
+          "เมื่อเปิดใช้งานครั้งแรก โปรดเลือกโฟลเดอร์ว่างหรือโฟลเดอร์สมุดบันทึก WaterNasOS ที่มีอยู่แล้ว",
       'notes_choose_folder': "เลือกโฟลเดอร์สมุดบันทึก",
       'notes_original_path_missing': "ไม่พบพาธสมุดบันทึกเดิมแล้ว: ",
       'notes_recent_deleted': "ลบล่าสุด",
@@ -679,7 +679,7 @@ class ThTh extends Translations {
           'โปรเซสพื้นฐานสำหรับบริการ API หากหยุดจะเข้าแอปไม่ได้',
       'process.worker.expressBroadcast.name': 'กระจาย API บน LAN',
       'process.worker.expressBroadcast.purpose':
-          'ให้ไคลเอนต์ค้นหาเซิร์ฟเวอร์ GNasCab ใน LAN ได้อัตโนมัติ',
+          'ให้ไคลเอนต์ค้นหาเซิร์ฟเวอร์ WaterNasOS ใน LAN ได้อัตโนมัติ',
       'process.worker.ffmpegHwTest.name': 'ตรวจสอบการเร่ง FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
           'ตรวจสอบการรองรับการเร่งฮาร์ดแวร์ FFmpeg บนเครื่องนี้',
@@ -817,12 +817,12 @@ class ThTh extends Translations {
       'terminal_cursor_blink': 'เคอร์เซอร์กระพริบ',
       'terminal_click_to_pick_color': 'คลิกเลือกสี',
       'service_menu_account': 'บัญชี',
-      'service_menu_account_nascab': 'บัญชี GNasCab',
+      'service_menu_account_nascab': 'บัญชี WaterNasOS',
       'service_menu_remote_access': 'การเข้าถึงระยะไกล',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'อุโมงค์',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -851,7 +851,7 @@ class ThTh extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'เปิดการเข้าถึงระยะไกล',
       'service_remote_access_toggle_hint':
-          'เมื่อเปิด สามารถเข้าถึงบริการ GNasCab ของคุณอย่างปลอดภัยจากระยะไกล',
+          'เมื่อเปิด สามารถเข้าถึงบริการ WaterNasOS ของคุณอย่างปลอดภัยจากระยะไกล',
       'service_remote_access_pair_code_label': 'รหัสจับคู่',
       'service_remote_access_pair_code_empty': 'ยังไม่มีรหัสจับคู่',
       'service_remote_access_custom_pair_code_title': 'รหัสจับคู่กำหนดเอง',
@@ -886,7 +886,7 @@ class ThTh extends Translations {
       'P2P.ERR_DEVICE_NOT_BIND': 'อุปกรณ์ยังไม่ได้ผูก',
       'P2P_TOO_MANY_REQUESTS': 'คำขอมากเกินไป กรุณาลองใหม่อีกครั้งในภายหลัง',
       'service_p2p_device_not_bind_message':
-          'คุณต้องผูกอุปกรณ์ปัจจุบันกับบัญชี GNasCab ของคุณจึงจะใช้ฟีเจอร์นี้ได้ เมื่อไม่ต้องการแล้วสามารถยกเลิกการผูกได้',
+          'คุณต้องผูกอุปกรณ์ปัจจุบันกับบัญชี WaterNasOS ของคุณจึงจะใช้ฟีเจอร์นี้ได้ เมื่อไม่ต้องการแล้วสามารถยกเลิกการผูกได้',
       'service_p2p_bind_device_button': 'ผูก',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'รูปแบบรหัสจับคู่ไม่ถูกต้อง (6-30 ตัว ใช้ได้แค่ตัวอักษร/ตัวเลข)',
@@ -902,15 +902,15 @@ class ThTh extends Translations {
       'service_remote_access_guide_title': 'คำอธิบายการเข้าถึงระยะไกล',
       'service_remote_access_guide_how_title': 'ฟีเจอร์นี้ทำงานอย่างไร?',
       'service_remote_access_guide_how_body':
-          'เมื่อเปิดการเข้าถึงระยะไกล GNasCab จะมอบรหัสจับคู่แบบสุ่ม คุณสามารถใช้รหัสจับคู่เชื่อมต่อกับโฮสต์ได้จากแอป GNasCab หรือเดสก์ท็อปใดก็ได้ ใช้ P2P ตรงเป็นหลัก เมื่อ P2P ใช้ไม่ได้ จะใช้โหนดรีเลย์ทั่วโลกที่ใกล้ที่สุด ข้อมูลส่งผ่าน SSL + WebRTC อย่างปลอดภัย',
+          'เมื่อเปิดการเข้าถึงระยะไกล WaterNasOS จะมอบรหัสจับคู่แบบสุ่ม คุณสามารถใช้รหัสจับคู่เชื่อมต่อกับโฮสต์ได้จากแอป WaterNasOS หรือเดสก์ท็อปใดก็ได้ ใช้ P2P ตรงเป็นหลัก เมื่อ P2P ใช้ไม่ได้ จะใช้โหนดรีเลย์ทั่วโลกที่ใกล้ที่สุด ข้อมูลส่งผ่าน SSL + WebRTC อย่างปลอดภัย',
       'service_remote_access_guide_use_title': 'ใช้รหัสจับคู่อย่างไร?',
       'service_remote_access_guide_use_body':
           'เมื่อเพิ่มเซิร์ฟเวอร์ในแอปหรือเดสก์ท็อป เลือก "เพิ่มเซิร์ฟเวอร์ด้วยรหัสจับคู่" แล้วใส่หรือสแกนรหัสจับคู่',
-      'service_nascab_title': 'บัญชี GNasCab',
+      'service_nascab_title': 'บัญชี WaterNasOS',
       'service_nascab_not_logged_in': 'ยังไม่ได้เข้าสู่ระบบ',
       'service_nascab_not_logged_in_hint':
-          'หลังเข้าสู่ระบบจะใช้ความสามารถบริการระยะไกล GNasCab ได้',
-      'service_nascab_login': 'เข้าสู่ระบบบัญชี GNasCab',
+          'หลังเข้าสู่ระบบจะใช้ความสามารถบริการระยะไกล WaterNasOS ได้',
+      'service_nascab_login': 'เข้าสู่ระบบบัญชี WaterNasOS',
       'service_nascab_logout': 'ออกจากระบบ',
       'service_nascab_switch_account': 'สลับบัญชี',
       'service_nascab_last_login': 'เข้าสู่ระบบล่าสุด: @time',
@@ -924,7 +924,7 @@ class ThTh extends Translations {
       'service_nascab_login_cancelled': 'ยกเลิกการเข้าสู่ระบบ',
       'service_nascab_app_not_supported':
           'ไม่รองรับการเข้าสู่ระบบบนแอป กรุณาเข้าสู่ระบบผ่าน PC หรือเว็บเบราว์เซอร์',
-      'service_nascab_login_title': 'เข้าสู่ระบบบัญชี GNasCab',
+      'service_nascab_login_title': 'เข้าสู่ระบบบัญชี WaterNasOS',
       'service_nascab_callback_success': 'เข้าสู่ระบบสำเร็จ',
       'service_nascab_callback_success_hint':
           'สามารถปิดหน้านี้และกลับไปแอปเพื่อดำเนินการต่อ',
@@ -953,8 +953,8 @@ class ThTh extends Translations {
       'service_nascab_membership_vip_diff': 'เปรียบเทียบแผน',
       'service_nascab_membership_my_devices': 'อุปกรณ์ของฉัน',
       'service_nascab_membership_user_center': 'ศูนย์ผู้ใช้',
-      'service_nascab_promotion_title': 'โปรโมท GNasCab',
-      'service_nascab_promotion_subtitle': 'โปรโมท GNasCab และรับคอมมิชชัน',
+      'service_nascab_promotion_title': 'โปรโมท WaterNasOS',
+      'service_nascab_promotion_subtitle': 'โปรโมท WaterNasOS และรับคอมมิชชัน',
       'service_nascab_promotion_action': 'โปรโมทเลย',
 
       'service_menu_contact_us': 'ติดต่อเรา',
@@ -1308,6 +1308,10 @@ class ThTh extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'ค้นหาชื่อ',
       'video_list_cover_size': 'ขนาดปก',
+      'video_list_image_poster': 'โปสเตอร์',
+      'video_list_image_fanart': 'ภาพย่อ',
+      'video_list_waterfall': 'น้ำตก',
+      'video_list_grid': 'ตาราง',
       'filter': 'กรอง',
       'video_list_filter_years': 'ปี',
       'video_list_filter_genres': 'ประเภท',
@@ -1552,7 +1556,7 @@ class ThTh extends Translations {
           'ถ้าไดเรกทอรีแหล่งที่มาย้ายแล้ว ใช้ฟีเจอร์นี้อัปเดตดัชนีแทนการสแกนใหม่ ตรวจสอบว่าโฟลเดอร์ใหม่มีโครงเดียวกับเดิม',
       'photo_source_delete_confirm': 'ยืนยันลบไดเรกทอรีแหล่งที่มา: @path?',
       'photo_source_help_scan_when_start':
-          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ GNasCab เริ่ม',
+          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ WaterNasOS เริ่ม',
       'photo_source_help_scan_when_change':
           'เปิดแล้วจะตรวจจับเมื่อไดเรกทอรีเปลี่ยน บางแพลตฟอร์มไม่รองรับ (เช่น Docker บน Windows)',
       'photo_source_help_scan_interval':
@@ -1570,7 +1574,7 @@ class ThTh extends Translations {
       'book_source_unavailable': 'ไม่พร้อมใช้',
       'book_source_delete_confirm': 'ยืนยันลบไดเรกทอรีแหล่งที่มา: @path?',
       'book_source_help_scan_when_start':
-          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ GNasCab เริ่ม',
+          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ WaterNasOS เริ่ม',
       'book_source_help_scan_when_change':
           'เปิดแล้วจะตรวจจับเมื่อไดเรกทอรีเปลี่ยน บางแพลตฟอร์มไม่รองรับ',
       'book_source_help_scan_interval': 'เปิดแล้วจะสแกนการเปลี่ยนตามช่วงเวลา',
@@ -1589,7 +1593,7 @@ class ThTh extends Translations {
       'music_source_unavailable': 'ไม่พร้อมใช้',
       'music_source_delete_confirm': 'ยืนยันลบไดเรกทอรีแหล่งที่มา: @path?',
       'music_source_help_scan_when_start':
-          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ GNasCab เริ่ม',
+          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ WaterNasOS เริ่ม',
       'music_source_help_scan_when_change':
           'เปิดแล้วจะตรวจจับเมื่อไดเรกทอรีเปลี่ยน บางแพลตฟอร์มไม่รองรับ',
       'music_source_help_scan_interval': 'เปิดแล้วจะสแกนการเปลี่ยนตามช่วงเวลา',
@@ -1856,7 +1860,7 @@ class ThTh extends Translations {
       'video_source_unavailable': 'ไม่พร้อมใช้',
       'video_source_delete_confirm': 'ยืนยันลบไดเรกทอรีแหล่งที่มา: @path?',
       'video_source_help_scan_when_start':
-          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ GNasCab เริ่ม',
+          'เปิดแล้วจะสแกนไดเรกทอรีนี้เมื่อ WaterNasOS เริ่ม',
       'video_source_help_match_nfo':
           'เปิดแล้วจะขูดข้อมูลภาพยนตร์จาก TMDB อัตโนมัติ',
       'video_source_help_scan_when_change':
@@ -1899,7 +1903,7 @@ class ThTh extends Translations {
       'server_need_input_password_every_time':
           'ต้องป้อนรหัสผ่านทุกครั้งที่เข้าสู่ระบบ',
       'server_add_invalid_server':
-          'เซิร์ฟเวอร์นี้ไม่ใช่เซิร์ฟเวอร์ GNasCab ที่ถูกต้อง กรุณาตรวจสอบที่อยู่',
+          'เซิร์ฟเวอร์นี้ไม่ใช่เซิร์ฟเวอร์ WaterNasOS ที่ถูกต้อง กรุณาตรวจสอบที่อยู่',
       'server_connecting': 'กำลังเชื่อมต่อ...',
       'home_server_connecting': 'กำลังเชื่อมต่อเซิร์ฟเวอร์...',
       'server_connect_fail':
@@ -1972,7 +1976,7 @@ class ThTh extends Translations {
       'auth_login_error': 'เกิดข้อผิดพลาดระหว่างเข้าสู่ระบบ',
       'auth_token_refresh_failure': 'รีเฟรชโทเค็นไม่สำเร็จ',
       'auth_token_refresh_error': 'เกิดข้อผิดพลาดระหว่างรีเฟรชโทเค็น',
-      'auth_welcome_title': 'ยินดีต้อนรับ GNasCab',
+      'auth_welcome_title': 'ยินดีต้อนรับ WaterNasOS',
       'auth_pair_code_label': 'รหัสจับคู่',
       'auth_pair_code_connect': 'เชื่อมต่อ',
       'auth_connected_host': 'เชื่อมต่อโฮสต์: @host',
@@ -2015,7 +2019,7 @@ class ThTh extends Translations {
       'admin_create_button': 'สร้างผู้ดูแล',
       'admin_create_success': 'สร้างบัญชีผู้ดูแลสำเร็จ',
       'admin_create_success_message':
-          'สร้างสำเร็จ บัญชีนี้เก็บบนดิสก์เซิร์ฟเวอร์ GNasCab ไม่ใช่บัญชีออนไลน์ กรุณาจดจำ',
+          'สร้างสำเร็จ บัญชีนี้เก็บบนดิสก์เซิร์ฟเวอร์ WaterNasOS ไม่ใช่บัญชีออนไลน์ กรุณาจดจำ',
       'admin_create_failure': 'สร้างไม่สำเร็จ',
       'admin_create_username_exists': 'ชื่อผู้ใช้นี้มีอยู่แล้ว',
       'auth_2fa_title': 'การยืนยันสองขั้นตอน',
@@ -2105,7 +2109,7 @@ class ThTh extends Translations {
       'logout_transfer_running_title': 'งานถ่ายโอนที่ยังไม่เสร็จ',
       'logout_transfer_running_content':
           'คุณยังมีงานอัปโหลด/ดาวน์โหลดที่ยังไม่เสร็จ หลังออกจากระบบงานจะหยุดและถูกลบ',
-      'home_status_restart': 'รีสตาร์ท GNasCab',
+      'home_status_restart': 'รีสตาร์ท WaterNasOS',
       'home_status_monitor': 'มอนิเตอร์',
       'home_status_message': 'ข้อความ',
       'home_status_bg_tasks': 'งานพื้นหลัง',
@@ -2504,7 +2508,7 @@ class ThTh extends Translations {
       'home_apps': 'แอปพลิเคชัน',
       'home_no_message': 'ยังไม่มีข้อความล่าสุด',
       'monitor_click_to_view': 'คลิกดูรายละเอียด',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'ศูนย์งาน',
       'recycle_bin_empty': 'ยังไม่มีไฟล์ในถังรีไซเคิล',
       'no_messages': 'ยังไม่มีข้อความ',
@@ -2680,7 +2684,7 @@ class ThTh extends Translations {
       'transmission_no_files': 'ไม่มีไฟล์',
       'transmission_select_all_files': 'เลือกทั้งหมด',
       'transmission_deselect_all_files': 'ไม่เลือกทั้งหมด',
-      'transmission_auto_start': 'เริ่มอัตโนมัติเมื่อ GNasCab เปิด',
+      'transmission_auto_start': 'เริ่มอัตโนมัติเมื่อ WaterNasOS เปิด',
       'transmission_dht_enabled': 'เปิด DHT',
       'transmission_pex_enabled': 'เปิด PEX',
       'transmission_utp_enabled': 'เปิด uTP',

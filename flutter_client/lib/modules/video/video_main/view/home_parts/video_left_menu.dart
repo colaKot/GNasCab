@@ -1,7 +1,7 @@
-import 'package:GNasCab/core/user/current_user_controller.dart';
-import 'package:GNasCab/modules/base/components/side_menu_two_level.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
-import 'package:GNasCab/modules/video/video_main/controller/video_main_controller.dart';
+import 'package:WaterNasOS/core/user/current_user_controller.dart';
+import 'package:WaterNasOS/modules/base/components/side_menu_two_level.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/modules/video/video_main/controller/video_main_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -131,7 +131,6 @@ class VideoLeftMenu extends StatelessWidget {
         onToggleCollapse: onToggleCollapse,
         toggleExpandTooltip: 'sidebar_expand'.tr,
         toggleCollapseTooltip: 'sidebar_collapse'.tr,
-        topPlaceholderHeight: 30,
         headerTrailing: Align(
           alignment: Alignment.centerLeft,
           child: Column(

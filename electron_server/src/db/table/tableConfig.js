@@ -283,6 +283,27 @@ class tableConfig {
     const v = enabled === true ? '1' : '0';
     return await this.setConfigByKey(this.KEY_AUTO_DISCOVER_SERVER_ENABLED, v);
   }
+
+  /**
+   * 缩略图「后台全量预生成」开关。
+   *
+   * 默认 false = 按需生成：只有浏览器真的请求某张缩略图时（写入 wait_gen_tiny）
+   * 才生成，浏览时逐张出现。几十万张图绝大多数永远不会被点开，预生成纯属浪费 CPU。
+   *
+   * 设为 true 才恢复旧行为：tinyImageWorker 单并发扫全库补图。
+   */
+  async getTinyPregenEnabled() {
+    const raw = await this.getConfigByKey(this.KEY_TINY_PREGEN_ENABLED);
+    if (raw === null || raw === undefined) return false;
+    if (typeof raw === 'number') return raw === 1;
+    const s = String(raw).trim().toLowerCase();
+    return s === '1' || s === 'true' || s === 'yes' || s === 'on';
+  }
+
+  async setTinyPregenEnabled(enabled) {
+    const v = enabled === true ? '1' : '0';
+    return await this.setConfigByKey(this.KEY_TINY_PREGEN_ENABLED, v);
+  }
 }
 // 创建单例实例
 const tableConfigInstance = new tableConfig();
@@ -318,5 +339,11 @@ tableConfigInstance.KEY_APP_ACCESS_SCOPE_DIRS = 'appAccessScopeDirs';
 tableConfigInstance.KEY_APP_TERMINAL_ENABLED = 'appTerminalEnabled';
 tableConfigInstance.KEY_TRANSMISSION_CONFIG = 'transmissionConfig';
 tableConfigInstance.KEY_TRANSMISSION_TORRENT_PATHS = 'transmissionTorrentPaths';
+tableConfigInstance.KEY_TINY_PREGEN_ENABLED = 'tinyPregenEnabled';
+// 全局网络代理（影视刮削等出站元数据请求走这里配置的代理）
+tableConfigInstance.KEY_GLOBAL_PROXY_ENABLE = 'globalProxyEnable';
+tableConfigInstance.KEY_GLOBAL_PROXY_URL = 'globalProxyUrl';
+// 日本片（番号）识别兜底：普通刮削（TMDB/豆瓣/IMDb 口径）识别不到时启用
+tableConfigInstance.KEY_JAV_FALLBACK_ENABLE = 'javFallbackEnable';
 // 导出单例实例
 module.exports = tableConfigInstance;

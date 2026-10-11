@@ -20,7 +20,7 @@ Future<void> main(List<String> args) async {
     size: Size(1000, 720),
     minimumSize: Size(780, 560),
     center: true,
-    title: 'GNasCab 同步',
+    title: 'WaterNasOS 同步',
   );
   await windowManager.waitUntilReadyToShow(options, () async {
     if (!silent) {

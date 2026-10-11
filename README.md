@@ -1,19 +1,23 @@
-# GNasCab
+# WaterNasOS
 
 > **简体中文** | [English](README.en.md)
 
-GNasCab 是一款跨平台 NAS 软件，支持远程管理照片、影音、音乐、图书和文件，还支持文件分享、Transmission 下载、Docker 管理、远程终端、多端目录同步等功能。
+WaterNasOS 是一款跨平台 NAS 软件，支持远程管理照片、影音、音乐、图书和文件，并提供文件分享、Transmission 下载、Docker 管理、远程终端、多端目录同步等能力，手机、电脑、电视与网页端共用同一套服务端。
 
-官方网站：<https://nas.cab>
+## 项目来源与许可证
 
-## 本仓库改动说明
+> WaterNasOS 是基于 [NasCabOS](https://github.com/nascab/NasCabOS) 二次开发的**修改版**，依据 **GNU GPL v3.0** 发布与再分发。
+> 上游原始版权归 Beijing Yunpiao Piao Technology Co., Ltd. 所有（© 2025）；本仓库新增与修改部分的版权归 **colaKot** 所有（© 2026）。
+> 本仓库自 **2026-10** 起在原项目基础上完成下述更名、功能增删与全局调整，修改部分同样以 GPL-3.0 授权。
+> 完整许可证与原始版权声明见仓库根目录 [LICENSE](LICENSE)，未做任何删改；网络协议、设备指纹与加密数据格式保持兼容。
 
-> 本仓库是 [NasCabOS](https://github.com/nascab/NasCabOS) 的**修改版**，依据 GPL-3.0 发布。
-> 以下为相对上游的改动（变更时间：2026-10，详见提交记录）。功能类改动在前，全局性调整在后。
+## 本版本改动一览
+
+以下为本版相对上游的全部改动，按「功能」在前、「全局性调整」在后排列。
 
 ### 功能改动
 
-- **多端目录同步**：新增 Windows 独立同步客户端 `sync_client` 与共享核心包 `packages/nascab_sync_core`，PC 主客户端与独立同步端共用同一套同步引擎与传输协议；服务端新增 `/api/sync` 命名空间与`tableSyncTask`、`tableSyncRecord` 两张表。
+- **多端目录同步**：新增 Windows 独立同步客户端 `sync_client` 与共享核心包 `packages/nascab_sync_core`，PC 主客户端与独立同步端共用同一套同步引擎与传输协议；服务端新增 `/api/sync` 命名空间与 `tableSyncTask`、`tableSyncRecord` 两张表。
 - **子账号权限体系**：新增应用级访问白名单（`appAccessGuard`）与路径级细粒度权限，可按用户限定可访问目录与操作范围（`/api/user/access-policy`），详见 `docs/子账号权限方案.md`。
 - **影视库支持多库**：新增 `video_library` 实体，可分别建立电影 / 电视剧 / 图片 / 混合媒体库，每个库带独立的「在主页显示」开关；图片库与混合库另有自己的网格浏览与全屏查看页。升级时按 `media_type` 自动回填老数据。
 - **相册 / 音乐独立客户端**：新增 `photo_client` 与 `music_client`，产出 `NasCabPhoto.exe`、`NasCabMusic.exe`。两者以 path 依赖复用主客户端，**不复制任何业务代码**——`main.dart` 只有三行，设置启动模式（`AppLaunchMode.photo` / `.music`）后即直达相册或音乐，图标与窗口标题各自独立。
@@ -22,14 +26,14 @@ GNasCab 是一款跨平台 NAS 软件，支持远程管理照片、影音、音�
 
 ### 全局性调整
 
-- **项目更名**：项目名与各端显示名统一改为 **GNasCab**（Windows 服务端显示为 GNasCabServer，TV 端为 GNasCab TV）；Flutter 包名由 `NasCabOS` 改为 `GNasCab`。
+- **项目更名**：项目名与各端显示名统一改为 **WaterNasOS**（Windows 服务端显示为 WaterNasOSServer，TV 端为 WaterNasOS TV）；Flutter 包名由 `NasCabOS` 改为 `WaterNasOS`。
 - **保持兼容**：`applicationId`、iOS Bundle ID、鸿蒙 `bundleName` 等应用标识**保持不变**，已安装用户可正常覆盖升级；网络协议、设备指纹与加密数据格式均未改动。
 - **仓库精简**：不再随仓库提供第三方运行时二进制（sftpgo、openlist、ffmpeg、ffprobe、rclone、transmission）与 AI 模型（`onnx_models`）、CocoaPods 依赖树、地名库；可运行 `tool/fetch_nascab_assets.py` 从官方资源清单获取。
 - **联系与捐助**：更新为本仓库维护者的微信收款二维码与邮箱。
 
 ## 内置应用
 
-GNasCab 的每一项功能都是**独立的 App**：有自己的图标、独立页面栈和独立的服务端 API 命名空间，
+WaterNasOS 的每一项功能都是**独立的 App**：有自己的图标、独立页面栈和独立的服务端 API 命名空间，
 PC 端还可以从主窗口单独打开。默认应用列表由服务端下发（见 `electron_server/src/config/config.js`
 的 `defaultApps`），用户可在设置中隐藏或重新排序。
 
@@ -82,7 +86,7 @@ PC 端还可以从主窗口单独打开。默认应用列表由服务端下发�
 ## 运行方式
 
 服务端运行方式：
-先要将 releases 中提供的依赖库和插件（https://github.com/colaKot/GNasCab/releases）下载到本地，然后将对应平台的 libs 以及 onnx_models 解压缩后放到 electron_server 根目录下，libs 中是第三方相关插件，onnx_models 中是 ocr 相关模型文件，用于图像识别
+先要将 releases 中提供的依赖库和插件（https://github.com/colaKot/WaterNasOS/releases）下载到本地，然后将对应平台的 libs 以及 onnx_models 解压缩后放到 electron_server 根目录下，libs 中是第三方相关插件，onnx_models 中是 ocr 相关模型文件，用于图像识别
 
 ```bash
 npm i;
@@ -104,7 +108,7 @@ flutter run -d win/ios/android/mac
 
 ## 捐助支持
 
-如果 GNasCab 对您有帮助，欢迎捐助支持我们：
+如果 WaterNasOS 对您有帮助，欢迎捐助支持我们：
 
 <div align="center">
 
@@ -116,4 +120,13 @@ flutter run -d win/ios/android/mac
 
 ## 许可证
 
-本项目以 [GNU General Public License v3.0](LICENSE) 发布，版权归 Beijing Yunpiao Piao Technology Co., Ltd. 所有。
+WaterNasOS 以 [GNU General Public License v3.0](LICENSE) 发布。
+
+- 上游原始作品版权归 **Beijing Yunpiao Piao Technology Co., Ltd.** 所有（© 2025），此声明原样保留。
+- 本仓库新增与修改部分的版权归 **colaKot** 所有（© 2026）。
+- 本仓库在原作品基础上完成的修改，同样以 GPL-3.0 授权，修改日期 **2026-10**。
+- 任何再分发者均须保留上述版权声明与许可证全文，并同样以 GPL-3.0 公开源代码。
+
+## 第三方资源与致谢
+
+- [Tabler Icons](https://github.com/tabler/tabler-icons)：窗口控制按钮等界面图标（**MIT License**，© Paweł Kuna），通过 Dart 包 `tabler_icons_plus` 引入。

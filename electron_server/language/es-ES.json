@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "Tiempo de espera de red agotado",
       "NETWORK_ERROR": "Error de red",
       "REMOTE_AUTH_FAILED": "Error de autenticación remota",
-      "NASCAB_LOGIN_REQUIRED": "Debe iniciar sesión en la cuenta GNasCab para habilitar el acceso remoto",
+      "NASCAB_LOGIN_REQUIRED": "Debe iniciar sesión en la cuenta WaterNasOS para habilitar el acceso remoto",
       "NASCAB_SESSION_EXPIRED": "Su sesión ha expirado, inicie sesión de nuevo",
       "PAIR_CODE_RESET_FAILED": "Error al restablecer el código de emparejamiento",
       "USER_SERIALIZE_FAILED": "Error al serializar la información del usuario",

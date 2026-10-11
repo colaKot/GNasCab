@@ -1,5 +1,4 @@
 const path = require('path');
-const userUtil = require('../../../../utils/userUtil');
 const photoTimeLineService = require('../timeline/photoTimeLineService');
 
 /** 判断 target 是否落在 root 之下（含自身），路径分隔符对齐，避免 E:\a 误匹配 E:\ab */
@@ -31,8 +30,13 @@ class PhotoCollectionService {
     }
   }
 
-  async _getSourcePaths(knexPhoto) {
-    const sources = await knexPhoto('photo_source').select('path');
+  async _getSourcePaths(knexPhoto, user = null) {
+    const query = knexPhoto('photo_source').select('path');
+    // 按归属隔离：只认该用户自己添加的源目录
+    if (user && user.id) {
+      query.where({ uid: Number(user.id) });
+    }
+    const sources = await query;
     return (sources || []).map(s => (s && s.path ? String(s.path).trim() : '')).filter(Boolean);
   }
 
@@ -46,7 +50,7 @@ class PhotoCollectionService {
       throw err;
     }
 
-    const sourcePaths = await this._getSourcePaths(knexPhoto);
+    const sourcePaths = await this._getSourcePaths(knexPhoto, user);
     if (sourcePaths.length === 0) {
       const err = new Error('photo.PHOTO_SOURCE_LIST_EMPTY');
       err.statusCode = 400;
@@ -83,10 +87,6 @@ class PhotoCollectionService {
       const err = new Error('common.NOT_FOUND');
       err.statusCode = 404;
       throw err;
-    }
-
-    if (userUtil.isAdmin(user)) {
-      return { collection, role: 'admin' };
     }
 
     if (Number(collection.uid) !== Number(uid)) {

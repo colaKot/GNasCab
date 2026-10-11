@@ -27,6 +27,15 @@ class VideoItemCoverImage extends StatelessWidget {
   final String typeText;
   final bool hovered;
 
+  /// ⭐ 图片填充方式（2026-10-10）。
+  ///
+  /// 竖版封面用 `cover`（裁切填满，视觉饱满）；
+  /// **横版缩略图必须用 `contain`** —— 实际库里混着 16:9 横屏和 9:16 竖屏视频
+  /// （实测采样 2015 条：横屏 ~67%、竖屏 ~16%、其余 3:4 / 2:1 等），
+  /// 只要用固定比例的框去 `cover`，总有一大批图被裁掉一大块。
+  /// `contain` 保证图完整，代价是比例不匹配时四周留白（用底色垫）。
+  final BoxFit fit;
+
   const VideoItemCoverImage({
     super.key,
     required this.imageUrl,
@@ -34,6 +43,7 @@ class VideoItemCoverImage extends StatelessWidget {
     required this.rating,
     required this.typeText,
     required this.hovered,
+    this.fit = BoxFit.cover,
   });
 
   @override
@@ -52,6 +62,9 @@ class VideoItemCoverImage extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
+            // contain 时四周会留白，先垫一层底色，免得露出卡片外的背景显脏
+            if (fit == BoxFit.contain)
+              ColoredBox(color: theme.colorScheme.surfaceContainerHighest),
             if (imageUrl.isNotEmpty)
               AnimatedScale(
                 scale: scale,
@@ -59,7 +72,7 @@ class VideoItemCoverImage extends StatelessWidget {
                 curve: Curves.easeOutCubic,
                 child: CustomExtendedImage(
                   imageUrl: imageUrl,
-                  fit: BoxFit.cover,
+                  fit: fit,
                   showLoading: false,
                   borderRadius: borderRadius,
                 ),

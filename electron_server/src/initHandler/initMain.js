@@ -14,8 +14,36 @@ try {
 } catch (e) {}
 
 module.exports = {
+  /**
+   * 缓存目录搬迁（若配置了新的缓存目录）。
+   * 必须在任何 worker / Express worker 启动之前执行：此时服务尚未对外提供 API，
+   * 客户端连不上，等价于「搬迁期间不能操作」，不会出现「边写缓存边搬」的竞争。
+   * 中途关闭服务后，下次启动会根据落盘状态自动接着搬（按文件大小比对跳过已完成的）。
+   */
+  async runCacheMigrationIfNeeded() {
+    try {
+      const cacheMigrator = require('../utils/cacheMigrator');
+      const res = await cacheMigrator.runStartupMigration();
+      if (res && res.ok && res.cachePath) {
+        // 搬迁成功后 PATH_CACHE 已在 migrator 内更新，同步到实例属性
+        // （worker 启动时读取 this.pathCache 作为环境变量）
+        process.env.PATH_CACHE = res.cachePath;
+        this.pathCache = res.cachePath;
+        Logger.info('✅ 缓存目录已就绪', { cachePath: res.cachePath });
+      } else if (res && !res.ok) {
+        Logger.error('❌ 缓存目录搬迁失败，继续使用原缓存目录启动', { error: res.error });
+      }
+    } catch (err) {
+      Logger.error('❌ 缓存目录搬迁异常，继续使用原缓存目录启动', err);
+    }
+  },
+
   async init() {
     Logger.debug('🚀 初始化主进程');
+
+    // ① 先处理缓存目录搬迁（早于一切 worker / Express worker 的启动）
+    await this.runCacheMigrationIfNeeded();
+
     const remoteAssets = require('../utils/remoteAssetsManager');
     if (remoteAssets.shouldUseRemoteAssets()) {
       Logger.info('[remoteAssets] startup sync before AI workers');
@@ -164,6 +192,6 @@ module.exports = {
     for (let i = 0; i < expressApiCount; i++) {
       this.startOneExpressWorker(freeHttpPort, freeHttpsPort, serverId, jwtSecret);
     }
-    Logger.info(`🎯 Started ${expressApiCount} GNasCab API worker(s)`);
+    Logger.info(`🎯 Started ${expressApiCount} WaterNasOS API worker(s)`);
   },
 };

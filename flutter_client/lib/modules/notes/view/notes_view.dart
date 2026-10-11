@@ -1,15 +1,15 @@
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/modules/notes/controller/notes_controller.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_editor_pane.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_layout.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_mobile_view.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_notebook_chooser.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_note_list.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_sidebar.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_view_utils.dart';
-import 'package:GNasCab/modules/base/components/custom_glass_card.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
-import 'package:GNasCab/utils/server_version_util.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/modules/notes/controller/notes_controller.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_editor_pane.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_layout.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_mobile_view.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_notebook_chooser.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_note_list.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_sidebar.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_view_utils.dart';
+import 'package:WaterNasOS/modules/base/components/custom_glass_card.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
+import 'package:WaterNasOS/utils/server_version_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -282,14 +282,14 @@ class ArAr extends Translations {
       'api_code_notes_notebook_not_found':
           "مجلد دفتر الملاحظات غير موجود أو تم نقله",
       'api_code_notes_notebook_invalid':
-          "المجلد المحدد ليس دفتر ملاحظات GNasCab صالحًا",
+          "المجلد المحدد ليس دفتر ملاحظات WaterNasOS صالحًا",
       'api_code_notes_notebook_folder_not_empty':
           "المجلد المحدد غير فارغ ولا يمكن تهيئته كدفتر ملاحظات جديد",
       'api_code_notes_group_not_empty':
           "لا تزال هناك ملاحظات داخل المجموعة ولا يمكن حذفها",
       'notes_notebook_choose_title': "اختر أو أنشئ دفتر ملاحظات",
       'notes_notebook_choose_desc':
-          "عند الفتح لأول مرة، يرجى اختيار مجلد فارغ أو مجلد دفتر ملاحظات GNasCab موجود.",
+          "عند الفتح لأول مرة، يرجى اختيار مجلد فارغ أو مجلد دفتر ملاحظات WaterNasOS موجود.",
       'notes_choose_folder': "اختر مجلد دفتر الملاحظات",
       'notes_original_path_missing':
           "لم يعد مسار دفتر الملاحظات الأصلي موجودًا: ",
@@ -712,7 +712,7 @@ class ArAr extends Translations {
           'عملية أساسية توفر خدمة API؛ عند إيقافها لا يمكن الوصول إلى التطبيق',
       'process.worker.expressBroadcast.name': 'بث LAN للـ API',
       'process.worker.expressBroadcast.purpose':
-          'يتيح للعملاء اكتشاف خوادم GNasCab على الشبكة المحلية',
+          'يتيح للعملاء اكتشاف خوادم WaterNasOS على الشبكة المحلية',
       'process.worker.ffmpegHwTest.name': 'فحص تسريع FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
           'يفحص دعم تسريع الأجهزة لـ FFmpeg على هذا المضيف',
@@ -853,12 +853,12 @@ class ArAr extends Translations {
       'terminal_cursor_blink': 'وميض المؤشر',
       'terminal_click_to_pick_color': 'اضغط لاختيار اللون',
       'service_menu_account': 'الحساب',
-      'service_menu_account_nascab': 'حساب GNasCab',
+      'service_menu_account_nascab': 'حساب WaterNasOS',
       'service_menu_remote_access': 'الوصول عن بُعد',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'اختراق NAT',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -887,7 +887,7 @@ class ArAr extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'تفعيل الوصول عن بُعد',
       'service_remote_access_toggle_hint':
-          'بمجرد التفعيل، يمكن الوصول إلى خدمة GNasCab الخاصة بك بشكل آمن في بيئة بعيدة.',
+          'بمجرد التفعيل، يمكن الوصول إلى خدمة WaterNasOS الخاصة بك بشكل آمن في بيئة بعيدة.',
       'service_remote_access_pair_code_label': 'رمز الاقتران',
       'service_remote_access_pair_code_empty': 'لا يوجد رمز اقتران',
       'service_remote_access_custom_pair_code_title': 'رمز اقتران مخصص',
@@ -922,7 +922,7 @@ class ArAr extends Translations {
       'P2P_TOO_MANY_REQUESTS':
           'طلبات كثيرة جدًا. يرجى المحاولة مرة أخرى لاحقًا.',
       'service_p2p_device_not_bind_message':
-          'تحتاج إلى ربط الجهاز الحالي بحساب GNasCab لاستخدام هذه الميزة. يمكنك إلغاء الربط عندما لا تحتاجها بعد الآن.',
+          'تحتاج إلى ربط الجهاز الحالي بحساب WaterNasOS لاستخدام هذه الميزة. يمكنك إلغاء الربط عندما لا تحتاجها بعد الآن.',
       'service_p2p_bind_device_button': 'ربط',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'تنسيق رمز الاقتران غير صالح (6-30، أحرف/أرقام فقط)',
@@ -941,15 +941,15 @@ class ArAr extends Translations {
       'service_remote_access_guide_title': 'دليل الوصول عن بُعد',
       'service_remote_access_guide_how_title': 'كيف يعمل؟',
       'service_remote_access_guide_how_body':
-          'بعد تفعيل الوصول عن بُعد، يعين GNasCab رمز اقتران عشوائي. به، يمكنك الاتصال بالمضيف من أي تطبيق GNasCab أو عميل سطح مكتب. يفضل الاتصال المباشر P2P؛ إذا لم يكن P2P متاحًا، سيتم استخدام عقدة ترحيل عالمية قريبة. يتم نقل البيانات بشكل آمن عبر SSL + WebRTC.',
+          'بعد تفعيل الوصول عن بُعد، يعين WaterNasOS رمز اقتران عشوائي. به، يمكنك الاتصال بالمضيف من أي تطبيق WaterNasOS أو عميل سطح مكتب. يفضل الاتصال المباشر P2P؛ إذا لم يكن P2P متاحًا، سيتم استخدام عقدة ترحيل عالمية قريبة. يتم نقل البيانات بشكل آمن عبر SSL + WebRTC.',
       'service_remote_access_guide_use_title': 'كيفية استخدام رمز الاقتران؟',
       'service_remote_access_guide_use_body':
           'عند إضافة خادم في التطبيق أو عميل سطح المكتب، اختر "إضافة برمز الاقتران"، ثم أدخل أو امسح رمز الاقتران.',
-      'service_nascab_title': 'حساب GNasCab',
+      'service_nascab_title': 'حساب WaterNasOS',
       'service_nascab_not_logged_in': 'غير مسجل الدخول',
       'service_nascab_not_logged_in_hint':
-          'سجل الدخول لاستخدام ميزات خدمة GNasCab البعيدة',
-      'service_nascab_login': 'تسجيل الدخول إلى GNasCab',
+          'سجل الدخول لاستخدام ميزات خدمة WaterNasOS البعيدة',
+      'service_nascab_login': 'تسجيل الدخول إلى WaterNasOS',
       'service_nascab_logout': 'تسجيل الخروج',
       'service_nascab_switch_account': 'تبديل الحساب',
       'service_nascab_last_login': 'آخر تسجيل دخول: @time',
@@ -963,7 +963,7 @@ class ArAr extends Translations {
       'service_nascab_login_cancelled': 'تم إلغاء تسجيل الدخول',
       'service_nascab_app_not_supported':
           'تسجيل الدخول غير مدعوم على التطبيق. يرجى تسجيل الدخول عبر الحاسوب أو المتصفح.',
-      'service_nascab_login_title': 'تسجيل الدخول إلى GNasCab',
+      'service_nascab_login_title': 'تسجيل الدخول إلى WaterNasOS',
       'service_nascab_callback_success': 'تم تسجيل الدخول بنجاح',
       'service_nascab_callback_success_hint':
           'يمكنك إغلاق هذه الصفحة والعودة إلى التطبيق',
@@ -992,8 +992,8 @@ class ArAr extends Translations {
       'service_nascab_membership_vip_diff': 'مقارنة الخطط',
       'service_nascab_membership_my_devices': 'أجهزتي',
       'service_nascab_membership_user_center': 'المركز الشخصي',
-      'service_nascab_promotion_title': 'الترويج لـ GNasCab',
-      'service_nascab_promotion_subtitle': 'روّج لـ GNasCab واحصل على عمولة',
+      'service_nascab_promotion_title': 'الترويج لـ WaterNasOS',
+      'service_nascab_promotion_subtitle': 'روّج لـ WaterNasOS واحصل على عمولة',
       'service_nascab_promotion_action': 'الترويج الآن',
 
       'service_menu_contact_us': 'اتصل بنا',
@@ -1340,6 +1340,10 @@ class ArAr extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'بحث في العنوان',
       'video_list_cover_size': 'حجم الغلاف',
+      'video_list_image_poster': 'ملصق',
+      'video_list_image_fanart': 'صورة مصغرة',
+      'video_list_waterfall': 'شلال',
+      'video_list_grid': 'شبكة',
       'filter': 'تصفية',
       'video_list_filter_years': 'سنة',
       'video_list_filter_genres': 'أنواع',
@@ -1540,7 +1544,7 @@ class ArAr extends Translations {
           'إذا تم نقل مجلد المصدر، يمكنك استخدام هذه الميزة لتحديث الفهارس لتجنب إعادة الفحص. يرجى التأكد من أن المجلد المعاد تحديده له نفس الهيكل مثل المجلد الأصلي.',
       'photo_source_delete_confirm': 'حذف مجلد المصدر: @path؟',
       'photo_source_help_scan_when_start':
-          'عند التفعيل، سيتم فحص هذا المجلد عند بدء GNasCab.',
+          'عند التفعيل، سيتم فحص هذا المجلد عند بدء WaterNasOS.',
       'photo_source_help_scan_when_change':
           'عند التفعيل، سيتم اكتشاف تغييرات المجلد تلقائيًا. بعض المنصات غير مدعومة (مثل Docker على Windows).',
       'photo_source_help_scan_interval':
@@ -1558,7 +1562,7 @@ class ArAr extends Translations {
       'book_source_unavailable': 'غير متاح',
       'book_source_delete_confirm': 'حذف مجلد المصدر: @path؟',
       'book_source_help_scan_when_start':
-          'عند التفعيل، سيتم فحص هذا المجلد عند بدء GNasCab.',
+          'عند التفعيل، سيتم فحص هذا المجلد عند بدء WaterNasOS.',
       'book_source_help_scan_when_change':
           'عند التفعيل، سيتم اكتشاف تغييرات المجلد تلقائيًا. بعض المنصات غير مدعومة (مثل Docker على Windows).',
       'book_source_help_scan_interval':
@@ -1578,7 +1582,7 @@ class ArAr extends Translations {
       'music_source_unavailable': 'غير متاح',
       'music_source_delete_confirm': 'حذف مجلد المصدر: @path؟',
       'music_source_help_scan_when_start':
-          'عند التفعيل، سيتم فحص هذا المجلد عند بدء GNasCab.',
+          'عند التفعيل، سيتم فحص هذا المجلد عند بدء WaterNasOS.',
       'music_source_help_scan_when_change':
           'عند التفعيل، سيتم اكتشاف تغييرات المجلد تلقائيًا. بعض المنصات غير مدعومة (مثل Docker على Windows).',
       'music_source_help_scan_interval':
@@ -1848,7 +1852,7 @@ class ArAr extends Translations {
       'video_source_unavailable': 'غير متاح',
       'video_source_delete_confirm': 'حذف مجلد المصدر: @path؟',
       'video_source_help_scan_when_start':
-          'عند التفعيل، سيتم فحص هذا المجلد عند بدء GNasCab.',
+          'عند التفعيل، سيتم فحص هذا المجلد عند بدء WaterNasOS.',
       'video_source_help_match_nfo':
           'عند التفعيل، سيتم كشط معلومات الفيلم تلقائيًا من TMDB.',
       'video_source_help_scan_when_change':
@@ -1871,7 +1875,7 @@ class ArAr extends Translations {
       'server_menu_select_channel': 'تحديد قناة',
       'server_menu_edit_pair_code': 'تحرير رمز الاقتران',
       'server_saved': 'خوادم محفوظة',
-      'server_listTitle': 'حدد خادم GNasCab لتسجيل الدخول',
+      'server_listTitle': 'حدد خادم WaterNasOS لتسجيل الدخول',
       'server_add': 'إضافة خادم',
       'server_localServer': 'محلي',
       'server_scanned': 'خادم تم فحصه',
@@ -1892,7 +1896,7 @@ class ArAr extends Translations {
       'server_need_input_password_every_time':
           'يلزم إدخال كلمة المرور في كل مرة تسجيل دخول',
       'server_add_invalid_server':
-          'هذا الخادم ليس خادم GNasCab صالحًا، يرجى التحقق مما إذا كان عنوان الخادم صحيحًا',
+          'هذا الخادم ليس خادم WaterNasOS صالحًا، يرجى التحقق مما إذا كان عنوان الخادم صحيحًا',
       'server_connect_timeout':
           'انتهاء مهلة الاتصال، يرجى إعادة المحاولة لاحقًا',
       'server_connect_failed_with_error': 'فشل الاتصال: @error',
@@ -1910,7 +1914,7 @@ class ArAr extends Translations {
       'server_pair_code_how_link': 'كيفية الحصول على رمز اقتران؟',
       'server_pair_code_how_title': 'كيفية الحصول على رمز اقتران؟',
       'server_pair_code_how_content':
-          'فعله على GNasCab: الخدمة -> الوصول عن بُعد. بعد ذلك يمكنك الحصول على رمز الاقتران. رمز الاقتران يسمح لك بالوصول إلى المضيف من أي مكان.',
+          'فعله على WaterNasOS: الخدمة -> الوصول عن بُعد. بعد ذلك يمكنك الحصول على رمز الاقتران. رمز الاقتران يسمح لك بالوصول إلى المضيف من أي مكان.',
       'server_pair_code_scan_qr': 'مسح QR',
       'server_pair_code_scan_invalid': 'رمز اقتران غير صالح',
       'server_edit_pair_code_title': 'تحرير رمز الاقتران',
@@ -1964,7 +1968,7 @@ class ArAr extends Translations {
       'auth_login_error': 'حدث خطأ أثناء عملية تسجيل الدخول',
       'auth_token_refresh_failure': 'فشل تحديث الرمز المميز',
       'auth_token_refresh_error': 'حدث خطأ أثناء عملية تحديث الرمز المميز',
-      'auth_welcome_title': 'مرحبًا بك في GNasCab',
+      'auth_welcome_title': 'مرحبًا بك في WaterNasOS',
       'auth_pair_code_label': 'رمز الاقتران',
       'auth_pair_code_connect': 'اتصال',
       'auth_connected_host': 'المضيف المتصل: @host',
@@ -2099,7 +2103,7 @@ class ArAr extends Translations {
       'logout_transfer_running_title': 'مهام نقل غير منتهية',
       'logout_transfer_running_content':
           'لا يزال لديك مهام تحميل/تنزيل غير منتهية. سيؤدي تسجيل الخروج إلى إيقافها وإزالتها.',
-      'home_status_restart': 'إعادة تشغيل GNasCab',
+      'home_status_restart': 'إعادة تشغيل WaterNasOS',
       'home_status_monitor': 'مراقب',
       'home_status_message': 'رسائل',
       'home_status_bg_tasks': 'مهام الخلفية',
@@ -2498,7 +2502,7 @@ class ArAr extends Translations {
       'home_apps': 'تطبيقات',
       'home_no_message': 'لا توجد رسالة أحدث',
       'monitor_click_to_view': 'انقر لعرض التفاصيل',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'مركز المهام',
       'recycle_bin_empty': 'لا توجد ملفات في سلة المحذوفات',
       'no_messages': 'لا توجد رسائل',
@@ -2689,7 +2693,7 @@ class ArAr extends Translations {
       'transmission_no_files': 'لا توجد ملفات',
       'transmission_select_all_files': 'تحديد الكل',
       'transmission_deselect_all_files': 'إلغاء تحديد الكل',
-      'transmission_auto_start': 'التشغيل التلقائي مع GNasCab',
+      'transmission_auto_start': 'التشغيل التلقائي مع WaterNasOS',
       'transmission_dht_enabled': 'تفعيل DHT',
       'transmission_pex_enabled': 'تفعيل PEX',
       'transmission_utp_enabled': 'تفعيل uTP',

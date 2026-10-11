@@ -25,7 +25,7 @@ class HomeView extends StatelessWidget {
                 errorBuilder: (_, __, ___) => const Icon(Icons.sync, size: 20),
               ),
               const SizedBox(width: 10),
-              const Text('GNasCab 同步'),
+              const Text('WaterNasOS 同步'),
               const SizedBox(width: 12),
               if (ctrl.tasks.isNotEmpty)
                 Text(

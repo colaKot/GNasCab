@@ -1,4 +1,4 @@
-import 'package:GNasCab/modules/notes/controller/notes_controller.dart';
+import 'package:WaterNasOS/modules/notes/controller/notes_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

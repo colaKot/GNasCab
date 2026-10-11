@@ -57,6 +57,8 @@ router.post('/home/data', authenticateJWT, videoHomeController.getHomeData);
 
 router.post('/list', authenticateJWT, videoListController.list);
 router.post('/list/count', authenticateJWT, videoListController.count);
+// 图片库 / 混合库的文件夹层级（只列直接子文件夹；图片库浏览页用）
+router.post('/image/folders', authenticateJWT, videoListController.imageFolders);
 router.post('/history/list', authenticateJWT, videoListController.historyList);
 router.post('/history/clear', authenticateJWT, videoListController.clearHistory);
 

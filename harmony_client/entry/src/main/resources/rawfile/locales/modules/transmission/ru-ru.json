@@ -68,7 +68,7 @@
   "transmission_no_files": "Нет файлов",
   "transmission_select_all_files": "Выбрать все",
   "transmission_deselect_all_files": "Снять выбор",
-  "transmission_auto_start": "Автозапуск с GNasCab",
+  "transmission_auto_start": "Автозапуск с WaterNasOS",
   "transmission_dht_enabled": "Включить DHT",
   "transmission_pex_enabled": "Включить PEX",
   "transmission_utp_enabled": "Включить uTP",

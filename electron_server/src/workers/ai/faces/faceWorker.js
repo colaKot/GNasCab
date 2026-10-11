@@ -398,7 +398,7 @@ class FaceWorker {
     let imagePath = fullPath;
     if (type === 2) {
       try {
-        imagePath = await fileService.getTinyImgByPath(fullPath, undefined, { deferSlowIo: false });
+        imagePath = await fileService.getTinyImgByPath(fullPath, undefined, { deferSlowIo: false, deferImages: false });
       } catch (err) {
         Logger.error(`❌  video thumbnail failed: ${fullPath}`, err);
         await this.markIndexDone(id);

@@ -74,7 +74,7 @@ class AddEditServerGuidedFragment : GuidedStepSupportFragment() {
             "onCreate: seeded vars name='${serverName.trim()}' url='${serverUrl.trim()}' pair=${pairCode.trim().isNotEmpty()} user='${maskUser(username)}' passLen=${password.length} requireEvery=$requirePasswordEveryLogin",
         )
 
-        if (serverName.trim().isEmpty()) serverName = "GNasCabServer"
+        if (serverName.trim().isEmpty()) serverName = "WaterNasOSServer"
         if (mode == Mode.AddDirect) {
             if (serverUrl.trim().isEmpty()) {
                 serverUrl = if (isDebuggable()) "http://192.168.31.100:9000" else "http://"
@@ -368,7 +368,7 @@ class AddEditServerGuidedFragment : GuidedStepSupportFragment() {
             serverId = serverId,
             serverUrl = url,
             userInputUrl = url,
-            serverName = serverName.trim().ifEmpty { "GNasCabServer" },
+            serverName = serverName.trim().ifEmpty { "WaterNasOSServer" },
             serverHost = host,
             serverPortHttp = if (httpPort.isNotEmpty()) httpPort else port,
             serverPortHttps = httpsPort,
@@ -430,7 +430,7 @@ class AddEditServerGuidedFragment : GuidedStepSupportFragment() {
                     serverId = data["serverId"]?.toString().orEmpty(),
                     serverUrl = "",
                     userInputUrl = "",
-                    serverName = serverName.trim().ifEmpty { "GNasCabServer" },
+                    serverName = serverName.trim().ifEmpty { "WaterNasOSServer" },
                     serverHost = "",
                     serverPortHttp = normalizePortValue(data["httpPort"]),
                     serverPortHttps = normalizePortValue(data["httpsPort"]),
@@ -517,8 +517,8 @@ class AddEditServerGuidedFragment : GuidedStepSupportFragment() {
     private fun applyDefaultsForAddIfNeeded() {
         if (existing == null) {
             val name = serverName.trim()
-            if (name.isEmpty() || name == "GNasCab") {
-                serverName = "GNasCabServer"
+            if (name.isEmpty() || name == "WaterNasOS") {
+                serverName = "WaterNasOSServer"
             }
             if (mode == Mode.AddDirect) {
                 val url = serverUrl.trim()
@@ -527,7 +527,7 @@ class AddEditServerGuidedFragment : GuidedStepSupportFragment() {
                 }
             }
         } else if (serverName.trim().isEmpty()) {
-            serverName = "GNasCabServer"
+            serverName = "WaterNasOSServer"
         }
     }
 

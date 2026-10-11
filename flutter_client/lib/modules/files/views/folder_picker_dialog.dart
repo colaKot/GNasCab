@@ -1,5 +1,5 @@
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/modules/base/components/custom_divider.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/modules/base/components/custom_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';

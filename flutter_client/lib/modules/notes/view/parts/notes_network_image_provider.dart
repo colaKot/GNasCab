@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui' show Codec, ImmutableBuffer;
 
-import 'package:GNasCab/modules/base/components/custom_extended_image.dart';
+import 'package:WaterNasOS/modules/base/components/custom_extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 

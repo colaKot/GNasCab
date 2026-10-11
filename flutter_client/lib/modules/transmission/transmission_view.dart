@@ -150,7 +150,9 @@ class _TransmissionSidebar extends StatelessWidget {
     final customColors = theme.extension<CustomColors>();
     return Obx(() {
       final tab = controller.currentTab.value;
-      return Container(
+      // ⭐ 左栏底色补画到窗口标题栏左侧（见 PcLeftRailTopExtend）；
+      //    顶部那截 40 的占位删掉 —— 框架已统一让位，留着会双倍留白。
+      return PcLeftRailTopExtend(
         width: 180,
         decoration: BoxDecoration(
           color: customColors?.mainContentBgColor,
@@ -160,7 +162,6 @@ class _TransmissionSidebar extends StatelessWidget {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 40),
             _SidebarItem(
               icon: Icons.dashboard_outlined,
               label: 'transmission_tab_overview'.tr,

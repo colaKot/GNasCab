@@ -18,7 +18,8 @@ class _SyncLeftMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
+    // ⭐ 左栏底色补画到窗口标题栏左侧（框架已把内容层整体下移，见 PcLeftRailTopExtend）
+    return PcLeftRailTopExtend(
       color: theme.cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

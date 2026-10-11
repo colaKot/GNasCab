@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "Yêu cầu mạng hết thời gian chờ",
       "NETWORK_ERROR": "Yêu cầu mạng thất bại",
       "REMOTE_AUTH_FAILED": "Xác thực từ xa thất bại",
-      "NASCAB_LOGIN_REQUIRED": "Vui lòng đăng nhập GNasCab trước khi bật truy cập từ xa",
+      "NASCAB_LOGIN_REQUIRED": "Vui lòng đăng nhập WaterNasOS trước khi bật truy cập từ xa",
       "NASCAB_SESSION_EXPIRED": "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại.",
       "PAIR_CODE_RESET_FAILED": "Không thể đặt lại mã ghép nối",
       "USER_SERIALIZE_FAILED": "Không thể tuần tự hóa thông tin người dùng",

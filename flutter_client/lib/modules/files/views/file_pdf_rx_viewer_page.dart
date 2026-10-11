@@ -8,7 +8,7 @@ import 'package:pdfrx/pdfrx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:GNasCab/modules/book/reader_comic/service/book_comic_reader_api_service.dart';
+import 'package:WaterNasOS/modules/book/reader_comic/service/book_comic_reader_api_service.dart';
 
 /// 使用 pdfrx 打开远程 PDF（URL 已含鉴权参数）。
 ///

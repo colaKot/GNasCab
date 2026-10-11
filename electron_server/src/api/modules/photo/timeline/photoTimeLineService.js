@@ -95,52 +95,24 @@ class PhotoTimeLineService {
   }
 
   /**
-   * 获取用户有权限的路径列表 来源路径和被授权路径的交集 管理员返回所有来源路径
+   * 获取用户可见的照片来源路径（按归属隔离）
+   *
+   * 规则：只返回「归属该用户自己」的源目录，无任何角色例外 ——
+   * 管理员同样看不到别人的照片（刻意的隐私设计，不要加 isAdmin 分支）。
    * @param {Object} user 用户对象
    * @returns {Promise<string[]>} 路径列表
    */
   async getValidPaths(user) {
     const knex = this.getKnex();
-    const uid = user.id;
+    const uid = user && user.id ? Number(user.id) : 0;
+    if (!Number.isFinite(uid) || uid <= 0) return [];
 
-    // 1. 获取所有照片源
-    const sources = await knex('photo_source').select('path');
-    const sourcePaths = sources.map(s => s.path);
-
-    // 如果是管理员，拥有所有权限
-    if (userUtil.isAdmin(user)) {
-      return sourcePaths;
-    }
-
-    // 2. 获取用户权限目录
-    const mainKnex = knexUtil.getInstance(dbUtil.DB_PATHS.MAIN_DB);
-    const permissions = await mainKnex('user_permission')
-      .where({
-        uid: uid,
-        action: 'view', // 假设 'view' 是查看权限
-        res_type: 'file',
-      })
-      .select('res_path');
-
-    const permissionPaths = permissions.map(p => p.res_path);
-
-    // 3. 计算交集
-    // 用户的权限路径必须在照片源路径之下，或者照片源路径在用户权限路径之下
-    const validPaths = [];
-
-    for (const pPath of permissionPaths) {
-      for (const sPath of sourcePaths) {
-        if (pPath.startsWith(sPath) || sPath.startsWith(pPath)) {
-          // 取更长（更具体）的那个路径作为限制
-          // 例如 source: /A, perm: /A/B -> valid: /A/B
-          // 例如 source: /A/B, perm: /A -> valid: /A/B
-          validPaths.push(pPath.length > sPath.length ? pPath : sPath);
-        }
-      }
-    }
-
-    // 去重
-    return [...new Set(validPaths)];
+    const sources = await knex('photo_source').where({ uid }).select('path').catch(() => []);
+    return [
+      ...new Set(
+        (sources || []).map(s => (s && s.path ? String(s.path).trim() : '')).filter(Boolean)
+      ),
+    ];
   }
 
   async getValidPathsByParams(params, user) {

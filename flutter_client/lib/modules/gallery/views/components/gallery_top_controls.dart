@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import '../../../base/components/custom_icon_button.dart';
 import '../../../home/views/pc_components/pc_app_window.dart';
 import '../../controllers/custom_gallery_controller.dart';

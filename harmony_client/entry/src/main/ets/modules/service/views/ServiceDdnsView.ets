@@ -287,7 +287,7 @@ export struct ServiceDdnsView {
           SymbolGlyph($r('sys.symbol.icloud_slash'))
             .fontSize(24)
             .fontColor([AppTheme.withAlpha(this.palette().primary, 0.9)])
-          Text(L10n.t('service_p2p_device_not_bind_message', '当前设备尚未绑定到您的 GNasCab 账号，绑定后即可使用 DDNS 功能'))
+          Text(L10n.t('service_p2p_device_not_bind_message', '当前设备尚未绑定到您的 WaterNasOS 账号，绑定后即可使用 DDNS 功能'))
             .fontSize(14)
             .fontColor(this.palette().onSurface)
             .lineHeight(20)

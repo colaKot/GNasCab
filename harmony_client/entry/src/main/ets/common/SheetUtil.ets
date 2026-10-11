@@ -58,11 +58,11 @@ export class SheetUtil {
         }
       };
       SheetUtil.prompt().openCustomDialog(content, options).catch((e: Object): void => {
-        hilog.error(DOMAIN, 'GNasCab', 'openCustomSheet failed: %{public}s', JSON.stringify(e));
+        hilog.error(DOMAIN, 'WaterNasOS', 'openCustomSheet failed: %{public}s', JSON.stringify(e));
         closeOnce();
       });
     } catch (e) {
-      hilog.error(DOMAIN, 'GNasCab', 'present sheet failed: %{public}s', JSON.stringify(e));
+      hilog.error(DOMAIN, 'WaterNasOS', 'present sheet failed: %{public}s', JSON.stringify(e));
       closeOnce();
     }
   }

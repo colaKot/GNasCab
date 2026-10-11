@@ -168,21 +168,29 @@ function main() {
         ipcMain.handle('mac:getFullDiskAccessStatus', async () => fullDiskAccessStatus);
       } catch (_) {}
 
-      await initUtil.init();
-
+      // ① 先创建主窗口并接上状态推送：
+      //    缓存目录搬迁可能要搬很久，窗口必须提前出现，用户才能看到搬迁进度，
+      //    否则会以为程序卡死（搬迁期间服务不对外提供 API）。
       mainWindow = await createMainWindow();
+      let pushUpdaterInstance = null;
       if (mainWindow) {
-        try {
-          initUtil.initTray(mainWindow);
-        } catch (_) {}
-        const pushUpdaterInstance = startPushUpdater(mainWindow, () => initUtil.getExpressStatus(), Logger);
+        pushUpdaterInstance = startPushUpdater(mainWindow, () => initUtil.getExpressStatus(), Logger);
         if (pushUpdaterInstance && typeof pushUpdaterInstance.pushStatusNow === 'function') {
           initUtil.setOnExpressStartedCallback(pushUpdaterInstance.pushStatusNow);
-          // 打包场景：API 常在 createMainWindow 之前就绪，等页面加载完成后再推送一次当前状态，确保界面能刷出「已启动」
           mainWindow.webContents.once('did-finish-load', () => {
             if (!mainWindow.isDestroyed()) pushUpdaterInstance.pushStatusNow();
           });
         }
+      }
+
+      // ② 初始化主进程：内部会先完成缓存目录搬迁，再拉起 API worker
+      await initUtil.init();
+
+      // ③ 托盘、自动更新、启动选项等（依赖数据库，必须在 init 之后）
+      if (mainWindow) {
+        try {
+          initUtil.initTray(mainWindow);
+        } catch (_) {}
         try {
           setupAutoUpdate(mainWindow, Logger);
         } catch (e) {
@@ -208,6 +216,10 @@ function main() {
           if (minimizeFlag === 'true') {
             mainWindow.minimize();
           }
+        } catch (_) {}
+        // 搬迁/启动完成后立即刷新一次界面：缓存目录与端口可能已变化
+        try {
+          if (pushUpdaterInstance && !mainWindow.isDestroyed()) pushUpdaterInstance.pushStatusNow();
         } catch (_) {}
       }
     });

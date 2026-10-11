@@ -1,5 +1,5 @@
-import 'package:GNasCab/modules/video/base/views/app_video_list_scaffold.dart';
-import 'package:GNasCab/modules/video/list/controller/video_list_controller.dart';
+import 'package:WaterNasOS/modules/video/base/views/app_video_list_scaffold.dart';
+import 'package:WaterNasOS/modules/video/list/controller/video_list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

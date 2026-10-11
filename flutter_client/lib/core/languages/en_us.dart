@@ -291,14 +291,14 @@ class EnUs extends Translations {
       'api_code_notes_notebook_not_found':
           'The notebook folder does not exist or has been moved',
       'api_code_notes_notebook_invalid':
-          'The selected folder is not a valid GNasCab notebook',
+          'The selected folder is not a valid WaterNasOS notebook',
       'api_code_notes_notebook_folder_not_empty':
           'The selected folder is not empty and cannot be initialized as a new notebook',
       'api_code_notes_group_not_empty':
           'The group still contains notes and cannot be deleted',
       'notes_notebook_choose_title': 'Choose or create a notebook',
       'notes_notebook_choose_desc':
-          'On first open, choose an empty folder or an existing GNasCab notebook folder.',
+          'On first open, choose an empty folder or an existing WaterNasOS notebook folder.',
       'notes_choose_folder': 'Choose notebook folder',
       'notes_original_path_missing':
           'Original notebook path no longer exists: ',
@@ -737,7 +737,7 @@ class EnUs extends Translations {
           'Core process providing API service; app becomes inaccessible if it stops',
       'process.worker.expressBroadcast.name': 'API LAN Broadcast Worker',
       'process.worker.expressBroadcast.purpose':
-          'Allows clients to auto-discover GNasCab servers in LAN',
+          'Allows clients to auto-discover WaterNasOS servers in LAN',
       'process.worker.ffmpegHwTest.name': 'FFMPEG HW Acceleration Test Worker',
       'process.worker.ffmpegHwTest.purpose':
           'Detects FFMPEG hardware acceleration support on current host',
@@ -880,12 +880,12 @@ class EnUs extends Translations {
       'terminal_cursor_blink': 'Cursor blink',
       'terminal_click_to_pick_color': 'Tap to pick color',
       'service_menu_account': 'Account',
-      'service_menu_account_nascab': 'GNasCab Account',
+      'service_menu_account_nascab': 'WaterNasOS Account',
       'service_menu_remote_access': 'Remote Access',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'NAT Traversal',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -915,7 +915,7 @@ class EnUs extends Translations {
       'DDNS_TYPE_REQUIRED': 'Please select DDNS type (IPv4 or IPv6) first',
       'service_remote_access_toggle': 'Enable remote access',
       'service_remote_access_toggle_hint':
-          'Once enabled, your GNasCab service can be securely accessed in a remote environment.',
+          'Once enabled, your WaterNasOS service can be securely accessed in a remote environment.',
       'service_remote_access_pair_code_label': 'Pair code',
       'service_remote_access_pair_code_empty': 'No pair code',
       'service_remote_access_custom_pair_code_title': 'Custom pair code',
@@ -950,7 +950,7 @@ class EnUs extends Translations {
       'P2P.ERR_DEVICE_NOT_BIND': 'Device not bound',
       'P2P_TOO_MANY_REQUESTS': 'Too many requests, please try again later',
       'service_p2p_device_not_bind_message':
-          'You need to bind the current device to your GNasCab account before you can use this feature. You can unbind it when you no longer need it.',
+          'You need to bind the current device to your WaterNasOS account before you can use this feature. You can unbind it when you no longer need it.',
       'service_p2p_bind_device_button': 'Bind',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Invalid pair code format (6-30, letters/numbers only)',
@@ -969,15 +969,15 @@ class EnUs extends Translations {
       'service_remote_access_guide_title': 'Remote access guide',
       'service_remote_access_guide_how_title': 'How does it work?',
       'service_remote_access_guide_how_body':
-          'After enabling remote access, GNasCab assigns a random pair code. With it, you can connect to your host from any GNasCab app or desktop client. It prefers P2P direct connection; if P2P is unavailable, a nearby global relay node will be used. Data is transmitted securely via SSL + WebRTC.',
+          'After enabling remote access, WaterNasOS assigns a random pair code. With it, you can connect to your host from any WaterNasOS app or desktop client. It prefers P2P direct connection; if P2P is unavailable, a nearby global relay node will be used. Data is transmitted securely via SSL + WebRTC.',
       'service_remote_access_guide_use_title': 'How to use the pair code?',
       'service_remote_access_guide_use_body':
           'When adding a server in the app or desktop client, choose “Add with pair code”, then enter or scan the pair code.',
-      'service_nascab_title': 'GNasCab Account',
+      'service_nascab_title': 'WaterNasOS Account',
       'service_nascab_not_logged_in': 'Not logged in',
       'service_nascab_not_logged_in_hint':
-          'Sign in to use GNasCab remote service features',
-      'service_nascab_login': 'Sign in to GNasCab',
+          'Sign in to use WaterNasOS remote service features',
+      'service_nascab_login': 'Sign in to WaterNasOS',
       'service_nascab_logout': 'Sign out',
       'service_nascab_switch_account': 'Switch account',
       'service_nascab_last_login': 'Last login: @time',
@@ -991,7 +991,7 @@ class EnUs extends Translations {
       'service_nascab_login_cancelled': 'Sign-in cancelled',
       'service_nascab_app_not_supported':
           'Login is not supported on the app. Please use PC or web to sign in.',
-      'service_nascab_login_title': 'Sign in to GNasCab',
+      'service_nascab_login_title': 'Sign in to WaterNasOS',
       'service_nascab_callback_success': 'Sign-in successful',
       'service_nascab_callback_success_hint':
           'You can close this page and return to the app',
@@ -1020,9 +1020,9 @@ class EnUs extends Translations {
       'service_nascab_membership_vip_diff': 'Plan comparison',
       'service_nascab_membership_my_devices': 'My devices',
       'service_nascab_membership_user_center': 'User center',
-      'service_nascab_promotion_title': 'Promote GNasCab',
+      'service_nascab_promotion_title': 'Promote WaterNasOS',
       'service_nascab_promotion_subtitle':
-          'Promote GNasCab and earn commission',
+          'Promote WaterNasOS and earn commission',
       'service_nascab_promotion_action': 'Promote now',
 
       'service_menu_contact_us': 'Contact Us',
@@ -1372,6 +1372,10 @@ class EnUs extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Search title',
       'video_list_cover_size': 'Cover size',
+      'video_list_image_poster': 'Poster',
+      'video_list_image_fanart': 'Thumbnail',
+      'video_list_waterfall': 'Waterfall',
+      'video_list_grid': 'Grid',
       'filter': 'Filter',
       'video_list_filter_years': 'Year',
       'video_list_filter_genres': 'Genres',
@@ -1575,7 +1579,7 @@ class EnUs extends Translations {
           'If your source folder has been moved, you can use this feature to update indexes to avoid rescanning. Please ensure the relocated folder has the same structure as the original one.',
       'photo_source_delete_confirm': 'Delete source folder: @path?',
       'photo_source_help_scan_when_start':
-          'When enabled, this folder will be scanned when GNasCab starts.',
+          'When enabled, this folder will be scanned when WaterNasOS starts.',
       'photo_source_help_scan_when_change':
           'When enabled, folder changes will be detected automatically. Some platforms are not supported (e.g. Docker on Windows).',
       'photo_source_help_scan_interval':
@@ -1593,7 +1597,7 @@ class EnUs extends Translations {
       'book_source_unavailable': 'Unavailable',
       'book_source_delete_confirm': 'Delete source folder: @path?',
       'book_source_help_scan_when_start':
-          'When enabled, this folder will be scanned when GNasCab starts.',
+          'When enabled, this folder will be scanned when WaterNasOS starts.',
       'book_source_help_scan_when_change':
           'When enabled, folder changes will be detected automatically. Some platforms are not supported (e.g. Docker on Windows).',
       'book_source_help_scan_interval':
@@ -1613,7 +1617,7 @@ class EnUs extends Translations {
       'music_source_unavailable': 'Unavailable',
       'music_source_delete_confirm': 'Delete source folder: @path?',
       'music_source_help_scan_when_start':
-          'When enabled, this folder will be scanned when GNasCab starts.',
+          'When enabled, this folder will be scanned when WaterNasOS starts.',
       'music_source_help_scan_when_change':
           'When enabled, folder changes will be detected automatically. Some platforms are not supported (e.g. Docker on Windows).',
       'music_source_help_scan_interval':
@@ -1894,7 +1898,7 @@ class EnUs extends Translations {
       'video_source_unavailable': 'Unavailable',
       'video_source_delete_confirm': 'Delete source folder: @path?',
       'video_source_help_scan_when_start':
-          'When enabled, this folder will be scanned when GNasCab starts.',
+          'When enabled, this folder will be scanned when WaterNasOS starts.',
       'video_source_help_match_nfo':
           'When enabled, auto scrape movie info from TMDB.',
       'video_source_help_scan_when_change':
@@ -1919,7 +1923,7 @@ class EnUs extends Translations {
       'server_menu_select_channel': 'Select Channel',
       'server_menu_edit_pair_code': 'Edit Pair Code',
       'server_saved': 'Saved servers',
-      'server_listTitle': 'Select GNasCab server to login',
+      'server_listTitle': 'Select WaterNasOS server to login',
       'server_add': 'Add Server',
       'server_localServer': 'Local',
       'server_scanned': 'Scanned server',
@@ -1940,7 +1944,7 @@ class EnUs extends Translations {
       'server_need_input_password_every_time':
           'Require password on every login',
       'server_add_invalid_server':
-          'This server is not a valid GNasCab server, please check if the server address is correct',
+          'This server is not a valid WaterNasOS server, please check if the server address is correct',
       'server_connect_timeout': 'Connection timeout, please retry later',
       'server_connect_failed_with_error': 'Connection failed: @error',
       'server_add_exit_title': 'Exit Confirmation',
@@ -1956,7 +1960,7 @@ class EnUs extends Translations {
       'server_pair_code_how_link': 'How to get a pair code?',
       'server_pair_code_how_title': 'How to get a pair code?',
       'server_pair_code_how_content':
-          'Enable it on GNasCab: Service -> Remote Access. Then you can get the pair code. Pair code lets you reach your host anywhere.',
+          'Enable it on WaterNasOS: Service -> Remote Access. Then you can get the pair code. Pair code lets you reach your host anywhere.',
       'server_pair_code_scan_qr': 'Scan QR',
       'server_pair_code_scan_invalid': 'Invalid pair code',
       'server_edit_pair_code_title': 'Edit Pair Code',
@@ -2014,7 +2018,7 @@ class EnUs extends Translations {
       'auth_login_error': 'Error occurred during login process',
       'auth_token_refresh_failure': 'Token refresh failed',
       'auth_token_refresh_error': 'Error occurred during token refresh process',
-      'auth_welcome_title': 'Welcome to GNasCab',
+      'auth_welcome_title': 'Welcome to WaterNasOS',
       'auth_pair_code_label': 'Pair code',
       'auth_pair_code_connect': 'Connect',
       'auth_connected_host': 'Connected host: @host',
@@ -2160,7 +2164,7 @@ class EnUs extends Translations {
       'logout_transfer_running_title': 'Unfinished Transfer Tasks',
       'logout_transfer_running_content':
           'You still have unfinished uploads, downloads, photo backup, or local backup. Logging out stops these transfers and removes transfer-center tasks.',
-      'home_status_restart': 'Restart GNasCab',
+      'home_status_restart': 'Restart WaterNasOS',
       'home_status_monitor': 'Monitor',
       'home_status_message': 'Messages',
       'home_status_bg_tasks': 'Background Tasks',
@@ -2569,7 +2573,7 @@ class EnUs extends Translations {
       'home_apps': 'Applications',
       'home_no_message': 'No latest message',
       'monitor_click_to_view': 'Click to view details',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Task Center',
       'recycle_bin_empty': 'No files in recycle bin',
       'app_help_docker': 'Manage Docker images, containers, tasks on the host',
@@ -2730,7 +2734,7 @@ class EnUs extends Translations {
       'transmission_no_files': 'No files',
       'transmission_select_all_files': 'Select all',
       'transmission_deselect_all_files': 'Deselect all',
-      'transmission_auto_start': 'Auto start with GNasCab',
+      'transmission_auto_start': 'Auto start with WaterNasOS',
       'transmission_dht_enabled': 'Enable DHT',
       'transmission_pex_enabled': 'Enable PEX',
       'transmission_utp_enabled': 'Enable uTP',

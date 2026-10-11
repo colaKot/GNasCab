@@ -1,4 +1,4 @@
-; NSIS Installer Custom Script for GNasCabServer
+; NSIS Installer Custom Script for WaterNasOSServer
 ; 自定义安装脚本
 ; 
 ; 注意：NSIS 会自动检测系统语言并选择合适的语言

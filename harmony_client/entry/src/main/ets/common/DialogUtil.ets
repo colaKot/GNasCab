@@ -527,11 +527,11 @@ export class DialogUtil {
         }
       };
       DialogUtil.prompt().openCustomDialog(content, options).catch((e: Object): void => {
-        hilog.error(DOMAIN, 'GNasCab', 'openCustomDialog failed: %{public}s', JSON.stringify(e));
+        hilog.error(DOMAIN, 'WaterNasOS', 'openCustomDialog failed: %{public}s', JSON.stringify(e));
         finish(undefined);
       });
     } catch (e) {
-      hilog.error(DOMAIN, 'GNasCab', 'present dialog failed: %{public}s', JSON.stringify(e));
+      hilog.error(DOMAIN, 'WaterNasOS', 'present dialog failed: %{public}s', JSON.stringify(e));
       finish(undefined);
     }
   }
@@ -571,7 +571,7 @@ export class DialogUtil {
       };
       await DialogUtil.prompt().openCustomDialog(content, options);
     } catch (e) {
-      hilog.error(DOMAIN, 'GNasCab', 'showLoading failed: %{public}s', JSON.stringify(e));
+      hilog.error(DOMAIN, 'WaterNasOS', 'showLoading failed: %{public}s', JSON.stringify(e));
       DialogUtil.loadingOpen = false;
       DialogUtil.loadingContent = undefined;
     }

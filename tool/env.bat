@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  GNasCab dev environment (project-local, NOT written to system env)
+REM  WaterNasOS dev environment (project-local, NOT written to system env)
 REM  Usage:  call G:\work\nascab\tool\env.bat
 REM ============================================================
 set "TOOLCHAIN=G:\work\_toolchain"
@@ -19,7 +19,7 @@ set "FLUTTER_SUPPRESS_ANALYTICS=true"
 
 set "PATH=%FLUTTER_ROOT%\bin;%JAVA_HOME%\bin;%ANDROID_HOME%\platform-tools;%PATH%"
 
-echo [GNasCab] Flutter : %FLUTTER_ROOT%
-echo [GNasCab] Dart    : %FLUTTER_ROOT%\bin\cache\dart-sdk
-echo [GNasCab] JDK     : %JAVA_HOME%
-echo [GNasCab] Android : %ANDROID_HOME%
+echo [WaterNasOS] Flutter : %FLUTTER_ROOT%
+echo [WaterNasOS] Dart    : %FLUTTER_ROOT%\bin\cache\dart-sdk
+echo [WaterNasOS] JDK     : %JAVA_HOME%
+echo [WaterNasOS] Android : %ANDROID_HOME%

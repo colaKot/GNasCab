@@ -9,7 +9,7 @@ import { formatLastLoginText, formatMembershipTime, isMembershipExpired } from '
 import { svcRecord, svcStr } from '../models/ServiceModels';
 
 /**
- * GNasCab 账号视图（对齐 Flutter NasCabAccountView）：
+ * WaterNasOS 账号视图（对齐 Flutter NasCabAccountView）：
  * 错误提示卡 + 登录态卡（头像/账号名/ID 复制/上次登录/退出与切换）+ 会员信息卡（购买/续费、我的设备等）。
  * showTitle=false 时由外层页签标题栏承载标题（对齐 Flutter 移动端 IndexedStack 用法）。
  */
@@ -47,7 +47,7 @@ export struct ServiceAccountView {
       Scroll() {
         Column({ space: 12 }) {
           if (this.showTitle) {
-            Text(L10n.t('service_nascab_title', 'GNasCab 账号'))
+            Text(L10n.t('service_nascab_title', 'WaterNasOS 账号'))
               .fontSize(24)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.palette().onSurface)
@@ -125,14 +125,14 @@ export struct ServiceAccountView {
         .fontWeight(FontWeight.Medium)
         .fontColor(this.palette().onSurface)
         .width('100%')
-      Text(L10n.t('service_nascab_not_logged_in_hint', '登录后可使用 GNasCab 远程服务能力'))
+      Text(L10n.t('service_nascab_not_logged_in_hint', '登录后可使用 WaterNasOS 远程服务能力'))
         .fontSize(14)
         .fontColor(this.palette().subText)
         .width('100%')
       Row() {
         ServiceFilledButton({
           icon: $r('sys.symbol.entrance_and_exit'),
-          label: L10n.t('service_nascab_login', '登录 GNasCab 账号'),
+          label: L10n.t('service_nascab_login', '登录 WaterNasOS 账号'),
           onTap: (): void => {
             void this.ctrl.login();
           }

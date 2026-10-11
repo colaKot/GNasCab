@@ -68,7 +68,7 @@
   "transmission_no_files": "Tidak ada file",
   "transmission_select_all_files": "Pilih semua",
   "transmission_deselect_all_files": "Batalkan semua",
-  "transmission_auto_start": "Mulai otomatis dengan GNasCab",
+  "transmission_auto_start": "Mulai otomatis dengan WaterNasOS",
   "transmission_dht_enabled": "Aktifkan DHT",
   "transmission_pex_enabled": "Aktifkan PEX",
   "transmission_utp_enabled": "Aktifkan uTP",

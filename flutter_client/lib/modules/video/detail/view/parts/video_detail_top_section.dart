@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:GNasCab/modules/video/base/beans/video_item_bean.dart';
+import 'package:WaterNasOS/modules/video/base/beans/video_item_bean.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

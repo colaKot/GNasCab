@@ -179,7 +179,7 @@ class AuthApiService extends BaseApiService {
     );
   }
 
-  /// 检查服务器状态并判断是否为GNasCab服务器
+  /// 检查服务器状态并判断是否为WaterNasOS服务器
   Future<ServerStatusResponse> checkServerStatus(
     bool showLoading, {
     Duration timeout = const Duration(seconds: 5),

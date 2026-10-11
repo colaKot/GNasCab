@@ -94,7 +94,7 @@ final class ServerListViewModel: ObservableObject {
             serverId: serverId,
             serverUrl: serverUrl,
             userInputUrl: nil,
-            serverName: "GNasCabServer",
+            serverName: "WaterNasOSServer",
             serverHost: host,
             serverPortHttp: String(port),
             serverPortHttps: httpsPort,
@@ -427,7 +427,7 @@ final class ServerListViewModel: ObservableObject {
                 serverId: serverId,
                 serverUrl: "",              // 不展示服务器地址，由 P2P 通道负责
                 userInputUrl: nil,
-                serverName: preferred?.serverName ?? "GNasCabServer",
+                serverName: preferred?.serverName ?? "WaterNasOSServer",
                 serverHost: "",
                 serverPortHttp: (status.serverData?["httpPort"] as? String) ?? "",
                 serverPortHttps: (status.serverData?["httpsPort"] as? String) ?? "",

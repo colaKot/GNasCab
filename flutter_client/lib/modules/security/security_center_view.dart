@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../base/components.dart';
@@ -125,7 +125,6 @@ class _LeftMenu extends StatelessWidget {
       onToggleCollapse: onToggleCollapse,
       toggleExpandTooltip: 'sidebar_expand'.tr,
       toggleCollapseTooltip: 'sidebar_collapse'.tr,
-      topPlaceholderHeight: 45,
     );
   }
 }

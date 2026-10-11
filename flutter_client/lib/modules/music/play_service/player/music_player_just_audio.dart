@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:GNasCab/utils/local_web_asset_server.dart';
+import 'package:WaterNasOS/utils/local_web_asset_server.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 

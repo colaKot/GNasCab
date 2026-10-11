@@ -358,7 +358,7 @@ class UserController {
       const user = await req.dbMain('user').where({ id: uid }).first();
       if (!user) return ResponseUtil.error(req, res, 'auth.USER_NOT_FOUND', 400);
 
-      const issuer = req.body && req.body.issuer ? String(req.body.issuer) : 'GNasCab';
+      const issuer = req.body && req.body.issuer ? String(req.body.issuer) : 'WaterNasOS';
       const accountName = req.body && req.body.accountName ? String(req.body.accountName) : String(user.username || uid);
 
       const service = new TwoFAService(req.dbMain);

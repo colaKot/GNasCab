@@ -180,7 +180,7 @@ async function refreshNasCabTokens(knex, tableConfig, apiConfig) {
   const data = json && json.data ? json.data : null;
   const accessToken = data && (data.accessToken || data.token) ? String(data.accessToken || data.token) : '';
   const nextRefreshToken = data && data.refreshToken ? String(data.refreshToken) : '';
-  // console.log('GNasCab账号登录状态刷新', data);
+  // console.log('WaterNasOS账号登录状态刷新', data);
   if (status === 200 && code === 0 && accessToken && nextRefreshToken) {
     try {
       await knex.transaction(async trx => {

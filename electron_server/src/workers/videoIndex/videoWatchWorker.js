@@ -26,6 +26,9 @@ class VideoWatchWorker {
     this.watchpack = null;
     this.watchedRoots = [];
     this.sourceMediaTypeByRoot = new Map();
+    // root -> { libType, libraryId, sourceId }：图片要写进独立的 image_index，
+    // 需要 library_id / source_id 才能做等值过滤，不再靠路径前缀匹配。
+    this.sourceInfoByRoot = new Map();
     this.pendingChangedPaths = new Set();
     this.pendingRemovedPaths = new Set();
     this.flushTimer = null;
@@ -66,11 +69,12 @@ class VideoWatchWorker {
   async getWatchedSourcePaths() {
     const rows = await this.knex('video_source as s')
       .leftJoin('video_library as l', 'l.id', 's.library_id')
-      .select('s.path', 's.media_type', 'l.lib_type')
+      .select('s.id', 's.path', 's.media_type', 's.library_id', 'l.lib_type')
       .where({ 's.scan_when_change': 1 })
       .catch(() => []);
 
     this.sourceMediaTypeByRoot.clear();
+    this.sourceInfoByRoot.clear();
     const unique = new Set();
     for (const r of rows || []) {
       const p = r && r.path ? String(r.path) : '';
@@ -82,6 +86,11 @@ class VideoWatchWorker {
       const fallback = ['movie', 'tv', 'image', 'mixed'].includes(mt) ? mt : 'movie';
       const libType = ['movie', 'tv', 'image', 'mixed'].includes(rawLibType) ? rawLibType : fallback;
       this.sourceMediaTypeByRoot.set(resolved, libType);
+      this.sourceInfoByRoot.set(resolved, {
+        libType,
+        libraryId: Number(r && r.library_id) || 0,
+        sourceId: Number(r && r.id) || 0,
+      });
     }
 
     const res = [];
@@ -158,6 +167,19 @@ class VideoWatchWorker {
     if (!root) return 'movie';
     // 统一以来源所属影视库的 lib_type 为准（movie/tv/image/mixed）
     return this.sourceMediaTypeByRoot.get(root) || 'movie';
+  }
+
+  // 图片入库需要 library_id / source_id（image_index 用 library_id 等值过滤）
+  getSourceInfoForPath(targetPath) {
+    const root = this.getMatchedRootForPath(targetPath);
+    if (!root) return { libType: 'movie', libraryId: 0, sourceId: 0 };
+    const info = this.sourceInfoByRoot.get(root);
+    if (info) return info;
+    return {
+      libType: this.sourceMediaTypeByRoot.get(root) || 'movie',
+      libraryId: 0,
+      sourceId: 0,
+    };
   }
 
   closeWatchpack() {
@@ -256,6 +278,11 @@ class VideoWatchWorker {
       .where({ path: dirPath, filename, is_file: 1 })
       .delete()
       .catch(() => {});
+    // 图片走独立表 image_index（用唯一索引 (path, filename) 命中，O(log n)）
+    await this.knex('image_index')
+      .where({ path: dirPath, filename })
+      .delete()
+      .catch(() => {});
   }
 
   async deleteDirectoryIndexes(dirPath) {
@@ -264,6 +291,14 @@ class VideoWatchWorker {
     const scanPrefix = resolved.endsWith(path.sep) ? resolved : `${resolved}${path.sep}`;
 
     await this.knex('video_index')
+      .where(qb => {
+        qb.where('path', resolved).orWhere('path', 'like', `${scanPrefix}%`);
+      })
+      .delete()
+      .catch(() => {});
+
+    // 图片子树（相册/图包的子目录）一并清理
+    await this.knex('image_index')
       .where(qb => {
         qb.where('path', resolved).orWhere('path', 'like', `${scanPrefix}%`);
       })
@@ -745,7 +780,7 @@ class VideoWatchWorker {
 
     const dirPath = path.dirname(p);
 
-    // 图片库 / 混合库：按图片条目索引
+    // 图片库 / 混合库：按图片条目索引（写入独立的 image_index 表）
     if (isImageFileExt(ext)) {
       if (!isImageLib) return;
       // 根据 Jellyfin 约定：Sample 文件夹下的样片不纳入索引
@@ -753,20 +788,30 @@ class VideoWatchWorker {
         await this.deleteFileIndex(dirPath, filename);
         return;
       }
-      const existedImg = await this.knex('video_index')
-        .where({ path: dirPath, filename, is_file: 1 })
-        .first('id', 'size')
+
+      const srcInfo = this.getSourceInfoForPath(p);
+      const imgRow = await videoIndexIndexUtil.buildImageIndexRow({
+        fullPath: p,
+        dirPath,
+        filename,
+        ext,
+        libraryId: srcInfo.libraryId,
+        sourceId: srcInfo.sourceId,
+      });
+      if (!imgRow) return;
+
+      const existedImg = await this.knex('image_index')
+        .where({ path: dirPath, filename })
+        .first('id', 'file_mtime')
         .catch(() => null);
-      if (existedImg && existedImg.id) {
-        const oldSize = Number(existedImg.size || 0) || 0;
-        if (oldSize === Number(stat.size || 0)) return;
-        await this.knex('video_index')
-          .where({ id: existedImg.id })
-          .delete()
-          .catch(() => {});
+
+      // ⭐ 用 mtime 判断是否真的变了（原来比 size，同尺寸覆盖会漏更新）
+      if (existedImg && existedImg.id && Number(existedImg.file_mtime || 0) === imgRow.file_mtime) {
+        return;
       }
-      const okImg = await videoIndexIndexUtil.indexImageFile({ knex: this.knex, fullPath: p, dirPath, filename, ext });
-      if (okImg && !(existedImg && existedImg.id)) this.scheduleNewVideoCome();
+
+      await videoIndexIndexUtil.upsertImageIndex(this.knex, imgRow);
+      if (!(existedImg && existedImg.id)) this.scheduleNewVideoCome();
       return;
     }
 
@@ -877,35 +922,35 @@ class VideoWatchWorker {
         if (!ent.isFile()) continue;
         const ext = path.extname(name).toLowerCase();
 
-        // 图片库 / 混合库：索引图片条目
+        // 图片库 / 混合库：索引图片条目（写入独立的 image_index 表）
         if (isImageFileExt(ext)) {
           if (!isImageLib) continue;
           if (String(path.basename(currentDir) || '').toLowerCase() === 'sample') {
             await this.deleteFileIndex(currentDir, name);
             continue;
           }
-          let imgStat;
-          try {
-            imgStat = await fs.promises.stat(fullPath);
-          } catch (_) {
+
+          const dirInfo = this.getSourceInfoForPath(fullPath);
+          const imgRow = await videoIndexIndexUtil.buildImageIndexRow({
+            fullPath,
+            dirPath: currentDir,
+            filename: name,
+            ext,
+            libraryId: dirInfo.libraryId,
+            sourceId: dirInfo.sourceId,
+          });
+          if (!imgRow) continue;
+
+          const existedImg = await this.knex('image_index')
+            .where({ path: currentDir, filename: name })
+            .first('id', 'file_mtime')
+            .catch(() => null);
+          if (existedImg && existedImg.id && Number(existedImg.file_mtime || 0) === imgRow.file_mtime) {
             continue;
           }
-          if (!imgStat.isFile()) continue;
 
-          const existedImg = await this.knex('video_index')
-            .where({ path: currentDir, filename: name, is_file: 1 })
-            .first('id', 'size')
-            .catch(() => null);
-          if (existedImg && existedImg.id) {
-            const oldImgSize = Number(existedImg.size || 0) || 0;
-            if (oldImgSize === Number(imgStat.size || 0)) continue;
-            await this.knex('video_index')
-              .where({ id: existedImg.id })
-              .delete()
-              .catch(() => {});
-          }
-          const okImg = await videoIndexIndexUtil.indexImageFile({ knex: this.knex, fullPath, dirPath: currentDir, filename: name, ext });
-          if (okImg && !(existedImg && existedImg.id)) this.scheduleNewVideoCome();
+          await videoIndexIndexUtil.upsertImageIndex(this.knex, imgRow);
+          if (!(existedImg && existedImg.id)) this.scheduleNewVideoCome();
           continue;
         }
 

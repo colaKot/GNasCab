@@ -826,10 +826,208 @@ tabs.forEach(tab => {
   });
 });
 
+// ==================== 缓存目录：自定义位置与搬迁 ====================
+// 搬迁不在运行时进行：保存配置 -> 重启服务 -> 启动阶段（API 对外之前）完成搬迁。
+// 因此搬迁期间客户端无法操作，也就不会出现「边写缓存边搬」的竞争。
+
+let cacheLocationState = null;
+// 用户已选择但尚未保存的目录，避免状态推送把输入框改回去
+let cacheLocationDirty = false;
+
+function getCacheLocationApi() {
+  return window.nascab && typeof window.nascab.getCacheLocation === 'function'
+    ? window.nascab
+    : window.electronAPI;
+}
+
+function formatBytesShort(bytes) {
+  const n = Number(bytes) || 0;
+  if (n < 1024) return `${n} B`;
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let value = n / 1024;
+  let idx = 0;
+  while (value >= 1024 && idx < units.length - 1) {
+    value /= 1024;
+    idx += 1;
+  }
+  return `${value.toFixed(value >= 100 ? 0 : 1)} ${units[idx]}`;
+}
+
+function setCacheNotice(text, kind) {
+  const el = document.getElementById('cache-location-notice');
+  if (!el) return;
+  if (!text) {
+    el.classList.add('hidden');
+    el.textContent = '';
+    return;
+  }
+  el.classList.remove('hidden');
+  el.textContent = text;
+  if (kind === 'error') {
+    el.style.background = 'rgba(244, 71, 71, 0.12)';
+    el.style.borderColor = 'rgba(244, 71, 71, 0.35)';
+    el.style.color = '#f44747';
+  } else {
+    el.style.background = 'rgba(79, 142, 247, 0.12)';
+    el.style.borderColor = 'rgba(79, 142, 247, 0.35)';
+    el.style.color = 'var(--text-sec)';
+  }
+}
+
+function renderCacheProgress(migration) {
+  const wrap = document.getElementById('cache-location-progress');
+  const fill = document.getElementById('cache-location-progress-fill');
+  const text = document.getElementById('cache-location-progress-text');
+  if (!wrap || !fill || !text) return;
+  if (!migration || !migration.running) {
+    wrap.classList.add('hidden');
+    return;
+  }
+  wrap.classList.remove('hidden');
+  const pct = Math.max(0, Math.min(100, Number(migration.progress) || 0));
+  fill.style.width = `${pct}%`;
+  const phaseText = migration.phase === 'cleanup' ? t('cacheLocation.phaseCleanup') : t('cacheLocation.phaseCopy');
+  text.textContent = `${phaseText} ${pct}% · ${migration.doneFiles}/${migration.totalFiles} · ${formatBytesShort(
+    migration.doneBytes
+  )} / ${formatBytesShort(migration.totalBytes)}`;
+}
+
+function renderCacheLocation(payload) {
+  if (!payload) return;
+  cacheLocationState = payload;
+
+  const effectiveEl = document.getElementById('cache-location-effective');
+  if (effectiveEl) effectiveEl.textContent = payload.effectiveCachePath || payload.effectiveParent || '—';
+
+  const input = document.getElementById('cache-location-input');
+  if (input && !cacheLocationDirty) {
+    input.value = payload.configuredParent || payload.defaultParent || '';
+  }
+
+  const cancelBtn = document.getElementById('cache-location-cancel-btn');
+  if (cancelBtn) cancelBtn.classList.toggle('hidden', !payload.pending);
+
+  const migration = payload.migration;
+  if (migration && migration.state === 'failed' && migration.lastError) {
+    setCacheNotice(`${t('cacheLocation.errorPrefix')}: ${migration.lastError}`, 'error');
+  } else if (payload.pending) {
+    setCacheNotice(t('cacheLocation.pendingNotice'), 'info');
+  } else {
+    setCacheNotice('');
+  }
+
+  renderCacheProgress(migration);
+}
+
+async function loadCacheLocation() {
+  const api = getCacheLocationApi();
+  if (!api || typeof api.getCacheLocation !== 'function') return;
+  try {
+    const res = await api.getCacheLocation();
+    if (res && res.success) renderCacheLocation(res.data);
+  } catch (_) {}
+}
+
+async function initCacheLocationUi() {
+  const api = getCacheLocationApi();
+  if (!api || typeof api.getCacheLocation !== 'function') return;
+
+  await loadCacheLocation();
+
+  const chooseBtn = document.getElementById('cache-location-choose-btn');
+  if (chooseBtn) {
+    chooseBtn.addEventListener('click', async () => {
+      try {
+        const res = await api.chooseCacheLocation();
+        if (res && res.success && res.path) {
+          const input = document.getElementById('cache-location-input');
+          if (input) input.value = res.path;
+          cacheLocationDirty = true;
+        }
+      } catch (_) {}
+    });
+  }
+
+  const resetBtn = document.getElementById('cache-location-reset-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      const input = document.getElementById('cache-location-input');
+      const fallback = (cacheLocationState && cacheLocationState.defaultParent) || '';
+      if (input) input.value = fallback;
+      cacheLocationDirty = true;
+    });
+  }
+
+  const saveBtn = document.getElementById('cache-location-save-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async () => {
+      const input = document.getElementById('cache-location-input');
+      const value = input ? input.value.trim() : '';
+      const currentParent = (cacheLocationState && cacheLocationState.configuredParent) || '';
+      const defaultParent = (cacheLocationState && cacheLocationState.defaultParent) || '';
+      if (!value) {
+        setCacheNotice(t('cacheLocation.error.empty'), 'error');
+        return;
+      }
+      // 与默认位置一致时按「留空 = 使用默认」处理
+      const target = defaultParent && value === defaultParent ? '' : value;
+      if (target === currentParent) {
+        showToast(t('cacheLocation.noChange'), 'info');
+        return;
+      }
+      if (!window.confirm(t('cacheLocation.confirmMigrate'))) return;
+
+      saveBtn.disabled = true;
+      try {
+        const res = await api.setCacheLocation(target);
+        if (!res || !res.success) {
+          const msg = res && res.errorKey ? t(res.errorKey) : ((res && res.error) || t('cacheLocation.error.failed'));
+          setCacheNotice(msg, 'error');
+          return;
+        }
+        cacheLocationDirty = false;
+        renderCacheLocation(res.data);
+        if (res.pending) {
+          if (window.confirm(t('cacheLocation.confirmRestart')) && typeof api.restartService === 'function') {
+            await api.restartService();
+            return;
+          }
+          setCacheNotice(t('cacheLocation.pendingNotice'), 'info');
+        } else {
+          showToast(t('cacheLocation.saved'), 'success');
+        }
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  }
+
+  const cancelBtn = document.getElementById('cache-location-cancel-btn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', async () => {
+      try {
+        const res = await api.cancelCacheLocationPending();
+        if (res && res.success) {
+          renderCacheLocation(res.data);
+          showToast(t('cacheLocation.canceled'), 'success');
+        }
+      } catch (_) {}
+    });
+  }
+
+  if (typeof api.onCacheMigration === 'function') {
+    api.onCacheMigration(st => {
+      renderCacheProgress(st);
+      if (st && (st.state === 'done' || st.state === 'failed')) loadCacheLocation();
+    });
+  }
+}
+
 // Initialize
 loadStatus();
 loadAdmin();
 loadSettings();
+initCacheLocationUi();
 loadInitialAdmin();
 loadAdminSecurity();
 checkMacFullDiskAccessOnStart();
@@ -893,6 +1091,8 @@ async function loadPaths(statusData) {
     const cacheLink = document.getElementById('open-cache-dir-link');
     dbLink.textContent = db ? db : 'N/A';
     cacheLink.textContent = cache ? cache : 'N/A';
+    const cacheEffectiveEl = document.getElementById('cache-location-effective');
+    if (cacheEffectiveEl && cache) cacheEffectiveEl.textContent = cache;
     dbLink.onclick = e => {
       window.electronAPI.openPath(db);
     };

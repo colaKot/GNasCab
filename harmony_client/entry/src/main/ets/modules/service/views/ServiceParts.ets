@@ -92,9 +92,9 @@ export struct ServiceNotLoggedInCard {
   @Param onGotoAccount: () => void = (): void => {
   };
   @Param title: string = L10n.t('service_nascab_not_logged_in', '未登录');
-  @Param hint: string = L10n.t('service_nascab_not_logged_in_hint', '登录后可使用 GNasCab 远程服务能力');
-  /** 窄屏按钮文案（远程访问/DDNS 均为「去登录 GNasCab 账号」页签切换） */
-  @Param actionLabel: string = L10n.t('service_menu_account_nascab', 'GNasCab账号');
+  @Param hint: string = L10n.t('service_nascab_not_logged_in_hint', '登录后可使用 WaterNasOS 远程服务能力');
+  /** 窄屏按钮文案（远程访问/DDNS 均为「去登录 WaterNasOS 账号」页签切换） */
+  @Param actionLabel: string = L10n.t('service_menu_account_nascab', 'WaterNasOS账号');
 
   private palette(): ThemePalette {
     return AppTheme.current();

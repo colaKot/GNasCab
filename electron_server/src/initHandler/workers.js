@@ -105,7 +105,7 @@ module.exports = {
       });
     } catch (_) {}
 
-    Logger.info(`🚀 Starting GNasCabAPI, ports:`, { http: httpPort, https: httpsPort });
+    Logger.info(`🚀 Starting WaterNasOSAPI, ports:`, { http: httpPort, https: httpsPort });
   },
 
   startFileOperationWorker() {

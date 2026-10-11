@@ -954,7 +954,7 @@ class VideoDetailService {
     }
 
     if (!targetPath) return '';
-    return await fileService.getTinyImgByPath(targetPath, size).catch(() => '');
+    return await fileService.getTinyImgByPath(targetPath, size, { deferImages: false }).catch(() => '');
   }
 
   async getDetail({ uid, indexId }) {

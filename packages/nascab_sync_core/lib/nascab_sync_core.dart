@@ -1,4 +1,4 @@
-/// GNasCab 目录同步核心。
+/// WaterNasOS 目录同步核心。
 ///
 /// 两个客户端共用这一份实现：
 ///   - `flutter_client`（PC 主客户端）—— 提供 FlutterSyncHost

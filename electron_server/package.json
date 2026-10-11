@@ -1,7 +1,7 @@
 {
   "name": "nascab_os_server",
   "version": "1.2.4",
-  "description": "GNasCabServer",
+  "description": "WaterNasOSServer",
   "main": "src/main_nascab_os.js",
   "isDocker": false,
   "scripts": {
@@ -28,7 +28,7 @@
   "license": "GPL-3.0",
   "build": {
     "appId": "com.nascabos.server",
-    "productName": "GNasCabServer",
+    "productName": "WaterNasOSServer",
     "publish": [
       {
         "provider": "generic",
@@ -155,7 +155,7 @@
       "deleteAppDataOnUninstall": false,
       "runAfterFinish": true,
       "createDesktopShortcut": "always",
-      "shortcutName": "GNasCabServer",
+      "shortcutName": "WaterNasOSServer",
       "include": "build/nsis/installer.nsh",
       "installerHeaderIcon": "libs/logo.ico",
       "installerIcon": "libs/logo.ico",

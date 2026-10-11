@@ -26,7 +26,7 @@ export class L10n {
   /** 语言版本号，页面监听 localeChanged 事件后可据此刷新 */
   static localeVersion: number = 0;
 
-  static readonly appName: string = 'GNasCab';
+  static readonly appName: string = 'WaterNasOS';
 
   /** 模块级语言包目录：迁移模块各自维护 locales/modules/<module>/<code>.json，避免并行开发冲突 */
   private static readonly moduleLocales: string[] = [
@@ -153,7 +153,7 @@ export class L10n {
   static get connecting(): string { return L10n.t('editor_status_connecting', '连接中...'); }
 
   // ===== 服务器列表 / 添加 =====
-  static get serverListTitle(): string { return L10n.t('server_listTitle', '登录GNasCab服务器'); }
+  static get serverListTitle(): string { return L10n.t('server_listTitle', '登录WaterNasOS服务器'); }
   static get addServer(): string { return L10n.t('server_add', '添加服务器'); }
   static get discoveredServers(): string { return L10n.t('server_scanned', '发现的服务器'); }
   static get savedServers(): string { return L10n.t('server_saved', '已保存的服务器'); }
@@ -254,7 +254,7 @@ export class L10n {
   static get serverAddUsernameRequired(): string { return L10n.t('server_add_username_required', '请输入用户名'); }
   static get serverAddPasswordRequired(): string { return L10n.t('server_add_password_required', '请输入密码'); }
   static get serverAddButton(): string { return L10n.t('server_add', '添加服务器'); }
-  static get serverAddInvalidServer(): string { return L10n.t('server_add_invalid_server', '该服务器不是有效的GNasCab服务器，请检查服务器地址是否正确'); }
+  static get serverAddInvalidServer(): string { return L10n.t('server_add_invalid_server', '该服务器不是有效的WaterNasOS服务器，请检查服务器地址是否正确'); }
   static get serverAddFailure(): string { return L10n.t('auth_login_failure', '登录失败'); }
   static get serverAddSuccess(): string { return L10n.t('service_nascab_logged_in', '登录成功'); }
   static get serverAddSuccessMessage(): string { return L10n.t('server_add_success_message', '服务器已成功添加'); }
@@ -268,7 +268,7 @@ export class L10n {
   static get authPasswordErrorMessage(): string { return L10n.t('auth_password_error_message', '密码错误，请重新输入密码'); }
   static get authPasswordHint(): string { return L10n.t('server_add_password_required', '请输入密码'); }
   static get authPasswordTooShort(): string { return L10n.t('auth_password_too_short', '密码长度不能小于6位'); }
-  static get authWelcomeTitle(): string { return L10n.t('auth_welcome_title', '欢迎使用GNasCab'); }
+  static get authWelcomeTitle(): string { return L10n.t('auth_welcome_title', '欢迎使用WaterNasOS'); }
   static get authPairCodeLabel(): string { return L10n.t('service_remote_access_pair_code_label', '配对码'); }
   static get authPairCodeConnect(): string { return L10n.t('auth_pair_code_connect', '连接'); }
   static get authForgotPassword(): string { return L10n.t('auth_forgot_password', '找回密码'); }
@@ -295,7 +295,7 @@ export class L10n {
   static get adminCreateFailure(): string { return L10n.t('admin_create_failure', '创建失败'); }
   static get adminCreateSuccess(): string { return L10n.t('admin_create_success', '管理员账户已成功创建'); }
   static get adminCreateSuccessMessage(): string {
-    return L10n.t('admin_create_success_message', '创建成功，此账号保存在您的GNasCab服务器磁盘上，非联网账号，请您牢记。');
+    return L10n.t('admin_create_success_message', '创建成功，此账号保存在您的WaterNasOS服务器磁盘上，非联网账号，请您牢记。');
   }
   static get adminCreateSecurityQuestionLabel(): string { return L10n.t('admin_create_security_question_label', '选择密保问题'); }
   static get adminCreateSecurityQuestionOption1(): string { return L10n.t('admin_create_security_question_option1', '我的手机号码是什么?'); }
@@ -339,7 +339,7 @@ export class L10n {
   static get settingsClearCacheDialogContent(): string { return L10n.t('settings_clear_cache_dialog_content', '确定要清理缓存吗？'); }
   static get settingsClearCacheSuccess(): string { return L10n.t('settings_clear_cache_success', '缓存清理成功'); }
   static get settingsRestartService(): string { return L10n.t('settings_restart_service', '重启服务'); }
-  static get settingsRestartServiceDescription(): string { return L10n.t('settings_restart_service_description', '重启GNasCab后端服务'); }
+  static get settingsRestartServiceDescription(): string { return L10n.t('settings_restart_service_description', '重启WaterNasOS后端服务'); }
   static get settingsRestartServiceDialogTitle(): string { return L10n.t('settings_restart_service_dialog_title', '重启服务'); }
   static get settingsRestartServiceDialogContent(): string { return L10n.t('settings_restart_service_dialog_content', '确定要重启服务吗？'); }
   static get settingsRestartServiceRequested(): string { return L10n.t('settings_restart_service_requested', '重启请求已发送'); }

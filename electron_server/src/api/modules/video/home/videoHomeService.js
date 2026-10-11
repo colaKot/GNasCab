@@ -1,6 +1,33 @@
 const path = require('path');
 const fs = require('fs');
 const VideoSourceService = require('../source/videoSourceService');
+const { escapeLikeValue, LIKE_ESCAPE } = require('../videoVisibilityUtil');
+
+/**
+ * 图片表（image_index）的路径可见性过滤。
+ * ⚠️ 不能复用下面的 `_applyVideoIndexPathPrefixFilter`：它带「目录行特判」，
+ *    会引用 image_index 并不存在的 `is_file` 列 → SQL 直接报错。
+ */
+function _applyImageIndexPathPrefixFilter(query, paths, alias = 'i') {
+  const list = Array.isArray(paths) ? paths.map(p => String(p || '').trim()).filter(Boolean) : [];
+  if (list.length === 0) {
+    query.whereRaw('1 = 0');
+    return;
+  }
+  const sep = path.sep;
+  query.where(builder => {
+    for (const p of list) {
+      const prefix = p.endsWith(sep) ? p : `${p}${sep}`;
+      builder.orWhere(function () {
+        this.where(`${alias}.path`, p).orWhereRaw('?? LIKE ? ESCAPE ?', [
+          `${alias}.path`,
+          `${escapeLikeValue(prefix)}%`,
+          LIKE_ESCAPE,
+        ]);
+      });
+    }
+  });
+}
 
 function _resolveArtworkAbsolute({ baseDir, maybeRelative }) {
   const p = maybeRelative === undefined || maybeRelative === null ? '' : String(maybeRelative).trim();
@@ -349,43 +376,86 @@ class VideoHomeService {
       const libPaths = pathsByLib.get(libId) || [];
       if (libPaths.length === 0) continue;
 
-      const mediaTypes =
-        lib.lib_type === 'movie'
-          ? ['movie', 'bdmv', 'video_ts']
-          : lib.lib_type === 'image'
-            ? ['image']
-            : [lib.lib_type];
+      const libTypeRaw = lib.lib_type ? String(lib.lib_type).trim().toLowerCase() : 'movie';
+      const isImageLib = libTypeRaw === 'image';
+      const isMixedLib = libTypeRaw === 'mixed';
 
-      const items = await this.knex('video_index as v')
-        .whereIn('v.media_type', mediaTypes)
-        .modify(qb => _applyVideoIndexPathPrefixFilter(qb, libPaths, 'v'))
-        .select(
-          'v.id',
-          'v.media_type',
-          'v.path',
-          'v.filename',
-          'v.nfo_name',
-          'v.nfo_year',
-          'v.nfo_score',
-          'v.nfo_regions',
-          'v.nfo_genres',
-          'v.poster_path',
-          'v.fanart_path',
-          'v.logo_path',
-          'v.play_rel_path',
-          'v.view_time',
-          'v.create_time'
-        )
-        .orderBy('v.id', 'desc')
-        .limit(limit)
-        .catch(() => []);
+      // ⭐ 首页「最近添加」：图片来自独立表 image_index（按 library_id 等值 + 路径可见性）
+      let items = [];
+      if (isImageLib || isMixedLib) {
+        const imgQuery = this.knex('image_index as i').where('i.library_id', libId);
+        _applyImageIndexPathPrefixFilter(imgQuery, libPaths, 'i');
+        const imgRows = await imgQuery
+          .select('i.id', 'i.path', 'i.filename', 'i.ext', 'i.width', 'i.height', 'i.view_time', 'i.create_time')
+          .orderBy('i.taken_at', 'desc')
+          .orderBy('i.id', 'desc')
+          .limit(limit)
+          .catch(() => []);
+        items = (imgRows || []).map(r => ({
+          id: r.id,
+          media_type: 'image',
+          path: r.path,
+          filename: r.filename,
+          ext: r.ext,
+          is_file: 1,
+          width: r.width,
+          height: r.height,
+          duration: 0,
+          nfo_name: r.filename,
+          nfo_year: 0,
+          nfo_score: 0,
+          nfo_regions: '',
+          nfo_genres: '',
+          poster_path: '',
+          fanart_path: '',
+          logo_path: '',
+          play_rel_path: '',
+          view_time: r.view_time,
+          create_time: r.create_time,
+        }));
+      }
+
+      if (!isImageLib) {
+        // 视频侧：movie 显式展开 bdmv/video_ts；mixed 把三类都带上
+        const mediaTypes =
+          libTypeRaw === 'movie'
+            ? ['movie', 'bdmv', 'video_ts']
+            : libTypeRaw === 'mixed'
+              ? ['movie', 'tv', 'bdmv', 'video_ts']
+              : ['tv'];
+
+        const vidRows = await this.knex('video_index as v')
+          .whereIn('v.media_type', mediaTypes)
+          .modify(qb => _applyVideoIndexPathPrefixFilter(qb, libPaths, 'v'))
+          .select(
+            'v.id',
+            'v.media_type',
+            'v.path',
+            'v.filename',
+            'v.nfo_name',
+            'v.nfo_year',
+            'v.nfo_score',
+            'v.nfo_regions',
+            'v.nfo_genres',
+            'v.poster_path',
+            'v.fanart_path',
+            'v.logo_path',
+            'v.play_rel_path',
+            'v.view_time',
+            'v.create_time'
+          )
+          .orderBy('v.id', 'desc')
+          .limit(limit)
+          .catch(() => []);
+        items = items.concat(vidRows || []);
+      }
 
       if ((items || []).length === 0) continue;
       out.push({
         libraryId: libId,
         libraryName: lib.name_key ? String(lib.name_key) : String(lib.name || ''),
         libType: lib.lib_type ? String(lib.lib_type) : 'movie',
-        items: _normalizeHomeRows(items),
+        items: _normalizeHomeRows(items.slice(0, limit)),
       });
     }
 

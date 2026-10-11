@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "Tempo esgotado para solicitação de rede",
       "NETWORK_ERROR": "Falha na solicitação de rede",
       "REMOTE_AUTH_FAILED": "Autenticação remota falhou",
-      "NASCAB_LOGIN_REQUIRED": "Por favor, faça login no GNasCab antes de ativar o acesso remoto",
+      "NASCAB_LOGIN_REQUIRED": "Por favor, faça login no WaterNasOS antes de ativar o acesso remoto",
       "NASCAB_SESSION_EXPIRED": "Sua sessão expirou. Por favor, faça login novamente.",
       "PAIR_CODE_RESET_FAILED": "Falha ao redefinir código de pareamento",
       "USER_SERIALIZE_FAILED": "Falha ao serializar informações do usuário",

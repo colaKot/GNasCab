@@ -231,7 +231,7 @@ export class ServerListViewModel {
       const serverItem = new ServerInfo();
       serverItem.serverId = info.serverId ?? '';
       serverItem.serverUrl = `http://${host}:${httpPort}`;
-      serverItem.serverName = 'GNasCabServer';
+      serverItem.serverName = 'WaterNasOSServer';
       serverItem.serverHost = host;
       serverItem.serverPortHttp = httpPort;
       serverItem.serverPortHttps = info.httpsPort !== undefined ? `${info.httpsPort}` : '';
@@ -528,7 +528,7 @@ export class ServerListViewModel {
       const statusData = status.serverData ? JsonCodec.parse<ServerStatusJson>(status.serverData) : new ServerStatusJson();
       const serverId = statusData.serverId ?? '';
       // 优先使用已保存的同 serverId 服务器名称
-      let preferredName = 'GNasCabServer';
+      let preferredName = 'WaterNasOSServer';
       const matches: ServerInfo[] = [];
       for (const s of this.savedServers) {
         if (s.serverId.trim().length > 0 && s.serverId === serverId) {

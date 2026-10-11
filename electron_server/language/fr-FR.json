@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "Délai d'attente de la demande réseau dépassé",
       "NETWORK_ERROR": "Échec de la demande réseau",
       "REMOTE_AUTH_FAILED": "Échec de l'authentification distante",
-      "NASCAB_LOGIN_REQUIRED": "Veuillez vous connecter à GNasCab avant d'activer l'accès distant",
+      "NASCAB_LOGIN_REQUIRED": "Veuillez vous connecter à WaterNasOS avant d'activer l'accès distant",
       "NASCAB_SESSION_EXPIRED": "Votre session a expiré. Veuillez vous reconnecter.",
       "PAIR_CODE_RESET_FAILED": "Échec de la réinitialisation du code d'appairage",
       "USER_SERIALIZE_FAILED": "Échec de la sérialisation des informations utilisateur",

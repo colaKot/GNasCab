@@ -62,15 +62,15 @@ WidgetStateProperty<Color> _scrollbarTrackColorState(Color base) {
 }
 
 // 设备信息检测工具类
-Future<void> main() => runGNasCabApp();
+Future<void> main() => runWaterNasOSApp();
 
 /// 共享启动入口。
 ///
-/// 主客户端（GNasCab 完整版）走 `main()`（等价于 `full`）；
+/// 主客户端（WaterNasOS 完整版）走 `main()`（等价于 `full`）；
 /// 派生的独立程序（photo_client / music_client）通过 `path:` 依赖本工程，
-/// 在各自的 `main()` 里调用 `runGNasCabApp(launchMode: ...)` 即可，
+/// 在各自的 `main()` 里调用 `runWaterNasOSApp(launchMode: ...)` 即可，
 /// **不复制任何业务代码**。
-Future<void> runGNasCabApp({
+Future<void> runWaterNasOSApp({
   AppLaunchMode launchMode = AppLaunchMode.full,
 }) async {
   AppLaunch.mode = launchMode;

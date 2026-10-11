@@ -11,7 +11,7 @@ import '../../service/response/login_response.dart';
 import '../../../../utils/dialog_util.dart';
 import '../../../../utils/toast_util.dart';
 import '../../service/server_storage_service.dart';
-import 'package:GNasCab/core/routes/app_routes.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
 import '../../../home/views/components/session_wallpaper_background.dart';
 import 'login_twofa_dialog.dart';
 import '../../../../core/config/nascab_endpoints.dart';
@@ -106,7 +106,7 @@ class LoginController extends GetxController {
         final serverItemForInit = ServerInfoBean(
           serverId: status.serverData?['serverId'] ?? '',
           serverUrl: baseUrl,
-          serverName: 'GNasCabServer',
+          serverName: 'WaterNasOSServer',
           serverHost: Uri.parse(baseUrl).host,
           serverPortHttp: status.serverData?['httpPort']?.toString() ?? '',
           serverPortHttps: status.serverData?['httpsPort']?.toString() ?? '',
@@ -131,7 +131,7 @@ class LoginController extends GetxController {
             status.serverData?['serverId'] ??
             DateTime.now().millisecondsSinceEpoch.toString(),
         serverUrl: baseUrl,
-        serverName: 'GNasCabServer',
+        serverName: 'WaterNasOSServer',
         serverHost: Uri.parse(baseUrl).host,
         serverPortHttp: '',
         serverPortHttps: '',
@@ -198,7 +198,7 @@ class LoginController extends GetxController {
       final serverItemForInit = ServerInfoBean(
         serverId: status.serverData?['serverId'] ?? '',
         serverUrl: baseUrl,
-        serverName: 'GNasCabServer',
+        serverName: 'WaterNasOSServer',
         serverHost: Uri.parse(baseUrl).host,
         serverPortHttp: status.serverData?['httpPort']?.toString() ?? '',
         serverPortHttps: status.serverData?['httpsPort']?.toString() ?? '',

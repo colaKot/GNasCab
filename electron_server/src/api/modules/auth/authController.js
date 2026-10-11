@@ -799,7 +799,7 @@ class AuthController {
       const uid = Number(req.user && req.user.id);
       if (!uid) return ResponseUtil.unauthorized(req, res);
       const body = req.body || {};
-      const issuer = body.issuer ? String(body.issuer) : 'GNasCab';
+      const issuer = body.issuer ? String(body.issuer) : 'WaterNasOS';
       const accountName = body.accountName ? String(body.accountName) : req.user && req.user.username ? String(req.user.username) : String(uid);
 
       const service = new TwoFAService(req.dbMain);

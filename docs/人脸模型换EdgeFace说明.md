@@ -147,7 +147,7 @@ EdgeFace @0.50 -> 3 组   ARI = 1.0000
 
 | 项 | 结果 |
 |---|---|
-| **`electron_server/dist_v5/win-unpacked/GNasCabServer.exe`** | ✅ 请用这个 |
+| **`electron_server/dist_v5/win-unpacked/WaterNasOSServer.exe`** | ✅ 请用这个 |
 | asar | 214.9 MB |
 | 包内 edgeface 模型 | 6.94 MB ✅，旧的 insightFace 已移除 |
 | web `main.dart.js` | 13008525 bytes / 30 文件（含足迹地图改动）|

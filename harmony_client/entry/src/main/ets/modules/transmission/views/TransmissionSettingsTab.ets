@@ -211,7 +211,7 @@ export struct TransmissionSettingsTab {
           this.trackerTimeoutText = v;
         })
 
-      this.SwitchRow(L10n.t('transmission_auto_start', '随 GNasCab 自动启动'),
+      this.SwitchRow(L10n.t('transmission_auto_start', '随 WaterNasOS 自动启动'),
         this.autoStart, (v: boolean): void => {
           this.autoStart = v;
         })

@@ -430,7 +430,7 @@ class PcHomeController extends GetxController {
     String? titleTooltip,
     String? helpText,
     Widget? icon,
-    bool maximize = false,
+    bool? maximize,
     bool resizable = true,
     bool maximizable = true,
     bool minimizable = true,
@@ -451,6 +451,15 @@ class PcHomeController extends GetxController {
         : initialSize;
     final resolvedHelpText =
         (helpText ?? _defaultHelpTextKeyForWindow(windowId))?.trim();
+    // ⭐ 默认最大化打开（2026-10-10）：影视等内容型 App 不再以 800×600 小窗打开，
+    //    web / 桌面端行为一致；只有工具型小窗与「已在桌面上打开」的窗口例外。
+    final resolvedMaximize =
+        maximize ??
+        _shouldMaximizeOnOpen(
+          windowId,
+          initialSize: resolvedInitialSize,
+          initialPosition: initialPosition,
+        );
     windows.openApp(
       windowId: windowId,
       viewBuilder: viewBuilder,
@@ -461,7 +470,7 @@ class PcHomeController extends GetxController {
           : null,
       icon: icon,
       showTitle: showTitle,
-      maximize: maximize,
+      maximize: resolvedMaximize,
       resizable: resizable,
       maximizable: maximizable,
       minimizable: minimizable,
@@ -469,6 +478,33 @@ class PcHomeController extends GetxController {
       initialSize: resolvedInitialSize,
       initialPosition: initialPosition,
     );
+  }
+
+  /// 打开时保持小窗的工具型 App：监控 / 任务中心 / 消息中心 / 进程列表。
+  ///
+  /// 其余 App（含 `folder_*` 动态窗口）首次打开默认铺满桌面。
+  static const Set<String> _kSmallWindowApps = <String>{
+    'monitor',
+    'task_center',
+    'message_center',
+    'process',
+  };
+
+  /// 是否需要「默认最大化打开」。
+  ///
+  /// - 工具型小窗（见 [_kSmallWindowApps]）保持原尺寸；
+  /// - 调用方显式给了 `initialSize` / `initialPosition`（如文本编辑器、任务中心）
+  ///   时按显式尺寸打开，尊重调用方意图；
+  /// - 已在桌面上打开的窗口再次点击图标只做聚焦，不再强制最大化，
+  ///   否则用户手动「还原」后一聚焦就被重新最大化。
+  bool _shouldMaximizeOnOpen(
+    String windowId, {
+    Size? initialSize,
+    Offset? initialPosition,
+  }) {
+    if (_kSmallWindowApps.contains(windowId)) return false;
+    if (initialSize != null || initialPosition != null) return false;
+    return !windows.openedWindowIds.contains(windowId);
   }
 
   String? _defaultHelpTextKeyForWindow(String windowId) {

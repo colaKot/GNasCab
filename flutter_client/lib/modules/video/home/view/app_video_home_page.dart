@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:GNasCab/core/routes/app_routes.dart';
-import 'package:GNasCab/modules/base/components/custom_extended_image.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
-import 'package:GNasCab/modules/video/base/beans/video_item_bean.dart';
-import 'package:GNasCab/modules/video/base/video_utils/video_item_utils.dart';
-import 'package:GNasCab/modules/video/base/video_utils/video_utils.dart';
-import 'package:GNasCab/modules/video/base/views/app_video_item_poster.dart';
-import 'package:GNasCab/modules/video/list/controller/video_list_controller.dart';
-import 'package:GNasCab/modules/video/list/view/app_video_list_page.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
+import 'package:WaterNasOS/modules/base/components/custom_extended_image.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/modules/video/base/beans/video_item_bean.dart';
+import 'package:WaterNasOS/modules/video/base/video_utils/video_item_utils.dart';
+import 'package:WaterNasOS/modules/video/base/video_utils/video_utils.dart';
+import 'package:WaterNasOS/modules/video/base/views/app_video_item_poster.dart';
+import 'package:WaterNasOS/modules/video/list/controller/video_list_controller.dart';
+import 'package:WaterNasOS/modules/video/list/view/app_video_list_page.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/app_video_home_page_controller.dart';

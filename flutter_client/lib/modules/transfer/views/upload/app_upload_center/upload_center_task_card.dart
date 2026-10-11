@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
-import 'package:GNasCab/modules/base/components/custom_icon_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_icon_button.dart';
 import '../../../controllers/upload_controller.dart';
 import '../../../controllers/upload_parts/upload_transfer_helper.dart';
 import '../../../models/transfer_task.dart';

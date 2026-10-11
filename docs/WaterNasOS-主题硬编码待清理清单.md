@@ -1,8 +1,8 @@
-# GNasCab 主题「写死颜色」清理台账
+# WaterNasOS 主题「写死颜色」清理台账
 
 > 背景：换肤的唯一入口是 `lib/core/theme/theme_apply_service.dart`；
 > 项目硬要求「所有涉及主题的覆盖都以主题为主」。
-> 排查方法论与根因分类见 `docs/GNasCab-开发速查.md` §1.3.2。
+> 排查方法论与根因分类见 `docs/WaterNasOS-开发速查.md` §1.3.2。
 >
 > 通用替换口诀：压在 `primary` 上 → `onPrimary`；压 `surface` → `onSurface`；
 > 压 `primaryContainer` → `onPrimaryContainer`；压 `error` → `onError`；

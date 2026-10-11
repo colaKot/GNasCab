@@ -37,15 +37,19 @@ class _SettingsViewState extends State<SettingsView> {
   final _apiCountCtrl = TextEditingController();
   final _welcomeCtrl = TextEditingController();
   final _hostnameCtrl = TextEditingController();
+  final _proxyCtrl = TextEditingController();
   static const int _kDefaultHttpPort = 6789;
   static const int _kDefaultHttpsPort = 6799;
   static const int _kDefaultApiCount = 2;
-  static const double _kTopSafeSpacing = 40;
   int? _cpuCores;
   bool _loadingConfig = false;
   bool _saving = false;
   bool _savingWelcome = false;
   bool _savingHostname = false;
+  bool _savingProxy = false;
+  bool _proxyEnable = false;
+  bool _savingJavFallback = false;
+  bool _javFallbackEnable = false;
   bool _restartingService = false;
   bool _loadingCacheSize = false;
   int? _cacheSizeBytes;
@@ -120,6 +124,7 @@ class _SettingsViewState extends State<SettingsView> {
     _apiCountCtrl.dispose();
     _welcomeCtrl.dispose();
     _hostnameCtrl.dispose();
+    _proxyCtrl.dispose();
     super.dispose();
   }
 
@@ -165,13 +170,20 @@ class _SettingsViewState extends State<SettingsView> {
       final apiCount = data['expressApiCount'];
       final welcomeText = data['welcomeText'];
       final customHostname = data['customHostname'];
+      final proxyEnable = data['globalProxyEnable'];
+      final proxyUrl = data['globalProxyUrl'];
+      final javFallback = data['javFallbackEnable'];
       final cpuCores = data['cpuCores'];
       setState(() {
         _cpuCores = cpuCores is int ? cpuCores : int.tryParse('$cpuCores');
+        _proxyEnable = proxyEnable == 1 || proxyEnable == '1' || proxyEnable == true;
+        _javFallbackEnable =
+            javFallback == 1 || javFallback == '1' || javFallback == true;
       });
       _httpPortCtrl.text = '${httpPort ?? _kDefaultHttpPort}';
       _httpsPortCtrl.text = '${httpsPort ?? _kDefaultHttpsPort}';
       _apiCountCtrl.text = '${apiCount ?? _kDefaultApiCount}';
+      _proxyCtrl.text = proxyUrl is String ? proxyUrl.trim() : '';
       if (welcomeText is String && welcomeText.trim().isNotEmpty) {
         _welcomeCtrl.text = welcomeText.trim();
       } else {
@@ -297,6 +309,42 @@ class _SettingsViewState extends State<SettingsView> {
     }
   }
 
+  Future<void> _saveProxy({required bool enable}) async {
+    if (_savingProxy) return;
+    final url = _proxyCtrl.text.trim();
+    if (enable && url.isEmpty) {
+      ToastUtil.show('settings_proxy_url_invalid'.tr);
+      return;
+    }
+    setState(() => _savingProxy = true);
+    try {
+      final resp = await _api.saveProxy(enable: enable, proxyUrl: url);
+      if (!resp.success) {
+        ToastUtil.show(resp.message ?? 'operation_failed'.tr);
+        return;
+      }
+      ToastUtil.show('settings_proxy_saved'.tr);
+      await _loadConfig();
+    } finally {
+      if (mounted) setState(() => _savingProxy = false);
+    }
+  }
+
+  Future<void> _setJavFallback(bool enable) async {
+    if (_savingJavFallback) return;
+    setState(() => _savingJavFallback = true);
+    try {
+      final resp = await _api.saveJavFallback(enable: enable);
+      if (!resp.success) {
+        ToastUtil.show(resp.message ?? 'operation_failed'.tr);
+        return;
+      }
+      if (mounted) setState(() => _javFallbackEnable = enable);
+    } finally {
+      if (mounted) setState(() => _savingJavFallback = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageService = LanguageService.to;
@@ -314,6 +362,10 @@ class _SettingsViewState extends State<SettingsView> {
             if (isAdmin) _buildCustomHostnameCard(context),
             if (isAdmin) const SizedBox(height: 16),
             if (isAdmin) _buildPersonalizationCard(context),
+            if (isAdmin) const SizedBox(height: 16),
+            if (isAdmin) _buildProxyCard(context),
+            if (isAdmin) const SizedBox(height: 16),
+            if (isAdmin) _buildJavFallbackCard(context),
             if (isAdmin) const SizedBox(height: 16),
             CustomContainer(
               child: Column(
@@ -432,7 +484,6 @@ class _SettingsViewState extends State<SettingsView> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: _kTopSafeSpacing),
             Expanded(child: content),
           ],
         ),
@@ -609,6 +660,99 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// 全局网络代理：影视刮削 / IMDb / TMDB 等出站元数据请求可统一走此代理。
+  Widget _buildProxyCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final disabled = _loadingConfig || _savingProxy;
+    return CustomContainer(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'settings_proxy_title'.tr,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'settings_proxy_subtitle'.tr,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('settings_proxy_enable_title'.tr),
+              value: _proxyEnable,
+              onChanged: disabled
+                  ? null
+                  : (v) {
+                      if (v) {
+                        final url = _proxyCtrl.text.trim();
+                        if (url.isEmpty) {
+                          ToastUtil.show('settings_proxy_url_invalid'.tr);
+                          return;
+                        }
+                      }
+                      _saveProxy(enable: v);
+                    },
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _proxyCtrl,
+              enabled: !disabled,
+              decoration: InputDecoration(
+                labelText: 'settings_proxy_url_label'.tr,
+                hintText: 'http://127.0.0.1:7890',
+                border: const OutlineInputBorder(),
+                suffixIcon: TextButton(
+                  onPressed: disabled
+                      ? null
+                      : () => _saveProxy(enable: _proxyEnable),
+                  child: Text('save'.tr),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 日本片识别兜底：TMDB / IMDb 均无法识别时，按番号从日文站点抓取。
+  /// 默认关闭（保守设计），仅在用户主动开启后参与刮削。
+  Widget _buildJavFallbackCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final disabled = _loadingConfig || _savingJavFallback;
+    return CustomContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+            child: Text(
+              'settings_jav_fallback_title'.tr,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            title: Text('settings_jav_fallback_enable_title'.tr),
+            subtitle: Text('settings_jav_fallback_enable_desc'.tr),
+            value: _javFallbackEnable,
+            onChanged: disabled ? null : _setJavFallback,
+          ),
+        ],
       ),
     );
   }
@@ -945,6 +1089,25 @@ class _ApiSettingApiService extends BaseApiService {
     return apiPost<dynamic>(
       '/api/apiSetting/saveWelcome',
       body: {'welcomeText': welcomeText},
+      showLoading: false,
+    );
+  }
+
+  Future<ApiResponse<dynamic>> saveProxy({
+    required bool enable,
+    required String proxyUrl,
+  }) {
+    return apiPost<dynamic>(
+      '/api/apiSetting/saveProxy',
+      body: {'enable': enable ? 1 : 0, 'proxyUrl': proxyUrl},
+      showLoading: false,
+    );
+  }
+
+  Future<ApiResponse<dynamic>> saveJavFallback({required bool enable}) {
+    return apiPost<dynamic>(
+      '/api/apiSetting/saveJavFallback',
+      body: {'enable': enable ? 1 : 0},
       showLoading: false,
     );
   }

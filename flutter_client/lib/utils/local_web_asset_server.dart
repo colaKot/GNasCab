@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/core/api/api_parts/p2p_channel_util.dart';
-import 'package:GNasCab/core/api/p2p_rtc_stub.dart'
-    if (dart.library.html) 'package:GNasCab/core/api/p2p_rtc_web.dart';
-import 'package:GNasCab/modules/video_player/cache/video_range_memory_cache.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/api/api_parts/p2p_channel_util.dart';
+import 'package:WaterNasOS/core/api/p2p_rtc_stub.dart'
+    if (dart.library.html) 'package:WaterNasOS/core/api/p2p_rtc_web.dart';
+import 'package:WaterNasOS/modules/video_player/cache/video_range_memory_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;

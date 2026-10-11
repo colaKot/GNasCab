@@ -54,6 +54,8 @@ class VideoListApiService extends BaseApiService {
     List<String>? sourceList,
     String? sortBy,
     String? sortOrder,
+    String? folderPath,
+    String? folderMode,
     bool showLoading = false,
   }) async {
     final res = await apiPost<Map<String, dynamic>>(
@@ -80,6 +82,14 @@ class VideoListApiService extends BaseApiService {
         if (sourceList != null) 'sourceList': sourceList,
         if (sortBy != null) 'sort_by': sortBy,
         if (sortOrder != null) 'sort_order': sortOrder,
+        // ⭐ 文件夹视图（图片库 / 混合库）：
+        //    folderMode='exact' 只看本目录自身；'subtree' 看整棵子树（搜索用）。
+        //    ⚠️ folderPath 允许是空串（= 库根），所以**只在 mode 非空时**才带上
+        //    folderPath，避免"空串被当成没传"导致口径悄悄变回整库平铺。
+        if (folderMode != null && folderMode.trim().isNotEmpty) ...{
+          'folderMode': folderMode.trim(),
+          'folderPath': folderPath ?? '',
+        },
       },
       showLoading: showLoading,
     );

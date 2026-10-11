@@ -1,4 +1,4 @@
-import 'package:GNasCab/modules/base/components/custom_divider.dart';
+import 'package:WaterNasOS/modules/base/components/custom_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

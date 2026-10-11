@@ -1,12 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/core/theme/app_skin.dart';
-import 'package:GNasCab/core/theme/skin_presets.dart';
+import 'package:tabler_icons_plus/tabler_icons_plus.dart';
+import 'package:WaterNasOS/core/theme/app_skin.dart';
+import 'package:WaterNasOS/core/theme/skin_presets.dart';
 import '../pc_home_controller.dart';
-import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/theme/dark_theme.dart';
 import '../../../base/components/custom_inset_border_shell.dart';
+
+/// 窗口内导航层级（2026-10-10）
+///
+/// 一级页（应用首页）：标题栏右侧显示 缩小 / 放大(还原) / 关闭 三个按钮；
+/// 二级页：只显示一个「返回」按钮，返回动作由内容层提供（[onBack]）。
+///
+/// 带 `==` 实现是为了避免每帧重复通知 —— Dart 里**同一实例的同名方法 tear-off
+/// 是相等的**，所以内容层可以直接把 `controller.navigateBack` 传进来。
+@immutable
+class PcWindowNavState {
+  final bool secondary;
+  final VoidCallback? onBack;
+
+  const PcWindowNavState.home()
+    : secondary = false,
+      onBack = null;
+
+  const PcWindowNavState.secondary(this.onBack) : secondary = true;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PcWindowNavState &&
+      other.secondary == secondary &&
+      other.onBack == onBack;
+
+  @override
+  int get hashCode => Object.hash(secondary, onBack);
+}
+
+/// 承载 [PcWindowNavState] 的可监听容器：由 `PcAppWindow` 持有并下发，
+/// 内容层在 build 后（post-frame）调用 [update] 上报当前层级。
+class PcWindowNav extends ValueNotifier<PcWindowNavState> {
+  PcWindowNav() : super(const PcWindowNavState.home());
+
+  void update(PcWindowNavState next) {
+    if (next == value) return;
+    value = next;
+  }
+}
 
 class PcWindowScope extends InheritedWidget {
   final String windowId;
@@ -22,10 +61,25 @@ class PcWindowScope extends InheritedWidget {
   /// ⛔ 不要写死数字 —— 按钮尺寸改了这里要跟着变。
   final double titleBarControlsWidth;
 
+  /// ⭐ 窗口内导航层级（2026-10-10）。内容层可用它上报「二级页」状态：
+  /// ```dart
+  /// PcWindowScope.of(context)?.nav.update(const PcWindowNavState.home());
+  /// ```
+  final PcWindowNav nav;
+
+  /// ⭐⭐ 框架已为内容层预留的**顶部让位高度**（2026-10-10）。
+  ///
+  /// 非全屏窗口 = 当前皮肤的 [AppSkin.titleBarHeight]（内容整体下移，顶部只留
+  /// 窗口按钮）；全屏窗口 = 0。子组件用 [PcAppWindow.titleBarHeightFor] 读它，
+  /// 从而**不必、也不应**再自己叠一层让位。
+  final double contentTopInset;
+
   const PcWindowScope({
     super.key,
     required this.windowId,
     this.titleBarControlsWidth = 0,
+    this.contentTopInset = 0,
+    required this.nav,
     required super.child,
   });
 
@@ -36,7 +90,9 @@ class PcWindowScope extends InheritedWidget {
   @override
   bool updateShouldNotify(PcWindowScope oldWidget) =>
       windowId != oldWidget.windowId ||
-      titleBarControlsWidth != oldWidget.titleBarControlsWidth;
+      titleBarControlsWidth != oldWidget.titleBarControlsWidth ||
+      contentTopInset != oldWidget.contentTopInset ||
+      nav != oldWidget.nav;
 }
 
 class PcAppWindow extends StatefulWidget {
@@ -52,7 +108,9 @@ class PcAppWindow extends StatefulWidget {
     this.showTitle = true,
   });
 
-  static const double titleBarHeight = 40;
+  /// 标题栏高度兜底值，**必须与默认皮肤 `windows11` 的 `titleBarHeight` 一致**。
+  /// 2026-10-10：按钮改 40×40 方块后，标题栏 40 → 48（上下各 4 让位）。
+  static const double titleBarHeight = 48;
   static const double _topResizeStripHeight = 4;
 
   /// ⭐⭐ 窗口按钮组占用宽度（2026-10-09）。
@@ -62,11 +120,28 @@ class PcAppWindow extends StatefulWidget {
   static double get titleBarControlsWidth =>
       SkinPresets.defaultSkin.titleBarControlsWidth;
 
+  /// 全屏铺满的窗口：内容本身就是黑底满屏，**不做顶部让位**；
+  /// 它们的顶部叠加层仍按 [PcWindowScope.titleBarControlsWidth] 自己躲开按钮。
+  static const Set<String> fullBleedWindowIds = <String>{
+    'video_player',
+    'image_view',
+    'terminal',
+  };
+
   /// ⭐⭐ 标题栏高度（2026-10-09 换肤）：跟随当前皮肤。
   /// ⚠️ 静态常量 [titleBarHeight] 只是**默认皮肤兜底**；有 context 的地方一律走这里，
   /// 否则切换皮肤（如「紧凑」标题栏变矮）后垂直让位会对不上。
-  static double titleBarHeightFor(BuildContext context) =>
-      Theme.of(context).extension<AppSkin>()?.titleBarHeight ?? titleBarHeight;
+  ///
+  /// ⚠️⚠️ **2026-10-10 起语义变更**：标题栏垂直让位已由 [PcAppWindow] **统一负责**
+  /// （内容层整体下移 [PcWindowScope.contentTopInset]）。所以在普通窗口内，本方法
+  /// **恒返回 0** —— 页面不要、也不该再自己让位，否则会双倍留白。
+  /// 只有全屏窗口（见 [fullBleedWindowIds]）才返回真实高度。
+  static double titleBarHeightFor(BuildContext context) {
+    final scope = PcWindowScope.of(context);
+    if (scope != null && scope.contentTopInset > 0) return 0;
+    return Theme.of(context).extension<AppSkin>()?.titleBarHeight ??
+        titleBarHeight;
+  }
 
   @override
   State<PcAppWindow> createState() => _PcAppWindowState();
@@ -78,6 +153,18 @@ class _PcAppWindowState extends State<PcAppWindow> {
 
   /// 拖拽开始时清除内容层在命中测试缓存中的 entry
   final GlobalKey _passthroughKey = GlobalKey();
+
+  /// ⭐ 框架给内容层预留的顶部让位高度（标题栏净空），用于命中测试坐标换算。
+  double _contentTopInset = 0;
+
+  /// ⭐ 窗口内导航层级（2026-10-10）：内容层上报，二级页标题栏只显示「返回」
+  final PcWindowNav _nav = PcWindowNav();
+
+  @override
+  void dispose() {
+    _nav.dispose();
+    super.dispose();
+  }
 
   void _onDragStateChanged(bool isDragging) {
     if (isDragging) {
@@ -121,10 +208,22 @@ class _PcAppWindowState extends State<PcAppWindow> {
         ? const Color(0xFF3A3A3A).withValues(alpha: 0.4)
         : const Color(0xFFE0E0E0).withValues(alpha: 0.3);
 
+    // ⭐⭐ 标题栏让位由框架统一负责（2026-10-10）：
+    //   普通窗口 → 内容整体下移 titleBarHeight，右上角三按钮独占标题栏，
+    //              子树不必再做垂直让位；
+    //   全屏窗口 → 内容顶到窗口边缘，顶部叠加层仍按按钮组宽度自己让位。
+    final fullBleed = PcAppWindow.fullBleedWindowIds.contains(widget.windowId);
+    _contentTopInset = fullBleed ? 0 : skin.titleBarHeight;
+
     final appContent = PcWindowScope(
       windowId: widget.windowId,
       // ⭐ 让子树能读到按钮组宽度，右侧元素据此让位（跟随皮肤）
-      titleBarControlsWidth: skin.titleBarControlsWidth,
+      // ⚠️ 框架已让位时传 0：顶栏已移到标题栏下方，再让位只会白留一截。
+      titleBarControlsWidth: fullBleed ? skin.titleBarControlsWidth : 0,
+      // ⭐ 框架已预留的顶部让位高度，子组件据此避免重复让位
+      contentTopInset: _contentTopInset,
+      // ⭐ 让子树能上报窗口导航层级（二级页 → 只显示返回按钮）
+      nav: _nav,
       child: widget.viewBuilder(context),
     );
 
@@ -181,24 +280,53 @@ class _PcAppWindowState extends State<PcAppWindow> {
                   ),
                 ),
                 // 中层：内容（hitTest 永远返回 false，让 Stack 继续往下遍历）
+                // ⭐ 顶部让出标题栏：非全屏窗口内容整体下移，标题栏只留窗口按钮。
                 Positioned.fill(
-                  child: _ContentHitPassthrough(
-                    key: _passthroughKey,
-                    child: Builder(
-                      key: _contentKey,
-                      builder: (_) => appContent,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: _contentTopInset),
+                    child: _ContentHitPassthrough(
+                      key: _passthroughKey,
+                      child: Builder(
+                        key: _contentKey,
+                        builder: (_) => appContent,
+                      ),
                     ),
                   ),
                 ),
                 // 顶层：窗口控制按钮（右上角，Windows 习惯）
+                // ⭐ 按导航层级切换（2026-10-10）：
+                //   一级页（应用首页）→ 缩小 / 放大(还原) / 关闭；
+                //   二级页 → 只有一个「返回」按钮（内容层通过 PcWindowScope 上报）。
                 Positioned(
                   right: 12,
                   top: (skin.titleBarHeight - skin.titleBarButtonHeight) / 2,
-                  child: _TrafficLightButtons(
-                    windowId: widget.windowId,
-                    skin: skin,
-                    canMinimize: ctrl.windowCanMinimize(widget.windowId),
-                    canMaximize: ctrl.windowCanMaximize(widget.windowId),
+                  child: ValueListenableBuilder<PcWindowNavState>(
+                    valueListenable: _nav,
+                    builder: (context, nav, _) {
+                      // 二级页：右上角只剩一个「返回」（与三按钮同款）
+                      if (nav.secondary) {
+                        final onBack = nav.onBack;
+                        return _TitleBarButton(
+                          skin: skin,
+                          icon: TablerIcons.arrowLeft,
+                          tooltip: 'back'.tr,
+                          onTap: onBack == null
+                              ? null
+                              : () {
+                                  PcHomeController.instance.focusWindow(
+                                    widget.windowId,
+                                  );
+                                  onBack();
+                                },
+                        );
+                      }
+                      return _WindowButtons(
+                        windowId: widget.windowId,
+                        skin: skin,
+                        canMinimize: ctrl.windowCanMinimize(widget.windowId),
+                        canMaximize: ctrl.windowCanMaximize(widget.windowId),
+                      );
+                    },
                   ),
                 ),
                 // 右上角已让给窗口控制按钮，角标换到左上角与左下角标呼应。
@@ -286,8 +414,13 @@ class _PcAppWindowState extends State<PcAppWindow> {
     final box = _contentKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null) return false;
 
+    // ⭐ 内容层已整体下移 [_contentTopInset]（标题栏净空），而 [localPosition] 是
+    //    相对标题栏拖拽区的坐标 ⇒ 先换算成内容层局部坐标。标题栏范围内的点会变成
+    //    负值、必然落在内容层之外，hitTest 直接失败 —— 正是我们要的「标题栏可拖拽」。
+    final local = localPosition - Offset(0, _contentTopInset);
+
     final result = BoxHitTestResult();
-    if (!box.hitTest(result, position: localPosition)) return false;
+    if (!box.hitTest(result, position: local)) return false;
 
     return result.path.any((e) {
       if (e.target is! RenderPointerListener) return false;
@@ -442,15 +575,20 @@ class _DragAreaState extends State<_DragArea> {
   }
 }
 
-class _TrafficLightButtons extends StatefulWidget {
+/// 窗口右上角三个常规按钮：缩小 / 放大(还原) / 关闭（2026-10-10 改版）。
+///
+/// ⭐ 与二级页的「返回」按钮**完全同款**：方形圆角、透明中性底、图标常显；
+/// 尺寸 / 间距 / 图标大小全部由皮肤驱动（默认皮肤 40×40）。
+/// ⛔ 不再使用红/黄/绿语义色 —— 统一成无色透明方块，靠图标区分功能。
+class _WindowButtons extends StatelessWidget {
   final String windowId;
 
-  /// ⭐ 外观皮肤：按钮造型 / 尺寸由它决定（2026-10-09）
+  /// ⭐ 外观皮肤：按钮造型 / 尺寸由它决定
   final AppSkin skin;
   final bool canMinimize;
   final bool canMaximize;
 
-  const _TrafficLightButtons({
+  const _WindowButtons({
     required this.windowId,
     required this.skin,
     required this.canMinimize,
@@ -458,153 +596,187 @@ class _TrafficLightButtons extends StatefulWidget {
   });
 
   @override
-  State<_TrafficLightButtons> createState() => _TrafficLightButtonsState();
+  Widget build(BuildContext context) {
+    final ctrl = PcHomeController.instance;
+    final isMaximized = ctrl.isMaximized(windowId);
+    // ⭐ 图标统一用 Tabler（MIT）：maximize = 四角外扩 / minimize = 四角内收（还原态）
+    final maximizeIcon = (canMaximize && isMaximized)
+        ? TablerIcons.minimize
+        : TablerIcons.maximize;
+
+    /// 点击前先把窗口置顶（与旧行为一致）
+    VoidCallback wrap(VoidCallback action) => () {
+      ctrl.focusWindow(windowId);
+      action();
+    };
+
+    // Windows 习惯：左 → 右 依次为 最小化、最大化、关闭（关闭贴最右）
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _TitleBarButton(
+          skin: skin,
+          icon: TablerIcons.minus,
+          tooltip: 'home_window_min'.tr,
+          onTap: canMinimize ? wrap(() => ctrl.minimizeApp(windowId)) : null,
+        ),
+        SizedBox(width: skin.titleBarButtonSpacing),
+        _TitleBarButton(
+          skin: skin,
+          icon: maximizeIcon,
+          tooltip: (canMaximize && isMaximized)
+              ? 'home_window_restore'.tr
+              : 'home_window_max'.tr,
+          onTap: canMaximize ? wrap(() => ctrl.maximizeApp(windowId)) : null,
+        ),
+        SizedBox(width: skin.titleBarButtonSpacing),
+        _TitleBarButton(
+          skin: skin,
+          icon: TablerIcons.x,
+          tooltip: 'home_window_close'.tr,
+          onTap: wrap(() => ctrl.closeApp(windowId)),
+        ),
+      ],
+    );
+  }
 }
 
-class _TrafficLightButtonsState extends State<_TrafficLightButtons> {
+/// 标题栏按钮（2026-10-10 统一造型）—— 三个窗口按钮与二级页「返回」共用：
+/// **方形圆角 + 透明中性底 + 图标常显**。
+///
+/// 底色取中性色、按亮/暗模式给不同透明度（暗色提亮 / 亮色压深），
+/// 悬停时加深一档；禁用时图标降透明度且不可点。尺寸全部来自皮肤。
+class _TitleBarButton extends StatefulWidget {
+  final AppSkin skin;
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onTap;
+
+  const _TitleBarButton({
+    required this.skin,
+    required this.icon,
+    required this.tooltip,
+    this.onTap,
+  });
+
+  @override
+  State<_TitleBarButton> createState() => _TitleBarButtonState();
+}
+
+class _TitleBarButtonState extends State<_TitleBarButton> {
   bool _isHovering = false;
 
-  /// ⭐ 按钮尺寸全部来自皮肤（2026-10-09）：
-  /// - Windows 11：24×16 宽扁圆角矩形
-  /// - macOS：14×14 圆形交通灯
-  /// - 极简：更小更方
-  AppSkin get _skin => widget.skin;
-
-  bool get _isFocused =>
-      PcHomeController.instance.topmostApp == widget.windowId;
-
-  /// ⭐ 语义色仍保留 macOS 红/黄/绿的身份识别（这是功能约定，不是风格），
-  /// 但**从主题派生明暗变体**：暗色模式下用更亮的色，亮色模式下用更沉的色，
-  /// 保证在任何配色/亮暗下都有足够对比度。
-  static const Color _closeBase = Color(0xFFFF5F57);
-  static const Color _minimizeBase = Color(0xFFFFBD2E);
-  static const Color _maximizeBase = Color(0xFF28CA41);
-
-  /// 按钮圆角：macOS 皮肤 = 正圆；极简 = 更方的 2；Windows = 控件圆角（扁平）
-  double get _radius => switch (_skin.titleBarButtonStyle) {
-    AppTitleBarButtonStyle.macos => _skin.titleBarButtonHeight / 2,
+  /// 方形圆角：Windows 取高度的 20%（40 高 → 8）；macOS 皮肤仍是正圆，极简更方
+  double get _radius => switch (widget.skin.titleBarButtonStyle) {
+    AppTitleBarButtonStyle.macos => widget.skin.titleBarButtonHeight / 2,
     AppTitleBarButtonStyle.minimal => 2,
-    AppTitleBarButtonStyle.windows => AppRadius.control,
+    AppTitleBarButtonStyle.windows => widget.skin.titleBarButtonHeight * 0.2,
   };
-
-  /// 窗口未聚焦时统一压成中性灰（保留一点原色相，避免三个点糊成一团）
-  Color _dotColor(Color activeColor, Brightness brightness) {
-    final cs = Theme.of(context).colorScheme;
-    if (!_isFocused) {
-      return brightness == Brightness.dark
-          ? cs.onSurface.withValues(alpha: 0.28)
-          : cs.onSurface.withValues(alpha: 0.32);
-    }
-    // 暗色模式提亮、亮色模式压深，保证按钮在两种背景下都"跳"出来
-    return brightness == Brightness.dark
-        ? Color.lerp(activeColor, Colors.white, 0.22)!
-        : Color.lerp(activeColor, Colors.black, 0.06)!;
-  }
-
-  /// ⭐ hover 时加深底色并显图标，替代原先"hover 变灰"的割裂感
-  Color _hoverColor(Color activeColor, Brightness brightness) {
-    return brightness == Brightness.dark
-        ? Color.lerp(activeColor, Colors.white, 0.42)!
-        : Color.lerp(activeColor, Colors.black, 0.14)!;
-  }
-
-  Widget _buildButton({
-    required Color activeColor,
-    required VoidCallback? onTap,
-    required IconData icon,
-    required String tooltip,
-  }) {
-    final theme = Theme.of(context);
-    final brightness = theme.brightness;
-    final showIcon = _isHovering && _isFocused;
-    final color = _dotColor(activeColor, brightness);
-
-    final child = AnimatedContainer(
-      duration: const Duration(milliseconds: 120),
-      width: _skin.titleBarButtonWidth,
-      height: _skin.titleBarButtonHeight,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        // 造型由皮肤决定：Windows 扁平圆角 / macOS 正圆
-        borderRadius: BorderRadius.circular(_radius),
-        color: showIcon ? _hoverColor(activeColor, brightness) : color,
-      ),
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 120),
-        opacity: showIcon ? 1 : 0,
-        child: Icon(
-          icon,
-          size: _skin.titleBarButtonIconSize,
-          color: brightness == Brightness.dark
-              ? const Color(0xFF1A1A1A)
-              : const Color(0xFFFFFFFF),
-        ),
-      ),
-    );
-
-    return Tooltip(
-      message: tooltip,
-      waitDuration: const Duration(milliseconds: 500),
-      child: MouseRegion(
-        cursor: onTap == null
-            ? SystemMouseCursors.basic
-            : SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: onTap == null
-              ? null
-              : () {
-                  PcHomeController.instance.focusWindow(widget.windowId);
-                  onTap();
-                },
-          child: child,
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = PcHomeController.instance;
-    final isMaximized = ctrl.isMaximized(widget.windowId);
-    final maximizeIcon = widget.canMaximize && isMaximized
-        ? Icons.close_fullscreen
-        : Icons.open_in_full;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final enabled = widget.onTap != null;
+    final hovered = _isHovering && enabled;
+    // 透明中性底：暗色模式提亮、亮色模式压深，两种配色下都不糊
+    final bg = isDark
+        ? Colors.white.withValues(alpha: hovered ? 0.26 : 0.14)
+        : theme.colorScheme.onSurface.withValues(
+            alpha: hovered ? 0.18 : 0.08,
+          );
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovering = true),
-      onExit: (_) => setState(() => _isHovering = false),
-      // Windows 习惯：左 → 右 依次为 最小化、最大化、关闭（关闭贴最右）
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildButton(
-            activeColor: _minimizeBase,
-            onTap: widget.canMinimize
-                ? () => ctrl.minimizeApp(widget.windowId)
-                : null,
-            icon: Icons.remove,
-            tooltip: 'home_window_min'.tr,
+    return Tooltip(
+      message: widget.tooltip,
+      waitDuration: const Duration(milliseconds: 500),
+      child: MouseRegion(
+        cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        onEnter: (_) => setState(() => _isHovering = true),
+        onExit: (_) => setState(() => _isHovering = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            width: widget.skin.titleBarButtonWidth,
+            height: widget.skin.titleBarButtonHeight,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(_radius),
+              color: bg,
+            ),
+            child: Icon(
+              widget.icon,
+              size: widget.skin.titleBarButtonIconSize,
+              color: enabled
+                  ? theme.colorScheme.onSurface
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.38),
+            ),
           ),
-          SizedBox(width: _skin.titleBarButtonSpacing),
-          _buildButton(
-            activeColor: _maximizeBase,
-            onTap: widget.canMaximize
-                ? () => ctrl.maximizeApp(widget.windowId)
-                : null,
-            icon: maximizeIcon,
-            tooltip: (widget.canMaximize && isMaximized)
-                ? 'home_window_restore'.tr
-                : 'home_window_max'.tr,
-          ),
-          SizedBox(width: _skin.titleBarButtonSpacing),
-          _buildButton(
-            activeColor: _closeBase,
-            onTap: () => ctrl.closeApp(widget.windowId),
-            icon: Icons.close,
-            tooltip: 'home_window_close'.tr,
-          ),
-        ],
+        ),
       ),
+    );
+  }
+}
+
+/// 左栏（侧边栏）容器：自带底色，并把同一块底色**补画**到窗口标题栏左侧。
+///
+/// ⚠️ 为什么要它：2026-10-10 起 [PcAppWindow] 会把内容层整体下移
+/// [PcWindowScope.contentTopInset]，左栏因此离开窗口上沿，顶部那截露出窗口底色。
+/// 用它替掉左栏外层的 `Container(color: ...)`，就能把底色补回标题栏区域 ——
+/// 只改绘制、不动布局（`Stack(clipBehavior: Clip.none)` + 负 top 探出），
+/// 所以菜单位置 / 点击区域 / 折叠动画全都不受影响。
+///
+/// 标题栏右侧仍归三个窗口按钮独占，于是窗口自上而下就是干净的三段式：
+/// 「左栏色 + 右上净空(窗口按钮)」/「左栏 + 顶栏」/「左栏 + 内容」。
+///
+/// 用法与 `Container` 一致：`Container(color: c, child: x)` 直接换成
+/// `PcLeftRailTopExtend(color: c, child: x)`，缩进都不用动。
+class PcLeftRailTopExtend extends StatelessWidget {
+  /// 纯色底色（最常用的写法）。
+  final Color? color;
+
+  /// 需要边框 / 圆角时改用这个；给了它就忽略 [color]。
+  final BoxDecoration? decoration;
+
+  /// 固定宽度（如 transmission 左栏的 180）。
+  final double? width;
+
+  final Widget child;
+
+  const PcLeftRailTopExtend({
+    super.key,
+    this.color,
+    this.decoration,
+    this.width,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final deco =
+        decoration ?? (color == null ? null : BoxDecoration(color: color));
+    final inset = PcWindowScope.of(context)?.contentTopInset ?? 0;
+    if (deco == null || deco.color == null || inset <= 0) {
+      return Container(width: width, decoration: deco, child: child);
+    }
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // 向上探出标题栏高度的一块同色背景；不参与命中测试，免得抢走拖拽。
+        // 圆角清零：补画的这块贴在窗口上沿，圆角交给窗口自己的 ClipRRect 处理。
+        Positioned(
+          left: 0,
+          right: 0,
+          top: -inset,
+          height: inset,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: deco.copyWith(borderRadius: BorderRadius.zero),
+            ),
+          ),
+        ),
+        Container(width: width, decoration: deco, child: child),
+      ],
     );
   }
 }

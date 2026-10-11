@@ -1,6 +1,6 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'dart:math';
-import 'package:GNasCab/modules/base/components.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';

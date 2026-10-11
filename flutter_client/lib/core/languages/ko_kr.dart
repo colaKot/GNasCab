@@ -275,13 +275,13 @@ class KoKr extends Translations {
       'api_code_file_target_is_subdirectory': '대상 경로는 암호화 공간 폴더 안에 있을 수 없습니다',
       'api_code_notes_notebook_not_selected': "먼저 노트북 폴더를 선택하세요",
       'api_code_notes_notebook_not_found': "노트북 폴더가 존재하지 않거나 이동되었습니다",
-      'api_code_notes_notebook_invalid': "선택한 폴더는 유효한 GNasCab 노트북이 아닙니다",
+      'api_code_notes_notebook_invalid': "선택한 폴더는 유효한 WaterNasOS 노트북이 아닙니다",
       'api_code_notes_notebook_folder_not_empty':
           "선택한 폴더가 비어 있지 않아 새 노트북으로 초기화할 수 없습니다",
       'api_code_notes_group_not_empty': "그룹에 아직 노트가 있어 삭제할 수 없습니다",
       'notes_notebook_choose_title': "노트북 선택 또는 생성",
       'notes_notebook_choose_desc':
-          "처음 열 때는 빈 폴더를 선택하거나 기존 GNasCab 노트북 폴더를 선택하세요.",
+          "처음 열 때는 빈 폴더를 선택하거나 기존 WaterNasOS 노트북 폴더를 선택하세요.",
       'notes_choose_folder': "노트북 폴더 선택",
       'notes_original_path_missing': "원래 노트북 경로가 더 이상 존재하지 않습니다: ",
       'notes_recent_deleted': "최근 삭제됨",
@@ -657,7 +657,7 @@ class KoKr extends Translations {
           'API 서비스를 제공하는 기본 프로세스입니다. 종료 시 앱에 접근할 수 없습니다',
       'process.worker.expressBroadcast.name': 'API LAN 브로드캐스트 프로세스',
       'process.worker.expressBroadcast.purpose':
-          '클라이언트가 LAN 내 GNasCab 서버를 자동으로 찾을 수 있게 합니다',
+          '클라이언트가 LAN 내 WaterNasOS 서버를 자동으로 찾을 수 있게 합니다',
       'process.worker.ffmpegHwTest.name': 'FFmpeg 하드웨어 가속 검사 프로세스',
       'process.worker.ffmpegHwTest.purpose':
           '현재 호스트의 FFmpeg 하드웨어 가속 지원 여부를 검사합니다',
@@ -778,12 +778,12 @@ class KoKr extends Translations {
       'terminal_cursor_blink': '커서 깜빡임',
       'terminal_click_to_pick_color': '클릭하여 색상 선택',
       'service_menu_account': '계정',
-      'service_menu_account_nascab': 'GNasCab 계정',
+      'service_menu_account_nascab': 'WaterNasOS 계정',
       'service_menu_remote_access': '원격 액세스',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': '내부 네트워크 침투',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -812,7 +812,7 @@ class KoKr extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': '원격 액세스 활성화',
       'service_remote_access_toggle_hint':
-          '활성화 후 원격 환경에서 GNasCab 서비스에 안전하게 액세스할 수 있습니다',
+          '활성화 후 원격 환경에서 WaterNasOS 서비스에 안전하게 액세스할 수 있습니다',
       'service_remote_access_pair_code_label': '페어링 코드',
       'service_remote_access_pair_code_empty': '페어링 코드 없음',
       'service_remote_access_custom_pair_code_title': '사용자 정의 페어링 코드',
@@ -846,7 +846,7 @@ class KoKr extends Translations {
       'P2P.ERR_DEVICE_NOT_BIND': '기기가 바인딩되지 않았습니다',
       'P2P_TOO_MANY_REQUESTS': '요청이 너무 많습니다. 나중에 다시 시도해 주세요',
       'service_p2p_device_not_bind_message':
-          '이 기능을 사용하려면 현재 기기를 GNasCab 계정에 바인딩해야 합니다. 더 이상 필요하지 않으면 바인딩을 해제할 수 있습니다.',
+          '이 기능을 사용하려면 현재 기기를 WaterNasOS 계정에 바인딩해야 합니다. 더 이상 필요하지 않으면 바인딩을 해제할 수 있습니다.',
       'service_p2p_bind_device_button': '바인딩',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           '페어링 코드 형식이 올바르지 않습니다 (6-30 자리, 영문자/숫자만 지원)',
@@ -861,14 +861,14 @@ class KoKr extends Translations {
       'service_remote_access_guide_title': '원격 액세스 설명',
       'service_remote_access_guide_how_title': '이 기능은 어떻게 작동하나요?',
       'service_remote_access_guide_how_body':
-          '원격 액세스를 활성화하면 GNasCab 은 무작위 페어링 코드를 할당합니다. 페어링 코드를 통해 모든 GNasCab App 또는 데스크톱 클라이언트에서 페어링 코드를 사용하여 호스트에 직접 연결할 수 있습니다. P2P 직접 연결을 우선 사용하며, P2P 를 사용할 수 없을 때는 전 세계 노드를 중계 서비스로 할당합니다. 데이터는 안전한 SSL + WebRTC 를 통해 전송되므로 안심하고 사용할 수 있습니다.',
+          '원격 액세스를 활성화하면 WaterNasOS 은 무작위 페어링 코드를 할당합니다. 페어링 코드를 통해 모든 WaterNasOS App 또는 데스크톱 클라이언트에서 페어링 코드를 사용하여 호스트에 직접 연결할 수 있습니다. P2P 직접 연결을 우선 사용하며, P2P 를 사용할 수 없을 때는 전 세계 노드를 중계 서비스로 할당합니다. 데이터는 안전한 SSL + WebRTC 를 통해 전송되므로 안심하고 사용할 수 있습니다.',
       'service_remote_access_guide_use_title': '페어링 코드는 어떻게 사용하나요?',
       'service_remote_access_guide_use_body':
           'App 또는 데스크톱 클라이언트에서 서버 추가 시 "페어링 코드로 서버 추가"를 선택한 후 페어링 코드를 입력하거나 스캔하면 됩니다.',
-      'service_nascab_title': 'GNasCab 계정',
+      'service_nascab_title': 'WaterNasOS 계정',
       'service_nascab_not_logged_in': '로그인하지 않음',
-      'service_nascab_not_logged_in_hint': '로그인 후 GNasCab 원격 서비스 기능을 사용할 수 있습니다',
-      'service_nascab_login': 'GNasCab 계정 로그인',
+      'service_nascab_not_logged_in_hint': '로그인 후 WaterNasOS 원격 서비스 기능을 사용할 수 있습니다',
+      'service_nascab_login': 'WaterNasOS 계정 로그인',
       'service_nascab_logout': '로그아웃',
       'service_nascab_switch_account': '계정 전환',
       'service_nascab_last_login': '마지막 로그인：@time',
@@ -882,7 +882,7 @@ class KoKr extends Translations {
       'service_nascab_login_cancelled': '로그인 취소됨',
       'service_nascab_app_not_supported':
           '앱에서는 로그인을 지원하지 않습니다. PC 또는 웹 브라우저를 통해 로그인하세요.',
-      'service_nascab_login_title': 'GNasCab 계정 로그인',
+      'service_nascab_login_title': 'WaterNasOS 계정 로그인',
       'service_nascab_callback_success': '로그인 성공',
       'service_nascab_callback_success_hint': '이 페이지를 닫고 앱으로 돌아가십시오',
       'service_nascab_callback_failed': '로그인 실패',
@@ -909,8 +909,8 @@ class KoKr extends Translations {
       'service_nascab_membership_vip_diff': '요금제 비교',
       'service_nascab_membership_my_devices': '내 기기',
       'service_nascab_membership_user_center': '개인 센터',
-      'service_nascab_promotion_title': 'GNasCab 추천',
-      'service_nascab_promotion_subtitle': 'GNasCab를 추천하고 수수료를 받으세요',
+      'service_nascab_promotion_title': 'WaterNasOS 추천',
+      'service_nascab_promotion_subtitle': 'WaterNasOS를 추천하고 수수료를 받으세요',
       'service_nascab_promotion_action': '지금 추천',
 
       'service_menu_contact_us': '문의하기',
@@ -1246,6 +1246,10 @@ class KoKr extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': '이름 검색',
       'video_list_cover_size': '커버 크기',
+      'video_list_image_poster': '포스터',
+      'video_list_image_fanart': '썸네일',
+      'video_list_waterfall': '워터폴',
+      'video_list_grid': '그리드',
       'filter': '필터',
       'video_list_filter_years': '연도',
       'video_list_filter_genres': '유형',
@@ -1486,7 +1490,7 @@ class KoKr extends Translations {
           '소스 디렉터리가 다른 곳으로 이전된 경우 이 기능을 사용하여 인덱스를 업데이트하여 다시 스캔하지 않도록 할 수 있습니다. 재위치 지정 디렉터리와 원본 디렉터리 구조가 일치하는지 확인하십시오',
       'photo_source_delete_confirm': '소스 디렉터리를 삭제하시겠습니까：@path？',
       'photo_source_help_scan_when_start':
-          '활성화 후 GNasCab 시작 시 이 디렉터리를 자동으로 스캔합니다',
+          '활성화 후 WaterNasOS 시작 시 이 디렉터리를 자동으로 스캔합니다',
       'photo_source_help_scan_when_change':
           '활성화 후 디렉터리 변경 시 자동으로 감지합니다. 일부 플랫폼은 지원하지 않습니다 (예: Windows 의 Docker)',
       'photo_source_help_scan_interval': '활성화 후 일정 간격으로 자동으로 사진 변경을 스캔합니다',
@@ -1503,7 +1507,7 @@ class KoKr extends Translations {
       'book_source_unavailable': '사용 불가',
       'book_source_delete_confirm': '소스 디렉터리를 삭제하시겠습니까：@path？',
       'book_source_help_scan_when_start':
-          '활성화 후 GNasCab 시작 시 이 디렉터리를 자동으로 스캔합니다',
+          '활성화 후 WaterNasOS 시작 시 이 디렉터리를 자동으로 스캔합니다',
       'book_source_help_scan_when_change':
           '활성화 후 디렉터리 변경 시 자동으로 감지합니다. 일부 플랫폼은 지원하지 않습니다 (예: Windows 의 Docker)',
       'book_source_help_scan_interval': '활성화 후 일정 간격으로 자동으로 변경을 스캔합니다',
@@ -1522,7 +1526,7 @@ class KoKr extends Translations {
       'music_source_unavailable': '사용 불가',
       'music_source_delete_confirm': '소스 디렉터리를 삭제하시겠습니까：@path？',
       'music_source_help_scan_when_start':
-          '활성화 후 GNasCab 시작 시 이 디렉터리를 자동으로 스캔합니다',
+          '활성화 후 WaterNasOS 시작 시 이 디렉터리를 자동으로 스캔합니다',
       'music_source_help_scan_when_change':
           '활성화 후 디렉터리 변경 시 자동으로 감지합니다. 일부 플랫폼은 지원하지 않습니다 (예: Windows 의 Docker)',
       'music_source_help_scan_interval': '활성화 후 일정 간격으로 자동으로 변경을 스캔합니다',
@@ -1786,7 +1790,7 @@ class KoKr extends Translations {
       'video_source_unavailable': '사용 불가',
       'video_source_delete_confirm': '소스 디렉터리를 삭제하시겠습니까：@path？',
       'video_source_help_scan_when_start':
-          '활성화 후 GNasCab 시작 시 이 디렉터리를 자동으로 스캔합니다',
+          '활성화 후 WaterNasOS 시작 시 이 디렉터리를 자동으로 스캔합니다',
       'video_source_help_match_nfo': '활성화 후 자동으로 TMDB 에서 영화 정보를 스크래핑합니다',
       'video_source_help_scan_when_change':
           '활성화 후 디렉터리 변경 시 자동으로 감지합니다. 일부 플랫폼은 지원하지 않습니다 (예: Windows 의 Docker)',
@@ -1829,7 +1833,7 @@ class KoKr extends Translations {
       'server_add_button': '서버 추가',
       'server_need_input_password_every_time': '로그인할 때마다 비밀번호 입력 필요',
       'server_add_invalid_server':
-          '이 서버는 유효한 GNasCab 서버가 아닙니다. 서버 주소가 올바른지 확인하십시오',
+          '이 서버는 유효한 WaterNasOS 서버가 아닙니다. 서버 주소가 올바른지 확인하십시오',
       'server_connecting': '연결 중...',
       'home_server_connecting': '서버 연결 중...',
       'server_connect_fail': '서버에 연결할 수 없습니다. 네트워크 연결 또는 서버 주소를 확인하십시오',
@@ -1899,7 +1903,7 @@ class KoKr extends Translations {
       'task_upload': '업로드 작업',
       'task_download': '다운로드 작업',
       'task_upload_to': '업로드 위치',
-      'auth_welcome_title': 'GNasCab 에 오신 것을 환영합니다',
+      'auth_welcome_title': 'WaterNasOS 에 오신 것을 환영합니다',
       'auth_pair_code_label': '페어링 코드',
       'auth_pair_code_connect': '연결',
       'auth_connected_host': '연결된 호스트：@host',
@@ -1940,7 +1944,7 @@ class KoKr extends Translations {
       'admin_create_button': '관리자 생성',
       'admin_create_success': '관리자 계정이 성공적으로 생성되었습니다',
       'admin_create_success_message':
-          '생성 성공, 이 계정은 GNasCab 서버 디스크에 저장되며 네트워크 계정이 아닙니다. 기억하십시오.',
+          '생성 성공, 이 계정은 WaterNasOS 서버 디스크에 저장되며 네트워크 계정이 아닙니다. 기억하십시오.',
       'admin_create_failure': '생성 실패',
       'admin_create_username_exists': '사용자 이름이 이미 존재합니다',
 
@@ -2030,7 +2034,7 @@ class KoKr extends Translations {
       'logout_transfer_running_title': '완료되지 않은 전송 작업',
       'logout_transfer_running_content':
           '아직 완료되지 않은 업로드/다운로드 작업이 있습니다. 로그아웃하면 작업이 중단되고 삭제됩니다.',
-      'home_status_restart': 'GNasCab 재시작',
+      'home_status_restart': 'WaterNasOS 재시작',
       'home_status_monitor': '모니터링',
       'home_status_message': '메시지',
       'home_status_bg_tasks': '백그라운드 작업',
@@ -2419,7 +2423,7 @@ class KoKr extends Translations {
       'home_apps': '애플리케이션',
       'home_no_message': '최신 메시지 없음',
       'monitor_click_to_view': '클릭하여 세부정보 보기',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': '작업 센터',
       'recycle_bin_empty': '휴지통에 파일이 없습니다',
 
@@ -2597,7 +2601,7 @@ class KoKr extends Translations {
       'transmission_no_files': '파일 없음',
       'transmission_select_all_files': '전체 선택',
       'transmission_deselect_all_files': '전체 해제',
-      'transmission_auto_start': 'GNasCab 시작 시 자동 실행',
+      'transmission_auto_start': 'WaterNasOS 시작 시 자동 실행',
       'transmission_dht_enabled': 'DHT 사용',
       'transmission_pex_enabled': 'PEX 사용',
       'transmission_utp_enabled': 'uTP 사용',

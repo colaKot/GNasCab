@@ -1,12 +1,12 @@
-import 'package:GNasCab/modules/base/components/custom_expandable_search_bar.dart';
-import 'package:GNasCab/modules/base/components/custom_bordered_icon_button.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
-import 'package:GNasCab/modules/video/base/views/app_video_item_poster.dart';
-import 'package:GNasCab/modules/video/list/controller/video_list_controller.dart';
-import 'package:GNasCab/modules/video/list/view/parts/video_list_filter_menu.dart';
-import 'package:GNasCab/modules/video/list/view/parts/video_list_grid.dart';
-import 'package:GNasCab/modules/video/list/view/parts/video_list_sort_menu.dart';
-import 'package:GNasCab/modules/video/list/view/parts/video_list_top_bar.dart';
+import 'package:WaterNasOS/modules/base/components/custom_expandable_search_bar.dart';
+import 'package:WaterNasOS/modules/base/components/custom_bordered_icon_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/modules/video/base/views/app_video_item_poster.dart';
+import 'package:WaterNasOS/modules/video/list/controller/video_list_controller.dart';
+import 'package:WaterNasOS/modules/video/list/view/parts/video_list_filter_menu.dart';
+import 'package:WaterNasOS/modules/video/list/view/parts/video_list_grid.dart';
+import 'package:WaterNasOS/modules/video/list/view/parts/video_list_sort_menu.dart';
+import 'package:WaterNasOS/modules/video/list/view/parts/video_list_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

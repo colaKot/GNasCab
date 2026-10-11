@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>GNasCab</string>
+	<string>WaterNasOS</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>GNasCab</string>
+	<string>WaterNasOS</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -32,13 +32,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>GNasCab needs the camera to scan QR codes when you add a server or sign in. It does not record video or save images unless you explicitly choose to save a photo.</string>
+	<string>WaterNasOS needs the camera to scan QR codes when you add a server or sign in. It does not record video or save images unless you explicitly choose to save a photo.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>GNasCab needs photo library access to upload or back up photos and videos, browse albums, and pick media on this device. Only items you select or authorize (including limited library access) are used.</string>
+	<string>WaterNasOS needs photo library access to upload or back up photos and videos, browse albums, and pick media on this device. Only items you select or authorize (including limited library access) are used.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>GNasCab needs permission to save downloaded photos, videos, thumbnails, or exported files to your library when you use Save to Photos or similar actions.</string>
+	<string>WaterNasOS needs permission to save downloaded photos, videos, thumbnails, or exported files to your library when you use Save to Photos or similar actions.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>GNasCab uses the local network to discover and connect to your GNasCab server on Wi-Fi, stream and play media, receive LAN discovery messages, and build encrypted peer connections for remote access on your network.</string>
+	<string>WaterNasOS uses the local network to discover and connect to your WaterNasOS server on Wi-Fi, stream and play media, receive LAN discovery messages, and build encrypted peer connections for remote access on your network.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

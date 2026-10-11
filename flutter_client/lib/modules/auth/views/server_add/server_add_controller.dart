@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../beans/server_info_bean.dart';
@@ -67,8 +67,8 @@ class ServerAddController extends GetxController {
     if (prefillServerInfo != null) {
       _initializeFromPrefill();
     } else {
-      serverName.value = 'GNasCabServer';
-      serverNameController.text = 'GNasCabServer';
+      serverName.value = 'WaterNasOSServer';
+      serverNameController.text = 'WaterNasOSServer';
     }
 
     // 监听 TextEditingController 变化
@@ -182,7 +182,7 @@ class ServerAddController extends GetxController {
         );
       }
 
-      // 检查是否为GNasCab服务器
+      // 检查是否为WaterNasOS服务器
       if (isP2pMode) {
         final code = (serverInfo.pairCode ?? '').trim();
         await ApiController.instance.connectP2pByPairCode(code);

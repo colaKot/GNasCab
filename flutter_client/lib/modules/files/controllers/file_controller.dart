@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -12,7 +12,7 @@ import '../../../utils/toast_util.dart';
 import '../../../utils/file_util.dart';
 import '../../../utils/local_web_asset_server.dart';
 import '../../../utils/device_utils.dart';
-import 'package:GNasCab/core/routes/app_routes.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
 import '../../home/views/pc_home_controller.dart';
 import '../../home/views/pc_components/pc_app_window.dart';
 import '../../music/list/models/music_list_models.dart';

@@ -3,6 +3,7 @@ import '../../../../home/views/pc_components/pc_app_window.dart';
 import 'package:get/get.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';
 import '../../../../base/components/custom_bordered_icon_button.dart';
+import '../../../../base/components/custom_segmented_icon_toggle.dart';
 import '../../../../base/components/custom_popup_select_button.dart';
 import '../../controller/video_list_controller.dart';
 import 'video_list_filter_menu.dart';
@@ -272,6 +273,22 @@ class _VideoListTopBarState extends State<VideoListTopBar> {
                             onTap: controller.increasePosterScale,
                           ),
                         ],
+                      );
+                    }),
+                    const SizedBox(width: 10),
+                    // ⭐ 图片模式开关（2026-10-10）：
+                    //   左 = 封面图（竖版 poster 2:3），右 = 缩略图（横版 fanart 16:9）。
+                    //   两种模式的图片高度一致，切成横版后卡片等比变宽、一行放得更少。
+                    Obx(() {
+                      return CustomSegmentedIconToggle(
+                        firstIcon: Icons.crop_portrait,
+                        // ⭐ 横版那半用 crop_16_9（= TMDB backdrop 的标准比例），
+                        //    和左半 crop_portrait 同系列；Flutter 没有 Icons.backdrop。
+                        secondIcon: Icons.crop_16_9,
+                        firstTooltip: 'video_list_image_poster'.tr,
+                        secondTooltip: 'video_list_image_fanart'.tr,
+                        secondSelected: controller.showFanart.value,
+                        onChanged: controller.setShowFanart,
                       );
                     }),
                   ],

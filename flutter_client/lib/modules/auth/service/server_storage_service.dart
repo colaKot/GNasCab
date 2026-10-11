@@ -1,4 +1,4 @@
-import 'package:GNasCab/utils/cache_manager.dart';
+import 'package:WaterNasOS/utils/cache_manager.dart';
 import '../beans/server_info_bean.dart';
 
 /// 服务器存储服务 - 负责服务器信息的本地存储

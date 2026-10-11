@@ -3,16 +3,16 @@ Future<NasCabDesktopOAuthSession> startNasCabDesktopOAuthSession({
   Duration timeout = const Duration(minutes: 5),
   required String language,
 }) {
-  throw UnsupportedError('GNasCab desktop OAuth callback is only for dart:io targets');
+  throw UnsupportedError('WaterNasOS desktop OAuth callback is only for dart:io targets');
 }
 
 class NasCabDesktopOAuthSession {
   String get redirectUrl =>
-      throw UnsupportedError('GNasCab desktop OAuth callback is only for dart:io targets');
+      throw UnsupportedError('WaterNasOS desktop OAuth callback is only for dart:io targets');
 
   Future<Map<String, String>?> get result =>
-      throw UnsupportedError('GNasCab desktop OAuth callback is only for dart:io targets');
+      throw UnsupportedError('WaterNasOS desktop OAuth callback is only for dart:io targets');
 
   Future<void> shutdown() =>
-      throw UnsupportedError('GNasCab desktop OAuth callback is only for dart:io targets');
+      throw UnsupportedError('WaterNasOS desktop OAuth callback is only for dart:io targets');
 }

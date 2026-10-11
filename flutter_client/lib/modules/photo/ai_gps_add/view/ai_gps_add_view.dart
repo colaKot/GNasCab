@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';

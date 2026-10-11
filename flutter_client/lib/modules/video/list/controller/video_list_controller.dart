@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../../../../utils/cache_manager.dart';
 import '../../base/beans/video_item_bean.dart';
 import '../../base/services/video_item_sync_service.dart';
+import '../../media_browser/bean/media_folder_item.dart';
+import '../../media_browser/service/media_folder_api_service.dart';
 import '../service/video_list_api_service.dart';
 import '../view/parts/video_list_sort_menu.dart';
 import '../../../../utils/device_utils.dart';
@@ -116,11 +118,16 @@ class VideoListController extends GetxController {
   static const String _keySortBy = 'video_list_sort_by';
   static const String _keySortOrder = 'video_list_sort_order';
   static const String _keyPosterScale = 'video_list_poster_scale';
+  /// 图片模式的持久化**前缀**，实际 key 会再拼上「库 / 影集」后缀。
+  static const String _keyShowFanartPrefix = 'video_list_show_fanart';
+  /// 布局模式（瀑布流 / 普通网格）的持久化前缀，同样按「库 / 影集」分开存。
+  static const String _keyWaterfallPrefix = 'video_list_waterfall';
   static double posterScaleMin = DeviceUtils.isMobile ? 0.9 : 0.7;
   static double posterScaleMax = DeviceUtils.isMobile ? 1.6 : 1.4;
   static const double posterScaleStep = 0.1;
   static final RxDouble sharedPosterScale = 1.0.obs;
   static bool _posterScaleLoaded = false;
+
 
   final String initialMediaType;
   final String listType;
@@ -133,6 +140,10 @@ class VideoListController extends GetxController {
   final List<String> initialRegions;
   final List<String> initialActors;
   final List<String> initialDirectors;
+
+  /// 是否进「文件夹层级」模式（图片库 / 混合库专用）。
+  /// 做成 Rx 而不是 final，是为了顶栏那个「文件夹 / 全部平铺」按钮能实时切。
+  final RxBool folderViewEnabled;
   VideoListController({
     required this.initialMediaType,
     this.listType = '',
@@ -144,7 +155,8 @@ class VideoListController extends GetxController {
     this.initialRegions = const <String>[],
     this.initialActors = const <String>[],
     this.initialDirectors = const <String>[],
-  });
+    bool folderView = false,
+  }) : folderViewEnabled = folderView.obs;
 
   bool get isFavoriteList => listType.trim().toLowerCase() == 'favorite';
   bool get isAlbumList => (albumId ?? 0) > 0;
@@ -187,6 +199,116 @@ class VideoListController extends GetxController {
   final Rx<VideoListSortBy> sortBy = VideoListSortBy.viewTime.obs;
   final Rx<VideoListSortOrder> sortOrder = VideoListSortOrder.desc.obs;
   final RxDouble posterScale = sharedPosterScale;
+  /// ⭐ 列表图片模式（2026-10-10）：false = 竖版封面（poster 2:3），
+  /// true = 横版缩略图（fanart ≈3:2）。
+  ///
+  /// ⚠️ **每个库 / 影集各自独立**（刻意不做 static 共享）—— 在一个库里切成
+  /// 缩略图不能连带改掉别的库。选择按 [libraryId] / 影集 id / [mediaType]
+  /// 分别存（见 [_imageModeStorageSuffix]），重进同一个库还记得上次的。
+  final RxBool showFanart = false.obs;
+
+  /// ⭐ 布局模式（2026-10-10）：true = **瀑布流**（每项按自己的宽高比），
+  /// false = **普通网格**（统一 4:3，一行对齐）。
+  ///
+  /// 与 [folderViewEnabled] **正交** —— 「文件夹层级 / 整库平铺」和
+  /// 「瀑布流 / 网格」是两个独立的开关，四种组合都成立。
+  ///
+  /// 同样**按库 / 影集独立持久化**（见 [_imageModeStorageSuffix]），
+  /// 默认**开**（图片库/混合库的主要用途就是看图，瀑布流更好看）。
+  final RxBool waterfallEnabled = true.obs;
+
+  // ================== 文件夹层级（图片库 / 混合库专用）==================
+  /// 当前所在目录（空串 = 库根）
+  final RxString folderPath = ''.obs;
+  /// 当前目录的直接子文件夹
+  final RxList<MediaFolderItem> subFolders = <MediaFolderItem>[].obs;
+  /// 面包屑（从所属来源根一路走到当前目录）
+  final RxList<MediaFolderSegment> breadcrumbs = <MediaFolderSegment>[].obs;
+  /// 上一级目录；库根 / 来源根为空串（空 = 不能再往上）
+  final RxString parentFolderPath = ''.obs;
+  final RxBool foldersLoading = false.obs;
+  /// 当前目录**自身**（不含子目录）的文件数
+  final RxInt selfCount = 0.obs;
+  /// 当前目录**整棵子树**的量（本级 + 所有子文件夹），顶栏那个数字用它
+  final RxInt subtreeTotal = 0.obs;
+
+  /// 搜索时看整棵子树（否则搜不到子目录里的图）；平时只看本目录自身。
+  /// ⚠️ 'exact' 与 'subtree' 是两种不同的服务端口径，别混：
+  ///    exact → 只返回 path **恰等于**本目录的行（拼接前缀都不算）
+  String get effectiveFolderMode {
+    if (!folderViewEnabled.value) return '';
+    return searchText.value.trim().isNotEmpty ? 'subtree' : 'exact';
+  }
+
+  /// 搜索态下不展示文件夹卡片：结果已经跨目录了，再列目录会自相矛盾
+  bool get showFolderCards =>
+      folderViewEnabled.value && searchText.value.trim().isEmpty;
+
+  bool get canGoUp =>
+      folderViewEnabled.value && parentFolderPath.value.trim().isNotEmpty;
+
+  /// 切进某个目录（传空串 = 回库根）
+  Future<void> setFolder(String path) async {
+    final next = path.trim();
+    if (next == folderPath.value) return;
+    folderPath.value = next;
+    items.clear();
+    await refreshList(showLoading: true);
+  }
+
+  Future<void> goUp() async {
+    if (!canGoUp) return;
+    await setFolder(parentFolderPath.value);
+  }
+
+  /// 文件夹视图 ↔ 整库平铺
+  Future<void> setFolderView(bool enabled) async {
+    if (folderViewEnabled.value == enabled) return;
+    folderViewEnabled.value = enabled;
+    if (!enabled) {
+      folderPath.value = '';
+      subFolders.clear();
+      breadcrumbs.clear();
+      parentFolderPath.value = '';
+      selfCount.value = 0;
+      subtreeTotal.value = 0;
+    }
+    items.clear();
+    await refreshList(showLoading: true);
+  }
+
+  /// 拉当前目录的子文件夹。
+  /// **失败不抛**：文件夹列表挂了不该连带把本级文件的瀑布流也弄崩 ——
+  /// 后者才是用户最需要看到的内容。
+  Future<void> loadFolders() async {
+    if (!showFolderCards || libraryId <= 0) {
+      subFolders.clear();
+      breadcrumbs.clear();
+      parentFolderPath.value = '';
+      selfCount.value = 0;
+      return;
+    }
+    foldersLoading.value = true;
+    try {
+      final level = await MediaFolderApiService.instance.listFolders(
+        libraryId: libraryId,
+        folderPath: folderPath.value,
+      );
+      subFolders.assignAll(level.folders);
+      breadcrumbs.assignAll(level.segments);
+      parentFolderPath.value = level.parentPath ?? '';
+      selfCount.value = level.selfCount;
+      subtreeTotal.value =
+          level.selfCount + level.folders.fold<int>(0, (a, f) => a + f.count);
+    } catch (_) {
+      subFolders.clear();
+      breadcrumbs.clear();
+      parentFolderPath.value = '';
+      selfCount.value = 0;
+    } finally {
+      foldersLoading.value = false;
+    }
+  }
 
   bool get hasActiveFilters =>
       genres.isNotEmpty ||
@@ -337,6 +459,68 @@ class VideoListController extends GetxController {
     } catch (_) {}
   }
 
+  /// 图片模式的持久化键后缀 —— **让每个库 / 影集各自独立**。
+  ///
+  /// 优先用具体的容器 id；都没有（「全部」这类入口）才退到 [initialMediaType]。
+  String _imageModeStorageSuffix() {
+    final parts = <String>[];
+    if (libraryId > 0) parts.add('lib$libraryId');
+    if (collectionId != null && collectionId! > 0) {
+      parts.add('col$collectionId');
+    }
+    if (smartAlbumId != null && smartAlbumId! > 0) {
+      parts.add('smart$smartAlbumId');
+    }
+    if (albumId != null && albumId! > 0) parts.add('alb$albumId');
+    if (parts.isEmpty) {
+      final mt = initialMediaType.trim();
+      parts.add(mt.isEmpty ? 'default' : mt);
+    }
+    return parts.join('_');
+  }
+
+  String get _showFanartKey =>
+      '${_keyShowFanartPrefix}_${_imageModeStorageSuffix()}';
+
+  void _loadShowFanart() {
+    try {
+      showFanart.value = CacheManager().getBool(_showFanartKey) ?? false;
+    } catch (_) {
+      showFanart.value = false;
+    }
+  }
+
+  /// 切换**当前库**的图片模式：false = 竖版封面，true = 横版缩略图。
+  /// 只影响这一个库 / 影集，并且它自己记住自己的选择。
+  void setShowFanart(bool on) {
+    if (showFanart.value == on) return;
+    showFanart.value = on;
+    try {
+      CacheManager().setBool(_showFanartKey, on);
+    } catch (_) {}
+  }
+
+  String get _waterfallKey =>
+      '${_keyWaterfallPrefix}_${_imageModeStorageSuffix()}';
+
+  void _loadWaterfall() {
+    try {
+      waterfallEnabled.value = CacheManager().getBool(_waterfallKey) ?? true;
+    } catch (_) {
+      waterfallEnabled.value = true;
+    }
+  }
+
+  /// 切换**当前库**的布局：true = 瀑布流，false = 普通网格。
+  /// 纯 UI 状态，不重新拉数据。
+  void setWaterfall(bool on) {
+    if (waterfallEnabled.value == on) return;
+    waterfallEnabled.value = on;
+    try {
+      CacheManager().setBool(_waterfallKey, on);
+    } catch (_) {}
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -350,6 +534,8 @@ class VideoListController extends GetxController {
     }
     _loadSortSettings();
     _loadPosterScale();
+    _loadShowFanart();
+    _loadWaterfall();
     genres.assignAll(
       initialGenres.map((e) => e.trim()).where((e) => e.isNotEmpty),
     );
@@ -406,16 +592,23 @@ class VideoListController extends GetxController {
         actors: actors.toList(),
         directors: directors.toList(),
         years: selectedYears.toList(),
-        sourceList:
-            requestedSelectedPaths.isEmpty ? null : requestedSelectedPaths,
+        // ⭐ 文件夹视图下不发来源筛选：folderPath 本身就是路径口径，
+        //    两个一起发会被服务端 intersect 掉，出现「明明在浏览却 403」。
+        sourceList: (folderViewEnabled.value || requestedSelectedPaths.isEmpty)
+            ? null
+            : requestedSelectedPaths,
         sortBy: _toSortByParam(sortBy.value),
         sortOrder: _toSortOrderParam(sortOrder.value),
+        folderPath: folderPath.value,
+        folderMode: effectiveFolderMode,
         showLoading: showLoading,
       );
       items.assignAll(res.items);
       total.value = res.pagination.total;
       hasMore.value = res.pagination.hasNextPage;
       availablePaths.assignAll(res.validPaths);
+      // 子文件夹列表跟本级文件一起取，避免「内容区空白一下再蹦出目录卡片」
+      await loadFolders();
       final didRestoreSelectedPaths = await _restoreSelectedPaths(
         effectiveMediaType: effectiveMediaType,
         availablePathItems: res.validPaths,
@@ -547,9 +740,14 @@ class VideoListController extends GetxController {
         actors: actors.toList(),
         directors: directors.toList(),
         years: selectedYears.toList(),
-        sourceList: selectedPaths.isEmpty ? null : selectedPaths.toList(),
+        sourceList: (folderViewEnabled.value || selectedPaths.isEmpty)
+            ? null
+            : selectedPaths.toList(),
         sortBy: _toSortByParam(sortBy.value),
         sortOrder: _toSortOrderParam(sortOrder.value),
+        // ⭐ 翻页必须沿用同一个文件夹口径，否则第 2 页会悄悄变成「整库」
+        folderPath: folderPath.value,
+        folderMode: effectiveFolderMode,
         showLoading: false,
       );
       _page = nextPage;

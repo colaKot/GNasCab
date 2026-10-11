@@ -12,7 +12,7 @@ class tableUser2FA {
         table.integer('user_id').notNullable();
         table.boolean('is_enabled').notNullable().defaultTo(false);
         table.text('secret_enc').nullable();
-        table.string('issuer').notNullable().defaultTo('GNasCab');
+        table.string('issuer').notNullable().defaultTo('WaterNasOS');
         table.integer('period').notNullable().defaultTo(30);
         table.integer('digits').notNullable().defaultTo(6);
         table.string('algorithm').notNullable().defaultTo('sha1');

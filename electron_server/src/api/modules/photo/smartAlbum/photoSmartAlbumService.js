@@ -54,8 +54,6 @@ class PhotoSmartAlbumService {
       throw err;
     }
 
-    if (userUtil.isAdmin(user)) return album;
-
     if (Number(album.uid) !== Number(uid)) {
       const err = new Error('auth.PERMISSION_DENIED');
       err.statusCode = 403;

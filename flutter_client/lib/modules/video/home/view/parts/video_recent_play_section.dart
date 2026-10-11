@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/routes/app_routes.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../base/beans/video_item_bean.dart';

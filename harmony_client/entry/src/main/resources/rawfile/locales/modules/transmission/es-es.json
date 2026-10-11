@@ -68,7 +68,7 @@
   "transmission_no_files": "Sin archivos",
   "transmission_select_all_files": "Seleccionar todo",
   "transmission_deselect_all_files": "Deseleccionar todo",
-  "transmission_auto_start": "Iniciar automaticamente con GNasCab",
+  "transmission_auto_start": "Iniciar automaticamente con WaterNasOS",
   "transmission_dht_enabled": "Habilitar DHT",
   "transmission_pex_enabled": "Habilitar PEX",
   "transmission_utp_enabled": "Habilitar uTP",

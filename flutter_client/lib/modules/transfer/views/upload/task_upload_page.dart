@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:GNasCab/modules/base/components/custom_bordered_icon_button.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
-import 'package:GNasCab/modules/base/components/custom_divider.dart';
+import 'package:WaterNasOS/modules/base/components/custom_bordered_icon_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/modules/base/components/custom_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';

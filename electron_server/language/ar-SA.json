@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "انتهت مهلة الشبكة",
       "NETWORK_ERROR": "خطأ في الشبكة",
       "REMOTE_AUTH_FAILED": "فشل المصادقة عن بُعد",
-      "NASCAB_LOGIN_REQUIRED": "يجب تسجيل الدخول إلى حساب GNasCab لتفعيل الوصول عن بُعد",
+      "NASCAB_LOGIN_REQUIRED": "يجب تسجيل الدخول إلى حساب WaterNasOS لتفعيل الوصول عن بُعد",
       "NASCAB_SESSION_EXPIRED": "انتهت صلاحية جلستك، يرجى تسجيل الدخول مرة أخرى",
       "PAIR_CODE_RESET_FAILED": "فشل إعادة تعيين رمز الاقتران",
       "USER_SERIALIZE_FAILED": "فشل تسلسل معلومات المستخدم",

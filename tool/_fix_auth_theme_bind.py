@@ -6,7 +6,7 @@
 
 背景：`darkTheme` 是编译期常量 = buildDarkTheme(AppColorSchemes.defaultScheme)，
 永远默认 shadBlue ⇒ 用户换任何配色，登录页/服务器列表页的颜色都不跟着变。
-详见 docs/GNasCab-开发速查.md §1.3。
+详见 docs/WaterNasOS-开发速查.md §1.3。
 
 逐文件「读 → 改 → 校验」；改完必须没有残留的 `darkTheme` 标识符。
 ⚠️ 故意不动 `modules/home/views/pc_components/pc_app_window.dart`：

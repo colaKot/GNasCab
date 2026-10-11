@@ -10,6 +10,7 @@ const knexUtil = require('../db/knexUtil');
 const dbUtil = require('../db/dbUtil');
 const tableConfig = require('../db/table/tableConfig');
 const { TmdbClient } = require('./videoIndex/nfoFetchWorker/tmdbClient');
+const networkProxyUtil = require('../utils/networkProxyUtil');
 
 let started = false;
 let dbInitialized = false;
@@ -37,7 +38,11 @@ async function getProxyAgent(allowProxy) {
   try {
     const [proxyEnable, proxyUrlRaw] = await Promise.all([tableConfig.getConfigByKey('tmdbProxyEnable').catch(() => null), tableConfig.getConfigByKey('tmdbProxyUrl').catch(() => null)]);
     const enabled = proxyEnable === '1' || proxyEnable === 1;
-    const proxyUrl = enabled && proxyUrlRaw ? String(proxyUrlRaw).trim() : '';
+    let proxyUrl = enabled && proxyUrlRaw ? String(proxyUrlRaw).trim() : '';
+    // TMDB 代理未开启时回退到「整体设置」里的全局代理
+    if (!proxyUrl) {
+      proxyUrl = await networkProxyUtil.resolveGlobalProxyUrl();
+    }
     if (!proxyUrl) return undefined;
     const client = new TmdbClient({ apiUrl: 'https://api.tmdb.org', apiToken: '', proxyUrl, language: 'en-US' });
     return client && client._proxyAgent ? client._proxyAgent : undefined;

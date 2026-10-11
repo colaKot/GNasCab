@@ -445,6 +445,17 @@ class FileService {
       this._deferTinyToWorker(resolvedPath);
     }
 
+    // ⭐ 图片一律不在 HTTP 线程里同步生成（2026-10-10）。
+    // 一张 9504×6336 的 JPEG 解码要 0.7~0.8s；网格一屏 30 张并发请求 = 30 个 sharp
+    // 同时解码 ⇒ CPU 瞬间打满，页面长时间空白。改成入队 + 202，由 tinyImageWorker
+    // 在独立进程里按受控并发生成；前端 CustomExtendedImage 本来就有 202/404
+    // 指数退避重试（5 次，500ms→8s），体验上会「先占位、随后逐张出现」。
+    // ⚠️ worker 自己调用时必须传 deferImages:false，否则会「入队→又入队」死循环。
+    const deferImages = typeof opts?.deferImages === 'boolean' ? opts.deferImages : true;
+    if (deferImages && type === 'image') {
+      this._deferTinyToWorker(resolvedPath);
+    }
+
     const deferSlowIo = typeof opts?.deferSlowIo === 'boolean' ? opts.deferSlowIo : true;
     if (deferSlowIo && (await isSlowIoPathForTiny(resolvedPath))) {
       this._deferTinyToWorker(resolvedPath);

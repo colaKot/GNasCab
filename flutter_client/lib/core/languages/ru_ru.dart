@@ -286,14 +286,14 @@ class RuRu extends Translations {
       'api_code_notes_notebook_not_found':
           "Папка блокнота не существует или была перемещена",
       'api_code_notes_notebook_invalid':
-          "Выбранная папка не является допустимым блокнотом GNasCab",
+          "Выбранная папка не является допустимым блокнотом WaterNasOS",
       'api_code_notes_notebook_folder_not_empty':
           "Выбранная папка не пуста и не может быть инициализирована как новый блокнот",
       'api_code_notes_group_not_empty':
           "В группе все еще есть заметки, поэтому ее нельзя удалить",
       'notes_notebook_choose_title': "Выбрать или создать блокнот",
       'notes_notebook_choose_desc':
-          "При первом открытии выберите пустую папку или существующую папку блокнота GNasCab.",
+          "При первом открытии выберите пустую папку или существующую папку блокнота WaterNasOS.",
       'notes_choose_folder': "Выбрать папку блокнота",
       'notes_original_path_missing':
           "Исходный путь блокнота больше не существует: ",
@@ -720,7 +720,7 @@ class RuRu extends Translations {
           'Базовый процесс API; при остановке приложение становится недоступным',
       'process.worker.expressBroadcast.name': 'LAN-трансляция API',
       'process.worker.expressBroadcast.purpose':
-          'Позволяет клиентам находить серверы GNasCab в локальной сети',
+          'Позволяет клиентам находить серверы WaterNasOS в локальной сети',
       'process.worker.ffmpegHwTest.name':
           'Проверка аппаратного ускорения FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
@@ -867,12 +867,12 @@ class RuRu extends Translations {
       'terminal_cursor_blink': 'Мигание курсора',
       'terminal_click_to_pick_color': 'Нажмите для выбора цвета',
       'service_menu_account': 'Учётная запись',
-      'service_menu_account_nascab': 'GNasCab Account',
+      'service_menu_account_nascab': 'WaterNasOS Account',
       'service_menu_remote_access': 'Удалённый доступ',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'NAT Traversal',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -901,7 +901,7 @@ class RuRu extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'Включить удалённый доступ',
       'service_remote_access_toggle_hint':
-          'После включения GNasCab можно безопасно использовать в удалённой среде.',
+          'После включения WaterNasOS можно безопасно использовать в удалённой среде.',
       'service_remote_access_pair_code_label': 'Код сопряжения',
       'service_remote_access_pair_code_empty': 'Нет кода',
       'service_remote_access_custom_pair_code_title': 'Пользовательский код',
@@ -937,7 +937,7 @@ class RuRu extends Translations {
       'P2P_TOO_MANY_REQUESTS':
           'Слишком много запросов. Пожалуйста, повторите попытку позже.',
       'service_p2p_device_not_bind_message':
-          'Чтобы использовать эту функцию, привяжите текущее устройство к учётной записи GNasCab. Когда она больше не нужна, привязку можно отменить.',
+          'Чтобы использовать эту функцию, привяжите текущее устройство к учётной записи WaterNasOS. Когда она больше не нужна, привязку можно отменить.',
       'service_p2p_bind_device_button': 'Привязать',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Неверный формат кода (6-30, только буквы/цифры)',
@@ -954,15 +954,15 @@ class RuRu extends Translations {
       'service_remote_access_guide_title': 'Руководство по удалённому доступу',
       'service_remote_access_guide_how_title': 'Как это работает?',
       'service_remote_access_guide_how_body':
-          'После включения GNasCab назначает случайный код. С ним можно подключаться к хосту из любого приложения GNasCab. Приоритет — P2P; если P2P недоступен, используется ближайший узел ретрансляции. Данные передаются через SSL + WebRTC.',
+          'После включения WaterNasOS назначает случайный код. С ним можно подключаться к хосту из любого приложения WaterNasOS. Приоритет — P2P; если P2P недоступен, используется ближайший узел ретрансляции. Данные передаются через SSL + WebRTC.',
       'service_remote_access_guide_use_title': 'Как использовать код?',
       'service_remote_access_guide_use_body':
           'При добавлении сервера в приложении выберите «Добавить по коду» и введите или отсканируйте код.',
-      'service_nascab_title': 'GNasCab Account',
+      'service_nascab_title': 'WaterNasOS Account',
       'service_nascab_not_logged_in': 'Не выполнен вход',
       'service_nascab_not_logged_in_hint':
           'Войдите для использования функций удалённого доступа',
-      'service_nascab_login': 'Войти в GNasCab',
+      'service_nascab_login': 'Войти в WaterNasOS',
       'service_nascab_logout': 'Выйти',
       'service_nascab_switch_account': 'Сменить учётную запись',
       'service_nascab_last_login': 'Последний вход: @time',
@@ -976,7 +976,7 @@ class RuRu extends Translations {
       'service_nascab_login_cancelled': 'Вход отменён',
       'service_nascab_app_not_supported':
           'Вход в систему не поддерживается в приложении. Пожалуйста, войдите через ПК или веб-браузер.',
-      'service_nascab_login_title': 'Вход в GNasCab',
+      'service_nascab_login_title': 'Вход в WaterNasOS',
       'service_nascab_callback_success': 'Вход успешен',
       'service_nascab_callback_success_hint':
           'Можно закрыть эту страницу и вернуться в приложение',
@@ -1005,9 +1005,9 @@ class RuRu extends Translations {
       'service_nascab_membership_vip_diff': 'Сравнение тарифов',
       'service_nascab_membership_my_devices': 'Мои устройства',
       'service_nascab_membership_user_center': 'Личный кабинет',
-      'service_nascab_promotion_title': 'Реклама GNasCab',
+      'service_nascab_promotion_title': 'Реклама WaterNasOS',
       'service_nascab_promotion_subtitle':
-          'Рекламируйте GNasCab и получайте комиссию',
+          'Рекламируйте WaterNasOS и получайте комиссию',
       'service_nascab_promotion_action': 'Рекламировать',
 
       'service_menu_contact_us': 'Связаться с нами',
@@ -1365,6 +1365,10 @@ class RuRu extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Поиск по названию',
       'video_list_cover_size': 'Размер обложки',
+      'video_list_image_poster': 'Постер',
+      'video_list_image_fanart': 'Миниатюра',
+      'video_list_waterfall': 'Водопад',
+      'video_list_grid': 'Сетка',
       'filter': 'Фильтр',
       'video_list_filter_years': 'Год',
       'video_list_filter_genres': 'Жанры',
@@ -1566,7 +1570,7 @@ class RuRu extends Translations {
           'Если исходная папка перемещена, используйте эту функцию для обновления индексов, чтобы избежать повторного сканирования. Убедитесь, что структура папок одинакова.',
       'photo_source_delete_confirm': 'Удалить исходную папку: @path?',
       'photo_source_help_scan_when_start':
-          'При включении эта папка будет сканироваться при запуске GNasCab.',
+          'При включении эта папка будет сканироваться при запуске WaterNasOS.',
       'photo_source_help_scan_when_change':
           'При включении изменения в папке будут обнаруживаться автоматически. Некоторые платформы не поддерживаются (например, Docker на Windows).',
       'photo_source_help_scan_interval':
@@ -1584,7 +1588,7 @@ class RuRu extends Translations {
       'book_source_unavailable': 'Недоступно',
       'book_source_delete_confirm': 'Удалить исходную папку: @path?',
       'book_source_help_scan_when_start':
-          'При включении эта папка будет сканироваться при запуске GNasCab.',
+          'При включении эта папка будет сканироваться при запуске WaterNasOS.',
       'book_source_help_scan_when_change':
           'При включении изменения в папке будут обнаруживаться автоматически. Некоторые платформы не поддерживаются (например, Docker на Windows).',
       'book_source_help_scan_interval':
@@ -1604,7 +1608,7 @@ class RuRu extends Translations {
       'music_source_unavailable': 'Недоступно',
       'music_source_delete_confirm': 'Удалить исходную папку: @path?',
       'music_source_help_scan_when_start':
-          'При включении эта папка будет сканироваться при запуске GNasCab.',
+          'При включении эта папка будет сканироваться при запуске WaterNasOS.',
       'music_source_help_scan_when_change':
           'При включении изменения в папке будут обнаруживаться автоматически. Некоторые платформы не поддерживаются (например, Docker на Windows).',
       'music_source_help_scan_interval':
@@ -1884,7 +1888,7 @@ class RuRu extends Translations {
       'video_source_unavailable': 'Недоступно',
       'video_source_delete_confirm': 'Удалить исходную папку: @path?',
       'video_source_help_scan_when_start':
-          'При включении эта папка будет сканироваться при запуске GNasCab.',
+          'При включении эта папка будет сканироваться при запуске WaterNasOS.',
       'video_source_help_match_nfo':
           'При включении автоматически получать информацию о фильме из TMDB.',
       'video_source_help_scan_when_change':
@@ -1907,7 +1911,7 @@ class RuRu extends Translations {
       'server_menu_select_channel': 'Выбрать канал',
       'server_menu_edit_pair_code': 'Редактировать код сопряжения',
       'server_saved': 'Сохранённые серверы',
-      'server_listTitle': 'Выберите сервер GNasCab для входа',
+      'server_listTitle': 'Выберите сервер WaterNasOS для входа',
       'server_add': 'Добавить сервер',
       'server_localServer': 'Локальный',
       'server_scanned': 'Обнаруженный сервер',
@@ -1928,7 +1932,7 @@ class RuRu extends Translations {
       'server_need_input_password_every_time':
           'Требовать пароль при каждом входе',
       'server_add_invalid_server':
-          'Этот сервер не является сервером GNasCab, проверьте адрес',
+          'Этот сервер не является сервером WaterNasOS, проверьте адрес',
       'server_connect_timeout': 'Тайм-аут подключения, повторите позже',
       'server_connect_failed_with_error': 'Ошибка подключения: @error',
       'server_add_exit_title': 'Подтверждение выхода',
@@ -1944,7 +1948,7 @@ class RuRu extends Translations {
       'server_pair_code_how_link': 'Как получить код?',
       'server_pair_code_how_title': 'Как получить код сопряжения?',
       'server_pair_code_how_content':
-          'Включите на GNasCab: Сервис -> Удалённый доступ. Затем получите код. Код позволяет достичь хоста из любого места.',
+          'Включите на WaterNasOS: Сервис -> Удалённый доступ. Затем получите код. Код позволяет достичь хоста из любого места.',
       'server_pair_code_scan_qr': 'Сканировать QR',
       'server_pair_code_scan_invalid': 'Неверный код сопряжения',
       'server_edit_pair_code_title': 'Редактировать код',
@@ -1998,7 +2002,7 @@ class RuRu extends Translations {
       'auth_login_error': 'Произошла ошибка во время входа',
       'auth_token_refresh_failure': 'Ошибка обновления токена',
       'auth_token_refresh_error': 'Произошла ошибка во время обновления токена',
-      'auth_welcome_title': 'Добро пожаловать в GNasCab',
+      'auth_welcome_title': 'Добро пожаловать в WaterNasOS',
       'auth_pair_code_label': 'Код сопряжения',
       'auth_pair_code_connect': 'Подключить',
       'auth_connected_host': 'Подключённый хост: @host',
@@ -2136,7 +2140,7 @@ class RuRu extends Translations {
       'logout_transfer_running_title': 'Незавершённые задачи передачи',
       'logout_transfer_running_content':
           'У вас есть незавершённые задачи загрузки/выгрузки. После выхода они будут остановлены и удалены.',
-      'home_status_restart': 'Перезапустить GNasCab',
+      'home_status_restart': 'Перезапустить WaterNasOS',
       'home_status_monitor': 'Монитор',
       'home_status_message': 'Сообщения',
       'home_status_bg_tasks': 'Фоновые задачи',
@@ -2538,7 +2542,7 @@ class RuRu extends Translations {
       'home_apps': 'Приложения',
       'home_no_message': 'Нет сообщений',
       'monitor_click_to_view': 'Нажмите для просмотра деталей',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Центр задач',
       'recycle_bin_empty': 'Корзина пуста',
       'no_messages': 'Нет сообщений',
@@ -2729,7 +2733,7 @@ class RuRu extends Translations {
       'transmission_no_files': 'Нет файлов',
       'transmission_select_all_files': 'Выбрать все',
       'transmission_deselect_all_files': 'Снять выбор',
-      'transmission_auto_start': 'Автозапуск с GNasCab',
+      'transmission_auto_start': 'Автозапуск с WaterNasOS',
       'transmission_dht_enabled': 'Включить DHT',
       'transmission_pex_enabled': 'Включить PEX',
       'transmission_utp_enabled': 'Включить uTP',

@@ -95,6 +95,25 @@ class VideoIndexWorker {
 
     await videoIndexIndexUtil.deleteMissingIndexes({ knex, scanPath });
 
+    // ⭐ 图片索引（image_index）扫描期状态：
+    //   ① 先把该来源已有的 (path||filename) -> file_mtime 载入内存（约 7 万条 ≈ 7MB）
+    //   ② 扫描时逐条比对，**只有文件真的变了才写库** —— 避免 7 万张图逐行 fsync
+    //   ③ 攒够 500 条一个事务批量 upsert
+    //   ④ 扫完把「库里还在、本次没走到」的行删掉（文件被外部删除）
+    const imageMtimeMap = indexImages
+      ? await videoIndexIndexUtil.loadImageIndexMtimeMap({ knex, sourceId })
+      : new Map();
+    const imageSeenKeys = new Set();
+    let imagePendingRows = [];
+    let imageSkippedCount = 0;
+
+    const flushImageRows = async () => {
+      if (imagePendingRows.length === 0) return;
+      const batch = imagePendingRows;
+      imagePendingRows = [];
+      await videoIndexIndexUtil.upsertImageIndexBatch(knex, batch);
+    };
+
     const showStats = new Map();
     const seasonStats = new Map();
     const showSeasons = new Map();
@@ -166,14 +185,34 @@ class VideoIndexWorker {
           aborted = true;
           return false;
         }
-        if (FileUtil.shouldSkipIndexingFilename(entry && entry.filename ? String(entry.filename) : '')) {
+        const imgName = entry && entry.filename ? String(entry.filename) : '';
+        if (FileUtil.shouldSkipIndexingFilename(imgName)) {
           return true;
         }
-        const ok = await videoIndexIndexUtil.indexImageFile({ knex, ...entry });
-        if (ok) {
-          indexedCount += 1;
-          processedVideoCount += 1;
+
+        const imgKey = `${entry && entry.dirPath ? entry.dirPath : ''}||${imgName}`;
+        imageSeenKeys.add(imgKey);
+
+        const row = await videoIndexIndexUtil.buildImageIndexRow({
+          ...entry,
+          libraryId: Number(source.library_id) || 0,
+          sourceId,
+        });
+        if (!row) return true;
+
+        // 文件 mtime 没变 ⇒ 整行跳过，完全不碰数据库
+        const prevMtime = imageMtimeMap.get(imgKey);
+        if (prevMtime !== undefined && prevMtime === row.file_mtime) {
+          imageSkippedCount += 1;
+          return true;
         }
+
+        imagePendingRows.push(row);
+        imageMtimeMap.set(imgKey, row.file_mtime);
+        indexedCount += 1;
+        processedVideoCount += 1;
+
+        if (imagePendingRows.length >= 500) await flushImageRows();
         return true;
       },
       includeImages: indexImages,
@@ -232,6 +271,29 @@ class VideoIndexWorker {
     if (completed === false) aborted = true;
 
     await flushTvFolderIndexes();
+
+    // 图片索引收尾：先落盘剩余批次，再清理「本次没扫到」的陈旧行。
+    // ⚠️ aborted（来源被删/中途退出）时不能清理 —— 那会把还没扫到的行误删。
+    if (indexImages) {
+      await flushImageRows();
+      if (!aborted) {
+        const staleCount = await videoIndexIndexUtil.deleteImageIndexesNotSeen({
+          knex,
+          libraryId: Number(source.library_id) || 0,
+          sourceId,
+          seenKeys: imageSeenKeys,
+        });
+        if (staleCount > 0) {
+          Logger.info('Video library: removed stale image indexes', { scanPath, staleCount });
+        }
+      }
+      Logger.info('Video library: image scan summary', {
+        scanPath,
+        seen: imageSeenKeys.size,
+        written: indexedCount,
+        skippedUnchanged: imageSkippedCount,
+      });
+    }
 
     Logger.info('Video library: scan done ' + scanPath, 'elapsedMs:', Date.now() - start, 'files:', indexedCount);
 

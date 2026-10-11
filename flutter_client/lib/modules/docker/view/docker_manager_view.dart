@@ -30,7 +30,6 @@ class DockerManagerView extends StatelessWidget {
 }
 
 class DockerManagerContent extends StatelessWidget {
-  static const double _desktopTopInset = 40;
   final bool appMode;
   final bool embedded;
 
@@ -179,7 +178,6 @@ class _DockerSidebar extends StatelessWidget {
             )
             .toList(growable: false),
         showCollapseToggle: false,
-        topPlaceholderHeight: DockerManagerContent._desktopTopInset,
       ),
     );
   }
@@ -307,8 +305,6 @@ class _DockerEmbeddedBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (!appMode)
-          const SizedBox(height: DockerManagerContent._desktopTopInset),
         if (appMode) ...[
           _DockerTopBar(controller: controller, topPadding: 18),
           const Divider(height: 1),

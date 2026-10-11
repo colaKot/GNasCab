@@ -31,7 +31,7 @@
   "process.worker.express.name": "خدمة API",
   "process.worker.express.purpose": "عملية أساسية توفر خدمة API؛ عند إيقافها لا يمكن الوصول إلى التطبيق",
   "process.worker.expressBroadcast.name": "بث LAN للـ API",
-  "process.worker.expressBroadcast.purpose": "يتيح للعملاء اكتشاف خوادم GNasCab على الشبكة المحلية",
+  "process.worker.expressBroadcast.purpose": "يتيح للعملاء اكتشاف خوادم WaterNasOS على الشبكة المحلية",
   "process.worker.ffmpegHwTest.name": "فحص تسريع FFmpeg",
   "process.worker.ffmpegHwTest.purpose": "يفحص دعم تسريع الأجهزة لـ FFmpeg على هذا المضيف",
   "process.worker.fileAllIndex.name": "فهرسة الملفات الشاملة",

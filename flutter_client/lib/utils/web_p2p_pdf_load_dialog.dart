@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:GNasCab/core/api/http_client_factory.dart'
-    if (dart.library.html) 'package:GNasCab/core/api/http_client_factory_web.dart'
-    if (dart.library.io) 'package:GNasCab/core/api/http_client_factory_io.dart';
-import 'package:GNasCab/utils/toast_util.dart';
+import 'package:WaterNasOS/core/api/http_client_factory.dart'
+    if (dart.library.html) 'package:WaterNasOS/core/api/http_client_factory_web.dart'
+    if (dart.library.io) 'package:WaterNasOS/core/api/http_client_factory_io.dart';
+import 'package:WaterNasOS/utils/toast_util.dart';
 
 String _formatBytes(int n) {
   if (n < 1024) return '$n B';

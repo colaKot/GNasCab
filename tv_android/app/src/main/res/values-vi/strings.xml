@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">Máy chủ</string>
     <string name="server_discovered_section">Đã phát hiện</string>
@@ -350,7 +350,7 @@
     <string name="error_twofa_too_many_attempts">Quá nhiều lần thử, hãy thử lại sau</string>
     <string name="error_twofa_invalid_token">Mã 2FA không hợp lệ, vui lòng đăng nhập lại</string>
     <string name="error_network_failed">Yêu cầu mạng thất bại</string>
-    <string name="error_not_nascab_server">Không phải máy chủ GNasCab</string>
+    <string name="error_not_nascab_server">Không phải máy chủ WaterNasOS</string>
     <string name="error_not_logged_in">Vui lòng đăng nhập trước</string>
     <string name="error_server_unreachable">Không thể truy cập máy chủ, vui lòng kiểm tra trạng thái máy chủ</string>
     <string name="error_no_direct_url">Không có URL trực tiếp nào khả dụng</string>

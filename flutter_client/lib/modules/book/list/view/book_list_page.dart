@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

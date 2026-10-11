@@ -20,6 +20,10 @@ class VideoItemPoster extends StatefulWidget {
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VideoHomeItemBean>? onDeleted;
 
+  /// ⭐ 横版「缩略图」模式（2026-10-10）：显示 fanart（16:9）而不是竖版 poster（2:3）。
+  /// 由影视列表顶栏的两段开关控制，默认 false = 沿用原来的竖版封面。
+  final bool showFanart;
+
   const VideoItemPoster({
     super.key,
     required this.item,
@@ -34,6 +38,7 @@ class VideoItemPoster extends StatefulWidget {
     this.onTitleTap,
     this.onFavoriteChanged,
     this.onDeleted,
+    this.showFanart = false,
   });
 
   @override
@@ -95,7 +100,10 @@ class _VideoItemPosterState extends State<VideoItemPoster> {
     final item = widget.item;
     final title = item.nfoName.isNotEmpty ? item.nfoName : item.filename;
     final year = item.nfoYear > 0 ? item.nfoYear.toString() : '';
-    final posterUrl = VideoUtils.getPosterUrl(item, size: 500);
+    // ⭐ 同一张卡片两种图：竖版封面 2:3 / 横版缩略图 16:9（外层的网格宽度会跟着变）
+    final posterUrl = widget.showFanart
+        ? VideoUtils.getFanartThumbUrl(item, size: 500)
+        : VideoUtils.getPosterUrl(item, size: 500);
 
     final p = widget.progress;
     final safeProgress = p?.clamp(0, 1).toDouble();
@@ -122,7 +130,8 @@ class _VideoItemPosterState extends State<VideoItemPoster> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   AspectRatio(
-                    aspectRatio: 2 / 3,
+                    // ⭐ 横版 3:2 = 刮削出的 backdrop 图的真实比例（见 video_list_grid 注释）
+                    aspectRatio: widget.showFanart ? 3 / 2 : 2 / 3,
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -132,6 +141,11 @@ class _VideoItemPosterState extends State<VideoItemPoster> {
                           rating: item.nfoScore,
                           typeText: videoMediaTypeText(item.mediaType),
                           hovered: _hovered,
+                          // ⭐ 横版缩略图用 contain：库里横屏 / 竖屏视频混排，
+                          //    用固定比例的框去 cover 一定会把其中一类裁掉一大块。
+                          fit: widget.showFanart
+                              ? BoxFit.contain
+                              : BoxFit.cover,
                         ),
                         if (_hovered || _effectiveFavorite)
                           Positioned(

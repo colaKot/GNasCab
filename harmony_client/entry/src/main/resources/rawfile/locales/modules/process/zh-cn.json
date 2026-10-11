@@ -31,7 +31,7 @@
   "process.worker.express.name": "API服务进程",
   "process.worker.express.purpose": "基础进程，用于提供API服务，此进程关闭后程序将无法访问",
   "process.worker.expressBroadcast.name": "API服务局域网广播进程",
-  "process.worker.expressBroadcast.purpose": "用于客户端自动发现局域网内的GNasCab服务器",
+  "process.worker.expressBroadcast.purpose": "用于客户端自动发现局域网内的WaterNasOS服务器",
   "process.worker.ffmpegHwTest.name": "FFMPEG硬件加速检测进程",
   "process.worker.ffmpegHwTest.purpose": "用于检测当前主机的FFMPEG硬件加速支持情况",
   "process.worker.fileAllIndex.name": "全局文件索引进程",

@@ -23,7 +23,7 @@ function buildLanServerUrl(lanIpv4: string, httpPort?: string, httpsPort?: strin
 
 @ObservedV2
 export class ServerAddViewModel {
-  @Trace serverName: string = 'GNasCabServer';
+  @Trace serverName: string = 'WaterNasOSServer';
   @Trace serverUrl: string = '';
   @Trace username: string = '';
   @Trace password: string = '';
@@ -55,7 +55,7 @@ export class ServerAddViewModel {
   private initializeFromPrefill(): void {
     const serverInfo = this.prefillServerInfo;
     if (serverInfo === undefined) {
-      this.serverName = 'GNasCabServer';
+      this.serverName = 'WaterNasOSServer';
       return;
     }
     if (serverInfo.isP2p) {
@@ -121,7 +121,7 @@ export class ServerAddViewModel {
     try {
       const serverInfo = this.buildServerInfo();
 
-      // 检查是否为GNasCab服务器
+      // 检查是否为WaterNasOS服务器
       if (this.isP2pMode) {
         const code = (serverInfo.pairCode ?? '').trim();
         if (code.length === 0) {

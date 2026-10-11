@@ -1,5 +1,5 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/base/components.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_context_menu/flutter_context_menu.dart';
 import 'package:get/get.dart';

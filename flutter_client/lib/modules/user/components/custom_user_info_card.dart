@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/utils/dimens_util.dart';
+import 'package:WaterNasOS/utils/dimens_util.dart';
 import '../controllers/user_management_controller.dart';
 import 'custom_user_form_dialog.dart';
 import '../../base/components/custom_outlined_button.dart';

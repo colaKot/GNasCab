@@ -1,11 +1,11 @@
 /**
  * 服务模块路由（对齐 Flutter ServiceMobileView / ServiceMainView）。
- * 移动端为单入口页：底部 3 标签（GNasCab账号/远程访问/DDNS），
+ * 移动端为单入口页：底部 3 标签（WaterNasOS账号/远程访问/DDNS），
  * PC 独有左侧二级菜单布局分支不实现（对齐迁移范围约定）。
  * 页面本身无需携带数据参数，控制器为全局单例（对齐 Flutter Get.put permanent: true）。
  */
 export class ServiceRoutes {
-  /** 服务主页（3 标签：GNasCab账号/远程访问/DDNS） */
+  /** 服务主页（3 标签：WaterNasOS账号/远程访问/DDNS） */
   static readonly PAGE_MAIN: string = 'ServiceMainPage';
 }
 

@@ -90,7 +90,7 @@ export class LoginViewModel {
     const serverItemForInit = new ServerInfo();
     serverItemForInit.serverId = data.serverId ?? '';
     serverItemForInit.serverUrl = APIClient.getInstance().baseUrl;
-    serverItemForInit.serverName = 'GNasCabServer';
+    serverItemForInit.serverName = 'WaterNasOSServer';
     serverItemForInit.serverHost = LoginViewModel.hostOf(serverItemForInit.serverUrl);
     serverItemForInit.serverPortHttp = data.httpPort !== undefined ? `${data.httpPort}` : '';
     serverItemForInit.serverPortHttps = data.httpsPort !== undefined ? `${data.httpsPort}` : '';
@@ -160,7 +160,7 @@ export class LoginViewModel {
       const serverItem = new ServerInfo();
       serverItem.serverId = data.serverId ?? `${Date.now()}`;
       serverItem.serverUrl = APIClient.getInstance().baseUrl;
-      serverItem.serverName = 'GNasCabServer';
+      serverItem.serverName = 'WaterNasOSServer';
       serverItem.serverHost = LoginViewModel.hostOf(serverItem.serverUrl);
       serverItem.serverHostName = data.hostname ?? 'unknown';
       serverItem.serverPlatform = data.platform ?? 'unknown';

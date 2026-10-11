@@ -816,7 +816,7 @@ class FaceService {
     let sourcePath = fullPath;
     if (type === 2) {
       try {
-        sourcePath = await fileService.getTinyImgByPath(fullPath);
+        sourcePath = await fileService.getTinyImgByPath(fullPath, undefined, { deferImages: false });
       } catch (_) {
         const err = new Error('common.NOT_FOUND');
         err.statusCode = 404;

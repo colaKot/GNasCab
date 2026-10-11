@@ -1,6 +1,6 @@
 import '../../home/views/pc_components/pc_app_window.dart';
-import 'package:GNasCab/modules/base/components/custom_glass_card.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/modules/base/components/custom_glass_card.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nascab_sync_core/nascab_sync_core.dart';

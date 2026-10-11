@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:GNasCab/modules/base/components/custom_switch.dart';
+import 'package:WaterNasOS/modules/base/components/custom_switch.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

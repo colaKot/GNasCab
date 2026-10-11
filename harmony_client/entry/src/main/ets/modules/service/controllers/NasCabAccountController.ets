@@ -8,7 +8,7 @@ import { svcRecord } from '../models/ServiceModels';
 import { ServiceMainController } from './ServiceMainController';
 
 /**
- * GNasCab 账号控制器（对齐 Flutter NasCabAccountController）。
+ * WaterNasOS 账号控制器（对齐 Flutter NasCabAccountController）。
  * 移动端 login 分支固定走 App 不支持提示（对齐 Flutter DeviceUtils.isMobile 分支，
  * PC/WEB 的 OAuth 弹窗与回调页流程不在迁移范围）。
  * 全局单例，登录态变化后联动刷新 ServiceMainController 远程访问状态。

@@ -14,7 +14,7 @@ export default class EntryAbility extends UIAbility {
     try {
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     } catch (err) {
-      hilog.error(DOMAIN, 'GNasCab', 'Failed to set colorMode: %{public}s', JSON.stringify(err));
+      hilog.error(DOMAIN, 'WaterNasOS', 'Failed to set colorMode: %{public}s', JSON.stringify(err));
     }
   }
 
@@ -24,16 +24,16 @@ export default class EntryAbility extends UIAbility {
     // 等待初始化完成后再加载页面，保证 preferences 就绪（服务器列表等本地数据可读取）
     try {
       await AppBootstrap.init(this.context, this.context.config?.colorMode);
-      hilog.info(DOMAIN, 'GNasCab', 'App bootstrap completed');
+      hilog.info(DOMAIN, 'WaterNasOS', 'App bootstrap completed');
     } catch (err) {
-      hilog.error(DOMAIN, 'GNasCab', 'Bootstrap failed: %{public}s', JSON.stringify(err));
+      hilog.error(DOMAIN, 'WaterNasOS', 'Bootstrap failed: %{public}s', JSON.stringify(err));
     }
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(DOMAIN, 'GNasCab', 'Failed to load content: %{public}s', JSON.stringify(err));
+        hilog.error(DOMAIN, 'WaterNasOS', 'Failed to load content: %{public}s', JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, 'GNasCab', 'Succeeded in loading content');
+      hilog.info(DOMAIN, 'WaterNasOS', 'Succeeded in loading content');
     });
   }
 

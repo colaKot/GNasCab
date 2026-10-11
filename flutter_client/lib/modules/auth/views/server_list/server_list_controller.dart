@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:GNasCab/modules/fileBackup/localBackup/local_backup_controller.dart';
+import 'package:WaterNasOS/modules/fileBackup/localBackup/local_backup_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
@@ -11,15 +11,15 @@ import '../../service/server_storage_service.dart';
 import '../../beans/server_info_bean.dart';
 import 'udp_broadcast_listener.dart';
 import '../../../../core/theme/theme_manager.dart';
-import 'package:GNasCab/core/config/app_config.dart';
+import 'package:WaterNasOS/core/config/app_config.dart';
 
-import 'package:GNasCab/modules/auth/service/auth_api_service.dart';
+import 'package:WaterNasOS/modules/auth/service/auth_api_service.dart';
 import '../../../../core/api/api_controller.dart';
 import '../../../../utils/dialog_util.dart';
 import '../../../../utils/device_utils.dart';
 import '../../../../utils/toast_util.dart';
-import 'package:GNasCab/utils/legal_document_opener.dart';
-import 'package:GNasCab/core/routes/app_routes.dart';
+import 'package:WaterNasOS/utils/legal_document_opener.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
 import '../../../home/views/components/session_wallpaper_background.dart';
 import '../login/login_twofa_dialog.dart';
 import '../../service/response/login_response.dart';
@@ -329,7 +329,7 @@ class ServerListController extends GetxController {
         serverId: serverInfo['serverId'] ?? '',
         serverUrl: 'http://${serverInfo['host']}:${serverInfo['port']}',
         userInputUrl: '',
-        serverName: "GNasCabServer",
+        serverName: "WaterNasOSServer",
         serverHost: serverInfo['host'],
         serverPortHttp: serverInfo['port'].toString(),
         serverPortHttps: serverInfo.containsKey('httpsPort')
@@ -1208,7 +1208,7 @@ class _PairCodeConnectDialogState extends State<_PairCodeConnectDialog> {
         serverId: serverId,
         serverUrl: '',
         userInputUrl: '',
-        serverName: preferred?.serverName ?? 'GNasCabServer',
+        serverName: preferred?.serverName ?? 'WaterNasOSServer',
         serverHost: '',
         serverPortHttp: status.serverData?['httpPort']?.toString() ?? '',
         serverPortHttps: status.serverData?['httpsPort']?.toString() ?? '',

@@ -66,6 +66,18 @@ class LanguageService extends GetxService with Translations {
     'photo_ai_gps_add_selected': 'Selected GPS',
     'photo_ai_gps_add_selected_reference': 'Current reference: @name',
     'photo_ai_gps_add_success': 'GPS written to @count photos',
+    'settings_proxy_title': 'Network Proxy',
+    'settings_proxy_subtitle':
+        'Route outbound metadata requests such as video scraping, IMDb and TMDB through this proxy.',
+    'settings_proxy_enable_title': 'Enable Network Proxy',
+    'settings_proxy_url_label': 'Proxy URL',
+    'settings_proxy_url_invalid':
+        'Enter a valid proxy URL, for example http://127.0.0.1:7890',
+    'settings_proxy_saved': 'Proxy settings saved',
+    'settings_jav_fallback_title': 'Japanese Video Recognition Fallback',
+    'settings_jav_fallback_enable_title': 'Enable Fallback Recognition',
+    'settings_jav_fallback_enable_desc':
+        'When TMDB and IMDb both fail to match, try scraping metadata by video code from Japanese sites.',
   };
 
   static const Map<String, String> _gpsAddFallbackZh = {
@@ -99,6 +111,15 @@ class LanguageService extends GetxService with Translations {
     'photo_ai_gps_add_selected_reference': '当前参考：@name',
     'photo_ai_gps_add_success': '已为 @count 张照片写入 GPS',
     'photo_ai_gps_add_completed': '已全部处理完成，没有更多可补充 GPS 的照片。',
+    'settings_proxy_title': '网络代理',
+    'settings_proxy_subtitle': '开启后，影视刮削、IMDb / TMDB 等出站元数据请求将走此代理。',
+    'settings_proxy_enable_title': '启用网络代理',
+    'settings_proxy_url_label': '代理地址',
+    'settings_proxy_url_invalid': '请输入合法的代理地址，例如 http://127.0.0.1:7890',
+    'settings_proxy_saved': '代理设置已保存',
+    'settings_jav_fallback_title': '日本片识别兜底',
+    'settings_jav_fallback_enable_title': '启用兜底识别',
+    'settings_jav_fallback_enable_desc': '当 TMDB、IMDb 都识别失败时，尝试按番号从日文站点抓取影片信息。',
   };
 
   static const String _languageKey = 'selected_language';
@@ -362,19 +383,19 @@ class LanguageService extends GetxService with Translations {
       await vi_vn.loadLibrary();
       await id_id.loadLibrary();
 
-      final zhKeys = zh_cn.ZhCn().keys;
-      final enKeys = en_us.EnUs().keys;
-      final frKeys = fr_fr.FrFr().keys;
-      final deKeys = de_de.DeDe().keys;
-      final ptKeys = pt_br.PtBr().keys;
-      final jaKeys = ja_jp.JaJp().keys;
-      final ruKeys = ru_ru.RuRu().keys;
-      final thKeys = th_th.ThTh().keys;
-      final koKeys = ko_kr.KoKr().keys;
-      final esKeys = es_es.EsEs().keys;
-      final arKeys = ar_ar.ArAr().keys;
-      final viKeys = vi_vn.ViVn().keys;
-      final idKeys = id_id.IdId().keys;
+      final zhKeys = _withGpsAddFallback(zh_cn.ZhCn().keys, 'zh_CN');
+      final enKeys = _withGpsAddFallback(en_us.EnUs().keys, 'en_US');
+      final frKeys = _withGpsAddFallback(fr_fr.FrFr().keys, 'fr_FR');
+      final deKeys = _withGpsAddFallback(de_de.DeDe().keys, 'de_DE');
+      final ptKeys = _withGpsAddFallback(pt_br.PtBr().keys, 'pt_BR');
+      final jaKeys = _withGpsAddFallback(ja_jp.JaJp().keys, 'ja_JP');
+      final ruKeys = _withGpsAddFallback(ru_ru.RuRu().keys, 'ru_RU');
+      final thKeys = _withGpsAddFallback(th_th.ThTh().keys, 'th_TH');
+      final koKeys = _withGpsAddFallback(ko_kr.KoKr().keys, 'ko_KR');
+      final esKeys = _withGpsAddFallback(es_es.EsEs().keys, 'es_ES');
+      final arKeys = _withGpsAddFallback(ar_ar.ArAr().keys, 'ar_AR');
+      final viKeys = _withGpsAddFallback(vi_vn.ViVn().keys, 'vi_VN');
+      final idKeys = _withGpsAddFallback(id_id.IdId().keys, 'id_ID');
 
       _loadedKeys.addAll(zhKeys);
       _loadedKeys.addAll(enKeys);

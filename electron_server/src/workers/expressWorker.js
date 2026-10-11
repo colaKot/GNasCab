@@ -165,7 +165,7 @@ class ExpressWorker {
   }
 
   async restartServer() {
-    Logger.info(`🔄 GNasCabAPI process restarting...`);
+    Logger.info(`🔄 WaterNasOSAPI process restarting...`);
 
     if (this.server) {
       await this.stopServer();
@@ -237,14 +237,14 @@ class ExpressWorker {
 
     // 优雅关闭处理
     const gracefulShutdown = signal => {
-      Logger.info(`📡 Received ${signal}, shutting down GNasCabAPI ...`);
+      Logger.info(`📡 Received ${signal}, shutting down WaterNasOSAPI ...`);
 
       this.stopServer()
         .then(() => {
           process.exit(0);
         })
         .catch(err => {
-          Logger.error(`❌ GNasCabAPI shutdown failed:`, err);
+          Logger.error(`❌ WaterNasOSAPI shutdown failed:`, err);
           process.exit(1);
         });
     };

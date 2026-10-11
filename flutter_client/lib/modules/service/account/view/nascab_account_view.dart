@@ -1,7 +1,7 @@
-import 'package:GNasCab/modules/base/components.dart';
-import 'package:GNasCab/modules/base/components/custom_outlined_button.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
-import 'package:GNasCab/utils/toast_util.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
+import 'package:WaterNasOS/modules/base/components/custom_outlined_button.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
+import 'package:WaterNasOS/utils/toast_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

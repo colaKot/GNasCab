@@ -2,6 +2,15 @@
 const NetUtil = require('../utils/netUtil');
 const { getSnapshotDatabaseTotalBytes } = require('../utils/databaseDirUiUtil');
 
+function safeMigrationStatus() {
+  try {
+    const cacheMigrator = require('../utils/cacheMigrator');
+    return cacheMigrator.getStatusForUi();
+  } catch (_) {
+    return null;
+  }
+}
+
 function start(window, getExpressState, Logger) {
   const timers = [];
   let lastSeq = 0;
@@ -21,6 +30,7 @@ function start(window, getExpressState, Logger) {
         databaseDir: process.env.PATH_DATABASE || '',
         cacheDir: process.env.PATH_CACHE || '',
         databaseTotalBytes: getSnapshotDatabaseTotalBytes(),
+        cacheMigration: safeMigrationStatus(),
       });
     }
   }
@@ -30,6 +40,19 @@ function start(window, getExpressState, Logger) {
     setInterval(() => {
       pushStatus();
     }, 5000)
+  );
+
+  // 缓存目录搬迁进行中：每秒推送一次进度，让界面进度条跟得上
+  timers.push(
+    setInterval(() => {
+      try {
+        if (window.isDestroyed()) return;
+        const st = safeMigrationStatus();
+        if (st && st.running) {
+          window.webContents.send('cache:migration', st);
+        }
+      } catch (_) {}
+    }, 1000)
   );
 
   // 每秒推送最近日志缓冲（过滤debug，并限制条数）

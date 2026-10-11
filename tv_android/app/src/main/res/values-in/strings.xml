@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">Server</string>
     <string name="server_discovered_section">Ditemukan</string>
@@ -350,7 +350,7 @@
     <string name="error_twofa_too_many_attempts">Terlalu banyak upaya, coba lagi nanti</string>
     <string name="error_twofa_invalid_token">Token 2FA tidak valid, silakan login lagi</string>
     <string name="error_network_failed">Permintaan jaringan gagal</string>
-    <string name="error_not_nascab_server">Bukan server GNasCab</string>
+    <string name="error_not_nascab_server">Bukan server WaterNasOS</string>
     <string name="error_not_logged_in">Silakan login terlebih dahulu</string>
     <string name="error_server_unreachable">Server tidak dapat dijangkau, silakan periksa status server</string>
     <string name="error_no_direct_url">Tidak ada URL langsung yang tersedia</string>

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/core/api/dio_bad_certificate_compat.dart';
-import 'package:GNasCab/utils/local_web_asset_server.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/api/dio_bad_certificate_compat.dart';
+import 'package:WaterNasOS/utils/local_web_asset_server.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;

@@ -1,7 +1,8 @@
-import 'package:GNasCab/modules/notes/controller/notes_controller.dart';
-import 'package:GNasCab/modules/notes/model/notes_models.dart';
-import 'package:GNasCab/modules/notes/view/parts/notes_view_utils.dart';
-import 'package:GNasCab/modules/base/components/custom_button.dart';
+import 'package:WaterNasOS/modules/notes/controller/notes_controller.dart';
+import 'package:WaterNasOS/modules/notes/model/notes_models.dart';
+import 'package:WaterNasOS/modules/notes/view/parts/notes_view_utils.dart';
+import 'package:WaterNasOS/modules/base/components/custom_button.dart';
+import 'package:WaterNasOS/modules/home/views/pc_components/pc_app_window.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,7 +28,8 @@ class NotesSidebar extends StatelessWidget {
         scheme.primary.withValues(alpha: 0.03),
         scheme.surfaceContainerHighest,
       );
-      return Container(
+      // ⭐ 左栏底色补画到窗口标题栏左侧（框架已把内容层整体下移，见 PcLeftRailTopExtend）
+      return PcLeftRailTopExtend(
         color: sidebarColor,
         child: Column(
           children: [
@@ -40,7 +42,6 @@ class NotesSidebar extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  SizedBox(height: 30),
                   if (desktop)
                     Align(
                       alignment: collapsed

@@ -1,5 +1,5 @@
-name: GNasCab
-description: "GNasCab"
+name: WaterNasOS
+description: "WaterNasOS"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -112,6 +112,7 @@ dependencies:
   nascab_sync_core:
     path: ../packages/nascab_sync_core
   flex_color_scheme: 8.4.0
+  tabler_icons_plus: ^3.44.0 # Tabler 开源图标（MIT），窗口控制按钮等使用
 
 dependency_overrides:
   # 覆盖 pub 版：修复 Android MediaSession.onPlayPause 未转发（桌面小组件/部分系统播放暂停键无响应）

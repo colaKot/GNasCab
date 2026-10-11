@@ -210,11 +210,11 @@
 ### 7.2 独立 exe（`photo_client/` + `music_client/`）
 
 **复用方式（= 方案 1 的落地形态）**：独立端通过 `path: ../flutter_client` 依赖主客户端
-（包名 `GNasCab`），**不复制任何业务代码**；主客户端新增一个启动开关：
+（包名 `WaterNasOS`），**不复制任何业务代码**；主客户端新增一个启动开关：
 
 - 新增 `flutter_client/lib/core/bootstrap/app_launch.dart`：`AppLaunchMode { full, photo, music }`
   + `AppLaunch`（`appTitle` / `allowedAppKeys` / `isAppAllowed()` / `autoOpenAppKey`）。
-- `flutter_client/lib/main.dart`：`main()` → `runGNasCabApp({launchMode})` 共享入口；
+- `flutter_client/lib/main.dart`：`main()` → `runWaterNasOSApp({launchMode})` 共享入口；
   `title` 改用 `AppLaunch.appTitle`；独立端只需 3 行代码调用。
 - `flutter_client/lib/modules/home/views/app_home_controller.dart` + `pc_home_controller.dart`：
   `showApps` / `_effectiveAllApps` 按 `AppLaunch.isAppAllowed()` 过滤（只留目标应用）。
@@ -223,7 +223,7 @@
   不再渲染虚拟桌面 / dock / 启动器 ⇒ **登录后整屏即相册/音乐，不存在「在主程序里选」这一步**。
   `full` 模式下 `autoOpenAppKey` 恒为 `null`，桌面行为完全不变。
 - `flutter_client/lib/utils/app_window_title.dart`：`defaultTitle` 改为跟随
-  `AppLaunch.appTitle`（`GNasCab` / `GNasCab 相册` / `GNasCab 音乐`），避免标题被重置。
+  `AppLaunch.appTitle`（`WaterNasOS` / `WaterNasOS 相册` / `WaterNasOS 音乐`），避免标题被重置。
 - `flutter_client/lib/modules/home/views/app_home_controller.dart`：移动端同样自动进入目标应用
   （桌面独立端走上面的 `pc_home_page` 分支）。
 
@@ -275,7 +275,7 @@ Windows 只是「独立端」的一半 —— 手机上要三个 App 并存，�
 |---|---|---|---|
 | applicationId / namespace | `com.nascabos.mobile` | **`com.nascabos.photo`** | **`com.nascabos.music`** |
 | Kotlin 包目录 | `com/nascabos/mobile/` | **`com/nascabos/photo/`** | **`com/nascabos/music/`** |
-| 桌面名 `android:label` | `GNasCab` | **`GNasCab 相册`** | **`GNasCab 音乐`** |
+| 桌面名 `android:label` | `WaterNasOS` | **`WaterNasOS 相册`** | **`WaterNasOS 音乐`** |
 | 启动图标（15 张） | 主端图标 | **黄蓝相机** | **红色音符** |
 
 必须跟着一起带走、**不能**用 `flutter create` 重建的定制件：

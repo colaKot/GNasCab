@@ -43,7 +43,7 @@ class ServerActionsGuidedFragment : GuidedStepSupportFragment() {
     }
 
     override fun onCreateGuidance(savedInstanceState: Bundle?): GuidanceStylist.Guidance {
-        val title = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "GNasCab" } }
+        val title = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "WaterNasOS" } }
         val desc = when {
             server.isP2p || server.pairCode.trim().isNotEmpty() && server.serverUrl.trim().isEmpty() -> "P2P"
             server.serverUrl.trim().isNotEmpty() -> normalizeUrlPort(server.serverUrl.trim())
@@ -290,7 +290,7 @@ class ServerActionsGuidedFragment : GuidedStepSupportFragment() {
         }
 
         override fun onCreateGuidance(savedInstanceState: Bundle?): GuidanceStylist.Guidance {
-            val title = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "GNasCab" } }
+            val title = server.serverName.trim().ifEmpty { server.serverHostName.trim().ifEmpty { "WaterNasOS" } }
             return GuidanceStylist.Guidance(
                 title,
                 getString(R.string.prompt_password_desc),

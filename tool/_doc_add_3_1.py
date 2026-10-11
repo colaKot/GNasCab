@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""在 docs/GNasCab-开发速查.md 的第 3 章末尾（`---` + `## 4.` 之前）插入 3.1 节。"""
+"""在 docs/WaterNasOS-开发速查.md 的第 3 章末尾（`---` + `## 4.` 之前）插入 3.1 节。"""
 import io
 import os
 import sys
 
-DOC = r"G:\work\nascab\docs\GNasCab-开发速查.md"
+DOC = r"G:\work\nascab\docs\WaterNasOS-开发速查.md"
 MARK = "### 3.1 \u2b50\u2b50 \u9ed8\u8ba4\u64ad\u653e\u753b\u8d28"
 
 INS = [

@@ -157,12 +157,151 @@ function getRemoteAssetsManifestUrl() {
   return process.env.NASCAB_LIBS_MANIFEST_URL || 'https://download.nas.cab/libs/manifest.json';
 }
 
+// ============================ 缓存位置（可选自定义目录） ============================
+// 说明：
+//  - 缓存根目录固定命名为 nascabos_cache（保持目录语义与既有校验，便于识别与迁移）。
+//  - 用户配置的是「缓存父目录」，实际缓存根 = 父目录 + /nascabos_cache。
+//  - 配置文件必须放在 userData 根目录下（它就是定位锚点），因此不使用数据库存储：
+//    数据库本身也在 userData 下，且本模块在数据库初始化之前就会被 require。
+const CACHE_FOLDER_NAME = 'nascabos_cache';
+const CACHE_LOCATION_FILE = 'cache_location.json';
+
+/**
+ * 缓存位置配置文件路径（固定位于 userData 根目录）
+ */
+function getCacheLocationConfigPath() {
+  return path.join(getUserDataPath(), CACHE_LOCATION_FILE);
+}
+
+/**
+ * 原子写入 JSON：先写临时文件再重命名，避免断电/异常产生半截文件
+ */
+function writeJsonAtomic(filePath, data) {
+  const text = JSON.stringify(data, null, 2);
+  try {
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  } catch (_) {}
+  const tmp = `${filePath}.tmp.${process.pid}`;
+  try {
+    fs.writeFileSync(tmp, text, 'utf8');
+    fs.renameSync(tmp, filePath);
+    return true;
+  } catch (_) {
+    try {
+      fs.writeFileSync(filePath, text, 'utf8');
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      try {
+        fs.unlinkSync(tmp);
+      } catch (_) {}
+    }
+  }
+}
+
+/**
+ * 读取缓存位置配置
+ * @returns {{parent:string, effectiveParent:string, updatedAt:number}|null}
+ *   parent          = 用户期望的缓存父目录（空字符串表示使用默认 userData）
+ *   effectiveParent = 当前实际生效的缓存父目录（搬迁完成前保持旧目录）
+ */
+function readCacheLocationConfig() {
+  try {
+    const p = getCacheLocationConfigPath();
+    if (!fs.existsSync(p)) return null;
+    const raw = fs.readFileSync(p, 'utf8');
+    if (!raw || !raw.trim()) return null;
+    const json = JSON.parse(raw);
+    const parent = json && typeof json.parent === 'string' ? json.parent.trim() : '';
+    const effectiveParent =
+      json && typeof json.effectiveParent === 'string' ? json.effectiveParent.trim() : '';
+    if (!parent && !effectiveParent) return null;
+    return {
+      parent: parent ? path.resolve(parent) : '',
+      effectiveParent: effectiveParent ? path.resolve(effectiveParent) : '',
+      updatedAt: Number(json.updatedAt) || 0,
+    };
+  } catch (_) {
+    // 配置损坏时按「未配置」处理，回退默认目录，不会影响服务启动
+    return null;
+  }
+}
+
+/**
+ * 写入用户期望的缓存父目录（空字符串表示「回到默认 userData 目录」）。
+ * 关键点：只更新 parent，effectiveParent 始终保留 —— 搬迁完成前一切照旧，
+ * 这样「恢复默认」也会被识别为一次真实的搬迁（从旧位置搬回 userData）。
+ */
+function writeCacheLocationConfig(parent) {
+  const prev = readCacheLocationConfig();
+  const raw = parent === null || parent === undefined ? '' : String(parent).trim();
+  const nextParent = raw ? path.resolve(raw) : '';
+  const effectiveParent =
+    (prev && prev.effectiveParent) || (prev && prev.parent) || path.resolve(getUserDataPath());
+  writeJsonAtomic(getCacheLocationConfigPath(), {
+    parent: nextParent,
+    effectiveParent,
+    updatedAt: Date.now(),
+  });
+  return nextParent;
+}
+
+/**
+ * 标记缓存父目录已生效（搬迁成功、或无需搬迁时调用）
+ */
+function setCacheEffectiveParent(parent) {
+  const raw = parent === null || parent === undefined ? '' : String(parent).trim();
+  const next = raw ? path.resolve(raw) : path.resolve(getUserDataPath());
+  const prev = readCacheLocationConfig();
+  // 保留用户「期望位置」的原样（含「空 = 默认」的语义），避免恢复默认后又被写成显式路径
+  const prevParent = prev ? prev.parent : undefined;
+  writeJsonAtomic(getCacheLocationConfigPath(), {
+    parent: prevParent !== undefined ? prevParent : next,
+    effectiveParent: next,
+    updatedAt: Date.now(),
+  });
+  return next;
+}
+
+/**
+ * 当前实际生效的缓存父目录（搬迁未完成时仍指向旧目录）
+ */
+function getEffectiveCacheParent() {
+  const cfg = readCacheLocationConfig();
+  if (cfg && cfg.effectiveParent) return cfg.effectiveParent;
+  if (cfg && cfg.parent) return cfg.parent;
+  return getUserDataPath();
+}
+
+/**
+ * 用户期望的缓存父目录（默认 = userData）
+ */
+function getConfiguredCacheParent() {
+  const cfg = readCacheLocationConfig();
+  if (cfg && cfg.parent) return cfg.parent;
+  return getUserDataPath();
+}
+
 /**
  * 获取缓存目录
+ * 解析优先级：
+ *   ① process.env.PATH_CACHE —— 进程内已解析结果（主进程 initUtil 注入，worker 继承），
+ *      保证主进程与各 worker 解析完全一致，也是「搬迁完成前仍用旧目录」的开关。
+ *   ② 缓存位置配置的 effectiveParent（搬迁完成前 = 旧目录）
+ *   ③ 默认 userData/nascabos_cache
  */
 function getCachePath() {
-  const cacheFolder = 'nascabos_cache';
-  return path.join(getUserDataPath(), cacheFolder);
+  if (process.env.PATH_CACHE) return process.env.PATH_CACHE;
+  return path.join(getEffectiveCacheParent(), CACHE_FOLDER_NAME);
+}
+
+/**
+ * 缓存根目录名（供迁移器等外部模块复用）
+ */
+function getCacheFolderName() {
+  return CACHE_FOLDER_NAME;
 }
 /**
  * 获取nfo头像目录
@@ -352,6 +491,13 @@ const config = {
   getFileType: getFileType, //获取文件类型
   getDatabasePath: getDatabasePath, //数据库目录
   getCachePath: getCachePath, //缓存目录
+  getCacheFolderName: getCacheFolderName, //缓存根目录名（nascabos_cache）
+  getCacheLocationConfigPath: getCacheLocationConfigPath, //缓存位置配置文件路径
+  readCacheLocationConfig: readCacheLocationConfig, //读取缓存位置配置
+  writeCacheLocationConfig: writeCacheLocationConfig, //写入期望的缓存父目录
+  setCacheEffectiveParent: setCacheEffectiveParent, //标记缓存父目录已生效
+  getEffectiveCacheParent: getEffectiveCacheParent, //当前实际生效的缓存父目录
+  getConfiguredCacheParent: getConfiguredCacheParent, //用户期望的缓存父目录
   getUserDataPath: getUserDataPath, //用户数据目录
   shouldUseRemoteAssets: shouldUseRemoteAssets,
   getRemoteAssetsManifestUrl: getRemoteAssetsManifestUrl,
@@ -408,6 +554,10 @@ const config = {
   videoTypeList: videoTypeList,
   bookTypeList: bookTypeList,
   musicTypeList: musicTypeList,
+
+  // 相册用户隔离：新建子账号时自动分配的私有相册目录根路径
+  // 形如 <photoUserAutoDirRoot>/<用户名>/相册，并登记为该用户私有的相册源；留空 = 不自动创建
+  photoUserAutoDirRoot: '',
 };
 
 // 开发环境特定配置

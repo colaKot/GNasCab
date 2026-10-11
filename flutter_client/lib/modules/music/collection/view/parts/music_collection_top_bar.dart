@@ -1,7 +1,7 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import '../../../../home/views/pc_components/pc_app_window.dart';
-import 'package:GNasCab/modules/base/components.dart';
-import 'package:GNasCab/utils/popup_menu_util.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
+import 'package:WaterNasOS/utils/popup_menu_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../base/components/custom_expandable_search_bar.dart';

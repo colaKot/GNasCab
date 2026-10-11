@@ -89,7 +89,7 @@ def dart_can_spawn():
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "GNasCabBuildBridge/1.0"
+    server_version = "WaterNasOSBuildBridge/1.0"
     protocol_version = "HTTP/1.1"
 
     def log_message(self, fmt, *args):
@@ -201,7 +201,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="GNasCab 外部构桥（在 WorkBuddy 树之外执行命令）")
+    ap = argparse.ArgumentParser(description="WaterNasOS 外部构桥（在 WorkBuddy 树之外执行命令）")
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
     ap.add_argument("--host", default="127.0.0.1",
                     help="只允许 127.0.0.1；改成别的等于对局域网开放，别这么干")
@@ -216,7 +216,7 @@ def main():
 
     can, err = dart_can_spawn()
     print("=" * 72)
-    print("GNasCab 外部构桥  http://%s:%d" % (a.host, a.port))
+    print("WaterNasOS 外部构桥  http://%s:%d" % (a.host, a.port))
     print("=" * 72)
     print("  PID                : %d" % os.getpid())
     print("  cwd                : %s" % os.getcwd())

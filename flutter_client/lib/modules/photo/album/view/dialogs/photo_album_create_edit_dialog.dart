@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
-import 'package:GNasCab/modules/base/components/custom_icon_button.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
+import 'package:WaterNasOS/modules/base/components/custom_icon_button.dart';
 import '../../controller/photo_album_controller.dart';
 import '../../models/photo_album_model.dart';
 import '../../service/photo_album_api_service.dart';

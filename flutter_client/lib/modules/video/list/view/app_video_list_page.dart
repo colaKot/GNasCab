@@ -1,9 +1,9 @@
-import 'package:GNasCab/core/routes/app_routes.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/core/user/current_user_controller.dart';
-import 'package:GNasCab/modules/base/components/custom_bordered_icon_button.dart';
-import 'package:GNasCab/modules/base/components/custom_expandable_search_bar.dart';
-import 'package:GNasCab/modules/video/base/views/app_video_item_poster.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/user/current_user_controller.dart';
+import 'package:WaterNasOS/modules/base/components/custom_bordered_icon_button.dart';
+import 'package:WaterNasOS/modules/base/components/custom_expandable_search_bar.dart';
+import 'package:WaterNasOS/modules/video/base/views/app_video_item_poster.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

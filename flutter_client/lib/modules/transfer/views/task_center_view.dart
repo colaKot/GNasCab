@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/user/current_user_controller.dart';
@@ -53,7 +53,6 @@ class TaskCenterView extends StatelessWidget {
                   ),
               ],
               showCollapseToggle: false,
-              topPlaceholderHeight: 40,
             ),
           ),
           // 任务中心

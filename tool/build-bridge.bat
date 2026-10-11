@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  GNasCab External Build Bridge
+REM  WaterNasOS External Build Bridge
 REM
 REM  START THIS FROM A NORMAL cmd WINDOW (Start menu > cmd).
 REM  Do NOT start it from an IDE / WorkBuddy integrated terminal:

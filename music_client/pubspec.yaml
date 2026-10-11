@@ -1,5 +1,5 @@
 name: nascab_music
-description: "GNasCab Music —— 复用主客户端（GNasCab）代码的独立客户端"
+description: "WaterNasOS Music —— 复用主客户端（WaterNasOS）代码的独立客户端"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   # 复用主客户端的全部业务代码（相册/音乐模块、鉴权、i18n、主题、分块上传等），
   # 不复制任何源码；独立端只通过 AppLaunchMode 收敛可见应用范围。
-  GNasCab:
+  WaterNasOS:
     path: ../flutter_client
 
 # ⚠️ 依赖方**不会继承**主客户端的 dependency_overrides，必须各自声明一遍。

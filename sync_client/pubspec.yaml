@@ -1,5 +1,5 @@
 name: nascab_sync
-description: "GNasCab 目录同步客户端 —— 电脑 <-> NAS 目录同步的 Windows 独立程序"
+description: "WaterNasOS 目录同步客户端 —— 电脑 <-> NAS 目录同步的 Windows 独立程序"
 publish_to: 'none'
 version: 1.0.0+1
 

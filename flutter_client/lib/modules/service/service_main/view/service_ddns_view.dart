@@ -1,4 +1,4 @@
-import 'package:GNasCab/modules/base/components.dart';
+import 'package:WaterNasOS/modules/base/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

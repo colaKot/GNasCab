@@ -1,7 +1,22 @@
 const ResponseUtil = require('../../../apiUtils/responseUtil');
 const PhotoSourceService = require('./photoSourceService');
 const FileUtil = require('../../../../utils/fileUtil');
+const userUtil = require('../../../../utils/userUtil');
 const fs = require('fs');
+
+/**
+ * 源目录归属规则：
+ * - 普通用户只能操作自己的（uid = 自己）
+ * - 管理员默认同样只看自己的；只有显式传 body.uid 时才可操作指定用户（管理用途）
+ */
+function resolveTargetUid(req) {
+  const user = req && req.user;
+  const selfUid = user && user.id ? Number(user.id) : 0;
+  const raw = req && req.body ? req.body.uid : undefined;
+  const bodyUid = raw !== undefined && raw !== null && raw !== '' ? Number(raw) : null;
+  if (bodyUid && Number.isFinite(bodyUid) && bodyUid > 0 && userUtil.isAdmin(user)) return bodyUid;
+  return selfUid;
+}
 
 async function stopPhotoIndexWorkerBeforeDelete(timeoutMs = 8000) {
   const waitStopped = new Promise(resolve => {
@@ -46,7 +61,7 @@ class PhotoSourceController {
   async listSources(req, res) {
     try {
       const service = new PhotoSourceService(req.dbPhoto);
-      const list = await service.listSources();
+      const list = await service.listSources(resolveTargetUid(req));
       const enriched = await Promise.all(
         (list || []).map(async row => {
           const p = row && row.path ? String(row.path) : '';
@@ -79,7 +94,7 @@ class PhotoSourceController {
         return ResponseUtil.error(req, res, 'file.FOLDER_NOT_EXIST');
       }
 
-      const result = await service.addSource(path);
+      const result = await service.addSource(path, resolveTargetUid(req));
       const statusCode = result.action === 'insert' ? 201 : 200;
       const messageKey = result.action === 'insert' ? 'photo.PHOTO_SOURCE_ADD_SUCCESS' : 'photo.PHOTO_SOURCE_UPDATE_SUCCESS';
 
@@ -124,16 +139,18 @@ class PhotoSourceController {
         return ResponseUtil.error(req, res, 'validation.VALIDATION_ERROR', 400);
       }
 
+      const ownerUid = resolveTargetUid(req);
       let scanPaths = [];
       if (input === 'all') {
         const rows = await req
           .dbPhoto('photo_source')
+          .where({ uid: ownerUid })
           .select('path')
           .catch(() => []);
         scanPaths = (rows || []).map(r => (r && r.path ? String(r.path) : '')).filter(Boolean);
       } else {
         const scanPath = input;
-        const row = await req.dbPhoto('photo_source').where({ path: scanPath }).first('id');
+        const row = await req.dbPhoto('photo_source').where({ path: scanPath, uid: ownerUid }).first('id');
         if (!row || !row.id) {
           return ResponseUtil.error(req, res, 'common.NOT_FOUND', 404);
         }
@@ -190,7 +207,12 @@ class PhotoSourceController {
       await stopPhotoIndexWorkerBeforeDelete();
       const service = new PhotoSourceService(req.dbPhoto);
       const { id, path } = req.body || {};
-      const affected = await service.deleteSource({ id, path });
+      const affected = await service.deleteSource({
+        id,
+        path,
+        uid: req.user && req.user.id,
+        allowAnyOwner: userUtil.isAdmin(req.user),
+      });
       if (process.send) {
         try {
           process.send({ type: 'resetPhotoWatchWorker' });
@@ -204,7 +226,8 @@ class PhotoSourceController {
       return ResponseUtil.success(req, res, { affected }, 'photo.PHOTO_SOURCE_DELETE_SUCCESS', 200);
     } catch (err) {
       const msgKey = err && err.message ? err.message : 'common.ERROR';
-      return ResponseUtil.error(req, res, msgKey, 400);
+      const statusCode = err && err.statusCode ? Number(err.statusCode) : 400;
+      return ResponseUtil.error(req, res, msgKey, statusCode);
     }
   }
 
@@ -212,7 +235,12 @@ class PhotoSourceController {
     try {
       const service = new PhotoSourceService(req.dbPhoto);
       const id = req.params && req.params.id;
-      const row = await service.updateSource(id, req.body || {});
+      const row = await service.updateSource(
+        id,
+        req.body || {},
+        req.user && req.user.id,
+        userUtil.isAdmin(req.user)
+      );
       if (process.send) {
         try {
           process.send({ type: 'resetPhotoWatchWorker' });
@@ -221,7 +249,7 @@ class PhotoSourceController {
       return ResponseUtil.success(req, res, row, 'photo.PHOTO_SOURCE_UPDATE_SUCCESS', 200);
     } catch (err) {
       const msgKey = err && err.message ? err.message : 'common.ERROR';
-      const statusCode = msgKey === 'common.NOT_FOUND' ? 404 : 400;
+      const statusCode = err && err.statusCode ? Number(err.statusCode) : msgKey === 'common.NOT_FOUND' ? 404 : 400;
       return ResponseUtil.error(req, res, msgKey, statusCode);
     }
   }
@@ -248,7 +276,12 @@ class PhotoSourceController {
         return ResponseUtil.error(req, res, 'file.FOLDER_NOT_EXIST', 400);
       }
 
-      const result = await service.relocateSource(id, newPath);
+      const result = await service.relocateSource(
+        id,
+        newPath,
+        req.user && req.user.id,
+        userUtil.isAdmin(req.user)
+      );
 
       if (process.send) {
         try {
@@ -259,7 +292,7 @@ class PhotoSourceController {
       return ResponseUtil.success(req, res, result, 'photo.PHOTO_SOURCE_RELOCATE_SUCCESS', 200);
     } catch (err) {
       const msgKey = err && err.message ? err.message : 'common.ERROR';
-      const statusCode = msgKey === 'common.NOT_FOUND' ? 404 : 400;
+      const statusCode = err && err.statusCode ? Number(err.statusCode) : msgKey === 'common.NOT_FOUND' ? 404 : 400;
       if (err && err.args) {
         return ResponseUtil.errorWithArgs(req, res, msgKey, err.args, statusCode);
       }
@@ -288,6 +321,12 @@ class PhotoSourceController {
             }
           })())
           .update({ gen_tiny: 0 });
+      }
+
+      // 影视库里的图片存在独立表 image_index，缩略图也一并重置
+      // （否则"重建缩略图"对图片库无效）
+      if (req.dbVideo) {
+        await req.dbVideo('image_index').update({ gen_tiny: 0 }).catch(() => {});
       }
 
       // 启动缩略图生成进程（若已在运行则跳过，会在下次轮询中自动处理新记录）

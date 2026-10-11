@@ -293,14 +293,14 @@ class ViVn extends Translations {
       'api_code_notes_notebook_not_found':
           "Thư mục sổ tay không tồn tại hoặc đã bị di chuyển",
       'api_code_notes_notebook_invalid':
-          "Thư mục đã chọn không phải là sổ tay GNasCab hợp lệ",
+          "Thư mục đã chọn không phải là sổ tay WaterNasOS hợp lệ",
       'api_code_notes_notebook_folder_not_empty':
           "Thư mục đã chọn không trống và không thể khởi tạo thành sổ tay mới",
       'api_code_notes_group_not_empty':
           "Nhóm vẫn còn ghi chú nên không thể xóa",
       'notes_notebook_choose_title': "Chọn hoặc tạo sổ tay",
       'notes_notebook_choose_desc':
-          "Khi mở lần đầu, vui lòng chọn một thư mục trống hoặc một thư mục sổ tay GNasCab hiện có.",
+          "Khi mở lần đầu, vui lòng chọn một thư mục trống hoặc một thư mục sổ tay WaterNasOS hiện có.",
       'notes_choose_folder': "Chọn thư mục sổ tay",
       'notes_original_path_missing': "Đường dẫn sổ tay gốc không còn tồn tại: ",
       'notes_recent_deleted': "Đã xóa gần đây",
@@ -705,7 +705,7 @@ class ViVn extends Translations {
           'Tiến trình nền cung cấp API; nếu dừng thì không thể truy cập ứng dụng',
       'process.worker.expressBroadcast.name': 'Phát sóng LAN API',
       'process.worker.expressBroadcast.purpose':
-          'Cho phép client tự phát hiện máy chủ GNasCab trong LAN',
+          'Cho phép client tự phát hiện máy chủ WaterNasOS trong LAN',
       'process.worker.ffmpegHwTest.name': 'Kiểm tra tăng tốc FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
           'Kiểm tra hỗ trợ tăng tốc phần cứng FFmpeg trên máy chủ',
@@ -848,12 +848,12 @@ class ViVn extends Translations {
       'terminal_cursor_blink': 'Con trỏ nhấp nháy',
       'terminal_click_to_pick_color': 'Nhấp để chọn màu',
       'service_menu_account': 'Tài khoản',
-      'service_menu_account_nascab': 'Tài khoản GNasCab',
+      'service_menu_account_nascab': 'Tài khoản WaterNasOS',
       'service_menu_remote_access': 'Truy cập từ xa',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'Xuyên mạng nội bộ',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -882,7 +882,7 @@ class ViVn extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'Bật truy cập từ xa',
       'service_remote_access_toggle_hint':
-          'Sau khi bật, bạn có thể truy cập an toàn vào dịch vụ GNasCab của mình trong môi trường từ xa',
+          'Sau khi bật, bạn có thể truy cập an toàn vào dịch vụ WaterNasOS của mình trong môi trường từ xa',
       'service_remote_access_pair_code_label': 'Mã ghép đôi',
       'service_remote_access_pair_code_empty': 'Không có mã ghép đôi',
       'service_remote_access_custom_pair_code_title': 'Mã ghép đôi tùy chỉnh',
@@ -918,7 +918,7 @@ class ViVn extends Translations {
       'P2P.ERR_DEVICE_NOT_BIND': 'Thiết bị chưa được liên kết',
       'P2P_TOO_MANY_REQUESTS': 'Quá nhiều yêu cầu. Vui lòng thử lại sau.',
       'service_p2p_device_not_bind_message':
-          'Bạn cần liên kết thiết bị hiện tại với tài khoản GNasCab để sử dụng tính năng này. Bạn có thể hủy liên kết khi không cần nữa.',
+          'Bạn cần liên kết thiết bị hiện tại với tài khoản WaterNasOS để sử dụng tính năng này. Bạn có thể hủy liên kết khi không cần nữa.',
       'service_p2p_bind_device_button': 'Liên kết',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Định dạng mã ghép đôi không hợp lệ (6-30 ký tự, chỉ hỗ trợ chữ cái/số)',
@@ -938,16 +938,16 @@ class ViVn extends Translations {
       'service_remote_access_guide_how_title':
           'Chức năng này hoạt động như thế nào?',
       'service_remote_access_guide_how_body':
-          'Sau khi bật truy cập từ xa, GNasCab sẽ cấp cho bạn một mã ghép đôi ngẫu nhiên. Thông qua mã ghép đôi, bạn có thể sử dụng mã ghép đôi để kết nối với máy chủ của mình trên bất kỳ ứng dụng GNasCab App hoặc máy tính để bàn nào. Ưu tiên sử dụng kết nối trực tiếp P2P, khi P2P không thể sử dụng, sẽ phân phối nút toàn cầu gần nhất để cung cấp dịch vụ chuyển tiếp cho bạn. Dữ liệu được truyền qua SSL + WebRTC an toàn, bạn có thể yên tâm sử dụng.',
+          'Sau khi bật truy cập từ xa, WaterNasOS sẽ cấp cho bạn một mã ghép đôi ngẫu nhiên. Thông qua mã ghép đôi, bạn có thể sử dụng mã ghép đôi để kết nối với máy chủ của mình trên bất kỳ ứng dụng WaterNasOS App hoặc máy tính để bàn nào. Ưu tiên sử dụng kết nối trực tiếp P2P, khi P2P không thể sử dụng, sẽ phân phối nút toàn cầu gần nhất để cung cấp dịch vụ chuyển tiếp cho bạn. Dữ liệu được truyền qua SSL + WebRTC an toàn, bạn có thể yên tâm sử dụng.',
       'service_remote_access_guide_use_title':
           'Mã ghép đôi sử dụng như thế nào?',
       'service_remote_access_guide_use_body':
           'Khi thêm máy chủ trên App hoặc máy tính để bàn, chọn "Sử dụng mã ghép đôi để thêm máy chủ", sau đó nhập hoặc quét mã ghép đôi là được.',
-      'service_nascab_title': 'Tài khoản GNasCab',
+      'service_nascab_title': 'Tài khoản WaterNasOS',
       'service_nascab_not_logged_in': 'Chưa đăng nhập',
       'service_nascab_not_logged_in_hint':
-          'Đăng nhập sau có thể sử dụng dịch vụ từ xa của GNasCab',
-      'service_nascab_login': 'Đăng nhập tài khoản GNasCab',
+          'Đăng nhập sau có thể sử dụng dịch vụ từ xa của WaterNasOS',
+      'service_nascab_login': 'Đăng nhập tài khoản WaterNasOS',
       'service_nascab_logout': 'Đăng xuất',
       'service_nascab_switch_account': 'Chuyển đổi tài khoản',
       'service_nascab_last_login': 'Lần đăng nhập cuối：@time',
@@ -961,7 +961,7 @@ class ViVn extends Translations {
       'service_nascab_login_cancelled': 'Đã hủy đăng nhập',
       'service_nascab_app_not_supported':
           'Đăng nhập không được hỗ trợ trên ứng dụng. Vui lòng đăng nhập qua PC hoặc trình duyệt web.',
-      'service_nascab_login_title': 'Đăng nhập tài khoản GNasCab',
+      'service_nascab_login_title': 'Đăng nhập tài khoản WaterNasOS',
       'service_nascab_callback_success': 'Đăng nhập thành công',
       'service_nascab_callback_success_hint':
           'Có thể đóng trang này và quay lại ứng dụng tiếp tục',
@@ -990,8 +990,8 @@ class ViVn extends Translations {
       'service_nascab_membership_vip_diff': 'So sánh gói',
       'service_nascab_membership_my_devices': 'Thiết bị của tôi',
       'service_nascab_membership_user_center': 'Trung tâm cá nhân',
-      'service_nascab_promotion_title': 'Quảng bá GNasCab',
-      'service_nascab_promotion_subtitle': 'Quảng bá GNasCab và nhận hoa hồng',
+      'service_nascab_promotion_title': 'Quảng bá WaterNasOS',
+      'service_nascab_promotion_subtitle': 'Quảng bá WaterNasOS và nhận hoa hồng',
       'service_nascab_promotion_action': 'Quảng bá ngay',
 
       'service_menu_contact_us': 'Liên hệ',
@@ -1350,6 +1350,10 @@ class ViVn extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Tìm kiếm tên',
       'video_list_cover_size': 'Kích thước bìa',
+      'video_list_image_poster': 'Poster',
+      'video_list_image_fanart': 'Hình thu nhỏ',
+      'video_list_waterfall': 'Thác nước',
+      'video_list_grid': 'Lưới',
       'filter': 'Lọc',
       'video_list_filter_years': 'Năm',
       'video_list_filter_genres': 'Thể loại',
@@ -1601,7 +1605,7 @@ class ViVn extends Translations {
           'Nếu thư mục nguồn của bạn đã di chuyển đến nơi khác, có thể sử dụng chức năng này để cập nhật chỉ mục tránh quét lại, vui lòng đảm bảo cấu trúc thư mục định vị lại và thư mục gốc giống nhau',
       'photo_source_delete_confirm': 'Xác nhận xóa thư mục nguồn：@path？',
       'photo_source_help_scan_when_start':
-          'Sau khi bật, sẽ tự động quét thư mục này khi GNasCab khởi động',
+          'Sau khi bật, sẽ tự động quét thư mục này khi WaterNasOS khởi động',
       'photo_source_help_scan_when_change':
           'Sau khi bật, tự động phát hiện khi thư mục có thay đổi, một số nền tảng không hỗ trợ (như Docker dưới Windows)',
       'photo_source_help_scan_interval':
@@ -1619,7 +1623,7 @@ class ViVn extends Translations {
       'book_source_unavailable': 'Không khả dụng',
       'book_source_delete_confirm': 'Xác nhận xóa thư mục nguồn：@path？',
       'book_source_help_scan_when_start':
-          'Sau khi bật, sẽ tự động quét thư mục này khi GNasCab khởi động',
+          'Sau khi bật, sẽ tự động quét thư mục này khi WaterNasOS khởi động',
       'book_source_help_scan_when_change':
           'Sau khi bật, tự động phát hiện khi thư mục có thay đổi, một số nền tảng không hỗ trợ (như Docker dưới Windows)',
       'book_source_help_scan_interval':
@@ -1639,7 +1643,7 @@ class ViVn extends Translations {
       'music_source_unavailable': 'Không khả dụng',
       'music_source_delete_confirm': 'Xác nhận xóa thư mục nguồn：@path？',
       'music_source_help_scan_when_start':
-          'Sau khi bật, sẽ tự động quét thư mục này khi GNasCab khởi động',
+          'Sau khi bật, sẽ tự động quét thư mục này khi WaterNasOS khởi động',
       'music_source_help_scan_when_change':
           'Sau khi bật, tự động phát hiện khi thư mục có thay đổi, một số nền tảng không hỗ trợ (như Docker dưới Windows)',
       'music_source_help_scan_interval':
@@ -1917,7 +1921,7 @@ class ViVn extends Translations {
       'video_source_unavailable': 'Không khả dụng',
       'video_source_delete_confirm': 'Xác nhận xóa thư mục nguồn：@path？',
       'video_source_help_scan_when_start':
-          'Sau khi bật, sẽ tự động quét thư mục này khi GNasCab khởi động',
+          'Sau khi bật, sẽ tự động quét thư mục này khi WaterNasOS khởi động',
       'video_source_help_match_nfo':
           'Sau khi bật, tự động cào thông tin phim từ TMDB',
       'video_source_help_scan_when_change':
@@ -1963,7 +1967,7 @@ class ViVn extends Translations {
       'server_need_input_password_every_time':
           'Cần nhập mật khẩu mỗi lần đăng nhập',
       'server_add_invalid_server':
-          'Máy chủ này không phải là máy chủ GNasCab hợp lệ, vui lòng kiểm tra địa chỉ máy chủ có đúng không',
+          'Máy chủ này không phải là máy chủ WaterNasOS hợp lệ, vui lòng kiểm tra địa chỉ máy chủ có đúng không',
       'server_connecting': 'Đang kết nối...',
       'home_server_connecting': 'Đang kết nối máy chủ...',
       'server_connect_fail':
@@ -2037,7 +2041,7 @@ class ViVn extends Translations {
       'auth_login_error': 'Xảy ra lỗi trong quá trình đăng nhập',
       'auth_token_refresh_failure': 'Làm mới token thất bại',
       'auth_token_refresh_error': 'Xảy ra lỗi trong quá trình làm mới token',
-      'auth_welcome_title': 'Chào mừng sử dụng GNasCab',
+      'auth_welcome_title': 'Chào mừng sử dụng WaterNasOS',
       'auth_pair_code_label': 'Mã ghép đôi',
       'auth_pair_code_connect': 'Kết nối',
       'auth_connected_host': 'Đã kết nối máy chủ：@host',
@@ -2084,7 +2088,7 @@ class ViVn extends Translations {
       'admin_create_button': 'Tạo quản trị viên',
       'admin_create_success': 'Tài khoản quản trị viên đã được tạo thành công',
       'admin_create_success_message':
-          'Tạo thành công, tài khoản này được lưu trên đĩa máy chủ GNasCab của bạn, không phải tài khoản mạng, vui lòng ghi nhớ.',
+          'Tạo thành công, tài khoản này được lưu trên đĩa máy chủ WaterNasOS của bạn, không phải tài khoản mạng, vui lòng ghi nhớ.',
       'admin_create_failure': 'Tạo thất bại',
       'admin_create_username_exists': 'Tên người dùng đã tồn tại',
 
@@ -2184,7 +2188,7 @@ class ViVn extends Translations {
       'logout_transfer_running_title': 'Nhiệm vụ truyền tải chưa hoàn tất',
       'logout_transfer_running_content':
           'Bạn hiện còn có nhiệm vụ tải lên/tải xuống chưa hoàn tất, sau khi đăng xuất nhiệm vụ sẽ dừng và xóa.',
-      'home_status_restart': 'Khởi động lại GNasCab',
+      'home_status_restart': 'Khởi động lại WaterNasOS',
       'home_status_monitor': 'Giám sát',
       'home_status_message': 'Tin nhắn',
       'home_status_bg_tasks': 'Nhiệm vụ nền',
@@ -2594,7 +2598,7 @@ class ViVn extends Translations {
       'home_apps': 'Ứng dụng',
       'home_no_message': 'Không có tin nhắn mới',
       'monitor_click_to_view': 'Nhấp để xem chi tiết',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Trung tâm nhiệm vụ',
       'recycle_bin_empty': 'Thùng rác không có tệp',
 
@@ -2778,7 +2782,7 @@ class ViVn extends Translations {
       'transmission_no_files': 'Không có tệp',
       'transmission_select_all_files': 'Chọn tất cả',
       'transmission_deselect_all_files': 'Bỏ chọn tất cả',
-      'transmission_auto_start': 'Tự khởi động cùng GNasCab',
+      'transmission_auto_start': 'Tự khởi động cùng WaterNasOS',
       'transmission_dht_enabled': 'Bật DHT',
       'transmission_pex_enabled': 'Bật PEX',
       'transmission_utp_enabled': 'Bật uTP',

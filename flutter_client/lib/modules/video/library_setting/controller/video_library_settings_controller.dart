@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
-import 'package:GNasCab/modules/video/library_setting/service/video_library_api_service.dart';
-import 'package:GNasCab/modules/video/video_main/controller/video_main_controller.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
-import 'package:GNasCab/utils/toast_util.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/modules/video/library_setting/service/video_library_api_service.dart';
+import 'package:WaterNasOS/modules/video/video_main/controller/video_main_controller.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
+import 'package:WaterNasOS/utils/toast_util.dart';
 
 class VideoLibrarySettingsController extends GetxController {
   final RxList<VideoLibrary> libraries = <VideoLibrary>[].obs;

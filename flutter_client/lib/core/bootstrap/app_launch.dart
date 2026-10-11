@@ -1,6 +1,6 @@
 /// 独立客户端启动模式。
 ///
-/// 主客户端（GNasCab 完整版）恒为 [AppLaunchMode.full]。
+/// 主客户端（WaterNasOS 完整版）恒为 [AppLaunchMode.full]。
 /// 派生的独立程序（photo_client / music_client）**不复制任何业务代码**，
 /// 而是通过 `path:` 依赖主客户端工程，在各自 `main()` 里设置启动模式，
 /// 复用同一份代码，仅在「可见应用范围」与「启动后自动进入的应用」上收敛。
@@ -27,18 +27,18 @@ class AppLaunch {
   /// 音乐应用 appKey（服务端 `defaultApps` 中的 `music`）。
   static const String appKeyMusic = 'music';
 
-  /// 启动模式。独立端在 `runGNasCabApp(launchMode: ...)` 中设置。
+  /// 启动模式。独立端在 `runWaterNasOSApp(launchMode: ...)` 中设置。
   static AppLaunchMode mode = AppLaunchMode.full;
 
   /// 应用标题（窗口标题 / MaterialApp title）。
   static String get appTitle {
     switch (mode) {
       case AppLaunchMode.full:
-        return 'GNasCab';
+        return 'WaterNasOS';
       case AppLaunchMode.photo:
-        return 'GNasCab 相册';
+        return 'WaterNasOS 相册';
       case AppLaunchMode.music:
-        return 'GNasCab 音乐';
+        return 'WaterNasOS 音乐';
     }
   }
 

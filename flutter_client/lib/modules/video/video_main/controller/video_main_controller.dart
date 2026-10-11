@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:GNasCab/modules/video/library_setting/models/video_library.dart';
-import 'package:GNasCab/modules/video/library_setting/service/video_library_api_service.dart';
-import 'package:GNasCab/modules/video/list/service/video_list_api_service.dart';
+import 'package:WaterNasOS/modules/video/library_setting/models/video_library.dart';
+import 'package:WaterNasOS/modules/video/library_setting/service/video_library_api_service.dart';
+import 'package:WaterNasOS/modules/video/list/service/video_list_api_service.dart';
 
 enum VideoFilterOverlayKind { genre, region, actor, director }
 
@@ -100,6 +100,34 @@ class VideoMainController extends GetxController {
 
   void selectPage(String key) {
     currentPageKey.value = key;
+  }
+
+  /// ⭐ 当前是否处于「二级页面」（2026-10-10）：
+  /// 影视首页（`library.home`）以外的一切页面，或打开了任意覆盖层
+  /// （详情 / 剧集详情 / 筛选列表）—— 二级页的窗口标题栏只显示一个「返回」按钮。
+  bool get isSecondaryPage =>
+      currentPageKey.value != 'library.home' ||
+      activeDetailIndexId.value != null ||
+      activeSubDetailIndexId.value != null ||
+      activeFilterOverlay.value != null;
+
+  /// ⭐ 二级页「返回」：逐层回退（剧集详情 → 详情 → 筛选列表 → 影视首页）。
+  void navigateBack() {
+    if (activeSubDetailIndexId.value != null) {
+      closeSubDetail();
+      return;
+    }
+    if (activeDetailIndexId.value != null) {
+      closeDetail();
+      return;
+    }
+    if (activeFilterOverlay.value != null) {
+      closeFilterOverlay();
+      return;
+    }
+    if (currentPageKey.value != 'library.home') {
+      selectPage('library.home');
+    }
   }
 
   void openDetail(int indexId) {

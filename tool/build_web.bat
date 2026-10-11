@@ -1,5 +1,5 @@
 @echo off
-rem Build the Flutter web bundle for the GNasCab server web UI.
+rem Build the Flutter web bundle for the WaterNasOS server web UI.
 rem Output is redirected to a log file on purpose: when this script is launched
 rem through tool/bridge_cli.py the bridge buffers the child's stdout/stderr in
 rem pipes until it exits, so a build that stalls shows nothing at all.

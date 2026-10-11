@@ -16,6 +16,20 @@ class VideoUtils {
     return ApiController.instance.getTinyUrl(fallbackFilePath, size: size);
   }
 
+  /// 列表网格用的**横版**图（2026-10-10，配合「缩略图」显示模式）。
+  ///
+  /// ⚠️ 这里**不能**用 [getFanartUrl] —— 那个走 `getRawFileUrl` 取原图，
+  /// 详情页 / 首页大图用得，网格里几十上百张会拖垮加载。统一走 tiny 缩略图服务。
+  ///
+  /// 没有 fanart 的条目退回封面图（会被 16:9 的框裁掉上下，属预期行为）。
+  static String getFanartThumbUrl(VideoHomeItemBean item, {int size = 500}) {
+    final fanartPath = item.fanartPath.trim();
+    if (fanartPath.isNotEmpty) {
+      return ApiController.instance.getTinyUrl(fanartPath, size: size);
+    }
+    return getPosterUrl(item, size: size);
+  }
+
   static String getFanartUrl(VideoHomeItemBean item, {int? size}) {
     size ??= 1600;
     final fanartPath = item.fanartPath.trim();

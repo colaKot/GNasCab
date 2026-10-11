@@ -1,15 +1,15 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/core/user/current_user_controller.dart';
-import 'package:GNasCab/modules/folder_view/folder_view_module_type.dart';
-import 'package:GNasCab/modules/folder_view/view/app_folder_view_page.dart';
-import 'package:GNasCab/modules/music/cache_setting/view/music_cache_settings_view.dart';
-import 'package:GNasCab/modules/music/collection/view/music_collection_list_view.dart';
-import 'package:GNasCab/modules/music/play_service/app_components/app_music_play_ctrl_floating_bar.dart';
-import 'package:GNasCab/modules/music/music_main/view/app_music_main_view.dart';
-import 'package:GNasCab/modules/music/play_service/play_ctrl_fullscreen/music_play_ctrl_fullscreen_sheet.dart';
-import 'package:GNasCab/modules/music/playlist/view/play_list_list_view.dart';
-import 'package:GNasCab/modules/music/source_setting/view/music_source_settings_view.dart';
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/user/current_user_controller.dart';
+import 'package:WaterNasOS/modules/folder_view/folder_view_module_type.dart';
+import 'package:WaterNasOS/modules/folder_view/view/app_folder_view_page.dart';
+import 'package:WaterNasOS/modules/music/cache_setting/view/music_cache_settings_view.dart';
+import 'package:WaterNasOS/modules/music/collection/view/music_collection_list_view.dart';
+import 'package:WaterNasOS/modules/music/play_service/app_components/app_music_play_ctrl_floating_bar.dart';
+import 'package:WaterNasOS/modules/music/music_main/view/app_music_main_view.dart';
+import 'package:WaterNasOS/modules/music/play_service/play_ctrl_fullscreen/music_play_ctrl_fullscreen_sheet.dart';
+import 'package:WaterNasOS/modules/music/playlist/view/play_list_list_view.dart';
+import 'package:WaterNasOS/modules/music/source_setting/view/music_source_settings_view.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import '../controller/photo_home_controller.dart';
 import 'home_parts/photo_left_menu.dart';
 import '../../source_setting/view/photo_source_settings_view.dart';

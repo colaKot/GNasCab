@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/user/current_user_controller.dart';
+import 'package:WaterNasOS/core/user/current_user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../utils/device_utils.dart';
@@ -106,7 +106,6 @@ class MusicLeftMenu extends StatelessWidget {
       onToggleCollapse: onToggleCollapse,
       toggleExpandTooltip: 'sidebar_expand'.tr,
       toggleCollapseTooltip: 'sidebar_collapse'.tr,
-      topPlaceholderHeight: 45,
       headerTrailing: Obx(() {
         final songText = '${'music'.tr}:${controller.songCount.value}';
         final style = theme.textTheme.bodySmall?.copyWith(

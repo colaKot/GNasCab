@@ -1,6 +1,6 @@
 import Foundation
 
-/// UDP 广播监听：监听端口 8888，解析 GNasCab 服务发现报文，与 Flutter 端 UdpBroadcastListener 协议一致
+/// UDP 广播监听：监听端口 8888，解析 WaterNasOS 服务发现报文，与 Flutter 端 UdpBroadcastListener 协议一致
 final class UdpBroadcastListener {
     static let broadcastPort: UInt16 = 8888
 

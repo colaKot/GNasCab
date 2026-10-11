@@ -1,6 +1,6 @@
-# GNasCab 音乐（独立客户端）
+# WaterNasOS 音乐（独立客户端）
 
-复用主客户端 `flutter_client`（包名 `GNasCab`）**整套代码**的 Windows 独立程序，
+复用主客户端 `flutter_client`（包名 `WaterNasOS`）**整套代码**的 Windows 独立程序，
 产物 `NasCabMusic.exe`。音乐能力与主客户端完全一致（歌单 / 收藏 / 歌词 / 播放引擎 /
 音频缓存），且**不复制任何业务代码**。
 
@@ -10,7 +10,7 @@
 
 ```yaml
 dependencies:
-  GNasCab:
+  WaterNasOS:
     path: ../flutter_client   # 主客户端 = 唯一代码源
 ```
 
@@ -18,14 +18,14 @@ dependencies:
 
 ```dart
 Future<void> main() =>
-    shell.runGNasCabApp(launchMode: shell_launch.AppLaunchMode.music);
+    shell.runWaterNasOSApp(launchMode: shell_launch.AppLaunchMode.music);
 ```
 
 `AppLaunchMode.music` 由主客户端 `lib/core/bootstrap/app_launch.dart` 定义，作用：
 
 1. **登录 / 选服务器成功后整屏直接进入音乐** —— 不出现桌面、dock、启动器
    （`pc_home_page.dart` 在非 `full` 模式下直接渲染 `MusicMainView`，不再渲染虚拟桌面）；
-2. 窗口标题为「GNasCab 音乐」（`AppWindowTitle.defaultTitle` 跟随启动模式）；
+2. 窗口标题为「WaterNasOS 音乐」（`AppWindowTitle.defaultTitle` 跟随启动模式）；
 3. exe 图标与托盘图标均为音乐专属（由 `assets/app_icons/music.webp` 生成）。
 
 ### 怎么确认它是「独立程序」
@@ -33,13 +33,13 @@ Future<void> main() =>
 | 项 | 主客户端 | 本程序 |
 |---|---|---|
 | exe 名 | `NasCabOS.exe` | **`NasCabMusic.exe`** |
-| exe 图标 | 蓝色箭头（GNasCab） | **红色音符（音乐）** |
-| 窗口标题 | `GNasCab` | **`GNasCab 音乐`** |
+| exe 图标 | 蓝色箭头（WaterNasOS） | **红色音符（音乐）** |
+| 窗口标题 | `WaterNasOS` | **`WaterNasOS 音乐`** |
 | 单实例 mutex | `Global\NasCabOS_SingleInstance` | **`Global\NasCabMusic_SingleInstance`** |
 | 窗口类名 | `FLUTTER_RUNNER_WIN32_WINDOW` | **`NASACB_MUSIC_WIN32_WINDOW`** |
-| 托盘图标 | `assets/tray_icon_round.ico`（GNasCab） | **音乐专属（已替换）** |
+| 托盘图标 | `assets/tray_icon_round.ico`（WaterNasOS） | **音乐专属（已替换）** |
 | Android applicationId | `com.nascabos.mobile` | **`com.nascabos.music`** |
-| Android 桌面名 | `GNasCab` | **`GNasCab 音乐`** |
+| Android 桌面名 | `WaterNasOS` | **`WaterNasOS 音乐`** |
 | Android 图标 | 主端图标 | **红色音符（各密度 15 张已替换）** |
 
 两者可同时运行、互不干扰（单实例锁与窗口类名都不同），任务栏是两个独立图标；
@@ -75,8 +75,8 @@ flutter build appbundle --release      # 上架 Google Play 用 AAB
 |---|---|
 | `windows/CMakeLists.txt` | `project(NasCabMusic)` / `BINARY_NAME = NasCabMusic` |
 | `windows/runner/utils.cpp` | 单实例 mutex `Global\NasCabMusic_SingleInstance`；窗口类名 `NASACB_MUSIC_WIN32_WINDOW`；单实例消息名 `NasCabMusic_ShowExistingInstance`；exe 名 `NasCabMusic.exe` |
-| `windows/runner/main.cpp` | 窗口标题「GNasCab 音乐」，初始 1280×800 |
-| `windows/runner/Runner.rc` | 产品名 / 文件描述 `GNasCab Music` |
+| `windows/runner/main.cpp` | 窗口标题「WaterNasOS 音乐」，初始 1280×800 |
+| `windows/runner/Runner.rc` | 产品名 / 文件描述 `WaterNasOS Music` |
 | `windows/runner/resources/app_icon.ico` | 由 `assets/app_icons/music.webp` 转换而来 |
 | `windows/flutter/generated_plugins.cmake`、`generated_plugin_registrant.cc` | **已清空**（跑 `flutter pub get` 后由工具填回） |
 
@@ -88,7 +88,7 @@ flutter build appbundle --release      # 上架 Google Play 用 AAB
 |---|---|
 | `android/app/build.gradle.kts` | `namespace` / `applicationId` → `com.nascabos.music` |
 | `android/app/src/main/kotlin/com/nascabos/music/` | Kotlin 包目录由 `mobile/` 改名而来，`package` / `import` 同步改写 |
-| `AndroidManifest.xml` | `android:label` → **GNasCab 音乐** |
+| `AndroidManifest.xml` | `android:label` → **WaterNasOS 音乐** |
 | `res/mipmap-*/{ic_launcher,launcher_icon}.png`、`res/drawable-*/ic_launcher_foreground.png` | 15 张图标全部由 `assets/app_icons/music.webp` 生成 |
 | `app/src/main/java/.../GeneratedPluginRegistrant.java` | **已排除**（每次构建自动生成；留着会引用本工程没有的插件而报错） |
 

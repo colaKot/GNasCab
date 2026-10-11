@@ -106,7 +106,7 @@ class NasCabAccountApiService extends BaseApiService {
     );
   }
 
-  /// 绑定当前设备到 GNasCab 账号（用于 P2P 远程连接）
+  /// 绑定当前设备到 WaterNasOS 账号（用于 P2P 远程连接）
   Future<ApiResponse<Map<String, dynamic>>> bindP2pDevice() {
     return apiPost<Map<String, dynamic>>(
       '/api/service/nascab/p2p/bindDevice',

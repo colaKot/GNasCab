@@ -1,4 +1,4 @@
-import 'package:GNasCab/modules/base/components/custom_extended_image.dart';
+import 'package:WaterNasOS/modules/base/components/custom_extended_image.dart';
 import 'package:flutter/material.dart';
 
 class AppVideoAlbumCard extends StatelessWidget {

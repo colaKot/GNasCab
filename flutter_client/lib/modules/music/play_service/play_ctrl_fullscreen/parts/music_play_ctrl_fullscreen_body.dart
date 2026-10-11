@@ -1,4 +1,4 @@
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../app_components/music_play_disc_cover.dart';

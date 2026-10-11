@@ -50,7 +50,7 @@ SHARED_API = {
 # 共享包里不该出现的客户端专有符号
 FOREIGN = ['ApiController', 'UploadCore', 'BaseApiService', 'SyncHttp.',
            'SessionController', 'SyncUploader', 'createHttpClient',
-           'createSyncHttpClient', 'package:GNasCab']
+           'createSyncHttpClient', 'package:WaterNasOS']
 
 SHARED_EXPORTS = [
     'sync_engine.dart', 'sync_host.dart', 'sync_local_scanner.dart',

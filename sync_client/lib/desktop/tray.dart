@@ -119,7 +119,7 @@ class SyncTray {
     } else {
       await trayManager.setIcon('assets/tray_icon_round.ico');
     }
-    await trayManager.setToolTip('GNasCab 同步');
+    await trayManager.setToolTip('WaterNasOS 同步');
     await _applyContextMenu();
 
     trayManager.addListener(_SyncTrayListener());

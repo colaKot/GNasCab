@@ -79,7 +79,7 @@ class DesktopTray {
     } else {
       await trayManager.setIcon('assets/home/logo_round.png');
     }
-    await trayManager.setToolTip('GNasCab');
+    await trayManager.setToolTip('WaterNasOS');
     await _applyContextMenu();
 
     trayManager.addListener(_DesktopTrayListener());

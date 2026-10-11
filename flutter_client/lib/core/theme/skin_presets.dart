@@ -20,10 +20,11 @@ class AppSkinPreset {
 
 /// 皮肤登记表（2026-10-09）
 ///
-/// ⭐ **默认皮肤 `windows11` 的取值必须与换肤前完全一致**（窗口 16 圆角 / 标题栏 40 /
-/// 按钮 24×16 / 控件圆角 4 / 主按钮圆角 10 / 图标 24），否则老用户默认外观会被改掉。
+/// ⭐ **默认皮肤 `windows11` = 当前发布外观**，改它等于改所有老用户的默认观感，
+/// 非必要不动。2026-10-10 按需求改过一次：右上角按钮从「24×16 红黄绿小圆点」
+/// 改为「40×40 方形圆角透明底 + 图标常显」，标题栏相应 40 → 48（上下各 4 让位）。
 ///
-/// 每套皮肤只描述**结构差异**；颜色（含红黄绿语义色）一律从当前配色派生。
+/// 每套皮肤只描述**结构差异**；颜色一律从当前配色派生。
 class SkinPresets {
   const SkinPresets._();
 
@@ -36,12 +37,13 @@ class SkinPresets {
     skin: AppSkin(
       windowRadius: 16,
       windowBorderWidth: 0.5,
-      titleBarHeight: 40,
+      // ⭐ 48 = 40×40 按钮 + 上下各 4 让位（2026-10-10：按钮改大方块后不再顶边）
+      titleBarHeight: 48,
       titleBarButtonStyle: AppTitleBarButtonStyle.windows,
-      titleBarButtonWidth: 24,
-      titleBarButtonHeight: 16,
-      titleBarButtonSpacing: 4,
-      titleBarButtonIconSize: 11,
+      titleBarButtonWidth: 40,
+      titleBarButtonHeight: 40,
+      titleBarButtonSpacing: 8,
+      titleBarButtonIconSize: 18,
       controlRadius: 4,
       buttonRadius: 10,
       buttonHeight: 40,
@@ -57,12 +59,14 @@ class SkinPresets {
     skin: AppSkin(
       windowRadius: 10,
       windowBorderWidth: 0.5,
-      titleBarHeight: 44,
-      titleBarButtonStyle: AppTitleBarButtonStyle.macos,
-      titleBarButtonWidth: 14,
-      titleBarButtonHeight: 14,
+      // ⭐ 2026-10-10：窗口按钮改为「全皮肤统一 40×40 方块 + 透明底」，故各皮肤的
+      //    按钮度量全部对齐 windows11；标题栏同步 48 保证上下各留 4（否则 40 高的按钮会溢出）
+      titleBarHeight: 48,
+      titleBarButtonStyle: AppTitleBarButtonStyle.windows,
+      titleBarButtonWidth: 40,
+      titleBarButtonHeight: 40,
       titleBarButtonSpacing: 8,
-      titleBarButtonIconSize: 7,
+      titleBarButtonIconSize: 18,
       controlRadius: 8,
       buttonRadius: 8,
       buttonHeight: 40,
@@ -78,12 +82,13 @@ class SkinPresets {
     skin: AppSkin(
       windowRadius: 28,
       windowBorderWidth: 0,
-      titleBarHeight: 46,
-      titleBarButtonStyle: AppTitleBarButtonStyle.minimal,
-      titleBarButtonWidth: 28,
-      titleBarButtonHeight: 18,
-      titleBarButtonSpacing: 6,
-      titleBarButtonIconSize: 12,
+      // ⭐ 2026-10-10：窗口按钮全皮肤统一 40×40 方块（详见 windows11 处注释）
+      titleBarHeight: 48,
+      titleBarButtonStyle: AppTitleBarButtonStyle.windows,
+      titleBarButtonWidth: 40,
+      titleBarButtonHeight: 40,
+      titleBarButtonSpacing: 8,
+      titleBarButtonIconSize: 18,
       controlRadius: 12,
       buttonRadius: 12,
       buttonHeight: 40,
@@ -99,12 +104,14 @@ class SkinPresets {
     skin: AppSkin(
       windowRadius: 8,
       windowBorderWidth: 0.5,
-      titleBarHeight: 34,
+      // ⭐ 2026-10-10：窗口按钮全皮肤统一 40×40 方块 ⇒ 标题栏不能再压到 34（会溢出），
+      //    「紧凑」皮肤现在只通过圆角/控件高度/图标风格体现紧凑感
+      titleBarHeight: 48,
       titleBarButtonStyle: AppTitleBarButtonStyle.windows,
-      titleBarButtonWidth: 20,
-      titleBarButtonHeight: 14,
-      titleBarButtonSpacing: 3,
-      titleBarButtonIconSize: 9,
+      titleBarButtonWidth: 40,
+      titleBarButtonHeight: 40,
+      titleBarButtonSpacing: 8,
+      titleBarButtonIconSize: 18,
       controlRadius: 2,
       buttonRadius: 2,
       buttonHeight: 32,

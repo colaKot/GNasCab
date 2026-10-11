@@ -309,7 +309,7 @@ class TwoFAService {
     await this.knexMain('user_2fa').insert({
       user_id: userId,
       is_enabled: false,
-      issuer: 'GNasCab',
+      issuer: 'WaterNasOS',
       period: 30,
       digits: 6,
       algorithm: 'sha1',
@@ -326,7 +326,7 @@ class TwoFAService {
     return {
       enabled: row && row.is_enabled === 1,
       hasSecret: !!(row && row.secret_enc),
-      issuer: row && row.issuer ? String(row.issuer) : 'GNasCab',
+      issuer: row && row.issuer ? String(row.issuer) : 'WaterNasOS',
       period: Number(row && row.period) || 30,
       digits: Number(row && row.digits) || 6,
       algorithm: row && row.algorithm ? String(row.algorithm) : 'sha1',
@@ -341,7 +341,7 @@ class TwoFAService {
     return !!(row && row.is_enabled === 1);
   }
 
-  async generateSecret(userId, { issuer = 'GNasCab', accountName = '' } = {}) {
+  async generateSecret(userId, { issuer = 'WaterNasOS', accountName = '' } = {}) {
     await this._ensureRow(userId);
     const keys = await this._getCryptoKeys();
     const secret = authenticator.generateSecret();
@@ -388,7 +388,7 @@ class TwoFAService {
     if (!secret) throw new Error('twofa.SECRET_DECRYPT_FAILED');
     return {
       secret,
-      issuer: row.issuer ? String(row.issuer) : 'GNasCab',
+      issuer: row.issuer ? String(row.issuer) : 'WaterNasOS',
       period: Number(row.period) || 30,
       digits: Number(row.digits) || 6,
       algorithm: row.algorithm ? String(row.algorithm) : 'sha1',

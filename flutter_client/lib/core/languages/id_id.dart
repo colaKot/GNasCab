@@ -294,14 +294,14 @@ class IdId extends Translations {
       'api_code_notes_notebook_not_found':
           "Folder buku catatan tidak ada atau telah dipindahkan",
       'api_code_notes_notebook_invalid':
-          "Folder yang dipilih bukan buku catatan GNasCab yang valid",
+          "Folder yang dipilih bukan buku catatan WaterNasOS yang valid",
       'api_code_notes_notebook_folder_not_empty':
           "Folder yang dipilih tidak kosong dan tidak dapat diinisialisasi sebagai buku catatan baru",
       'api_code_notes_group_not_empty':
           "Grup masih berisi catatan dan tidak dapat dihapus",
       'notes_notebook_choose_title': "Pilih atau buat buku catatan",
       'notes_notebook_choose_desc':
-          "Saat pertama kali dibuka, pilih folder kosong atau folder buku catatan GNasCab yang sudah ada.",
+          "Saat pertama kali dibuka, pilih folder kosong atau folder buku catatan WaterNasOS yang sudah ada.",
       'notes_choose_folder': "Pilih folder buku catatan",
       'notes_original_path_missing': "Path buku catatan asli sudah tidak ada: ",
       'notes_recent_deleted': "Baru Dihapus",
@@ -709,7 +709,7 @@ class IdId extends Translations {
           'Proses dasar layanan API; jika dihentikan aplikasi tidak dapat diakses',
       'process.worker.expressBroadcast.name': 'Siaran LAN API',
       'process.worker.expressBroadcast.purpose':
-          'Memungkinkan klien menemukan server GNasCab di LAN',
+          'Memungkinkan klien menemukan server WaterNasOS di LAN',
       'process.worker.ffmpegHwTest.name': 'Deteksi akselerasi FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
           'Memeriksa dukungan akselerasi perangkat keras FFmpeg di host ini',
@@ -852,12 +852,12 @@ class IdId extends Translations {
       'terminal_cursor_blink': 'Kursor Berkedip',
       'terminal_click_to_pick_color': 'Klik untuk memilih warna',
       'service_menu_account': 'Akun',
-      'service_menu_account_nascab': 'Akun GNasCab',
+      'service_menu_account_nascab': 'Akun WaterNasOS',
       'service_menu_remote_access': 'Akses Remote',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'Tembus Jaringan Internal',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -886,7 +886,7 @@ class IdId extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'Aktifkan Akses Remote',
       'service_remote_access_toggle_hint':
-          'Setelah diaktifkan, Anda dapat mengakses layanan GNasCab Anda dengan aman di lingkungan remote',
+          'Setelah diaktifkan, Anda dapat mengakses layanan WaterNasOS Anda dengan aman di lingkungan remote',
       'service_remote_access_pair_code_label': 'Kode Pencocokan',
       'service_remote_access_pair_code_empty': 'Tidak ada kode pencocokan',
       'service_remote_access_custom_pair_code_title': 'Kode Pencocokan Kustom',
@@ -923,7 +923,7 @@ class IdId extends Translations {
       'P2P_TOO_MANY_REQUESTS':
           'Terlalu banyak permintaan. Silakan coba lagi nanti.',
       'service_p2p_device_not_bind_message':
-          'Anda perlu menghubungkan perangkat saat ini ke akun GNasCab untuk menggunakan fitur ini. Anda dapat melepaskan koneksi saat tidak lagi diperlukan.',
+          'Anda perlu menghubungkan perangkat saat ini ke akun WaterNasOS untuk menggunakan fitur ini. Anda dapat melepaskan koneksi saat tidak lagi diperlukan.',
       'service_p2p_bind_device_button': 'Hubungkan',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Format kode pencocokan tidak valid (6-30 karakter, hanya mendukung huruf/angka)',
@@ -942,16 +942,16 @@ class IdId extends Translations {
       'service_remote_access_guide_title': 'Penjelasan Akses Remote',
       'service_remote_access_guide_how_title': 'Bagaimana fitur ini bekerja?',
       'service_remote_access_guide_how_body':
-          'Setelah mengaktifkan akses remote, GNasCab akan mengalokasikan kode pencocokan acak untuk Anda. Melalui kode pencocokan, Anda dapat langsung menggunakan kode pencocokan untuk terhubung ke host Anda di aplikasi GNasCab atau desktop mana pun. Prioritas menggunakan koneksi langsung P2P, ketika P2P tidak dapat digunakan, akan mengalokasikan node global terdekat untuk menyediakan layanan relay untuk Anda. Data ditransmisikan melalui SSL + WebRTC yang aman, Anda dapat menggunakannya dengan percaya diri.',
+          'Setelah mengaktifkan akses remote, WaterNasOS akan mengalokasikan kode pencocokan acak untuk Anda. Melalui kode pencocokan, Anda dapat langsung menggunakan kode pencocokan untuk terhubung ke host Anda di aplikasi WaterNasOS atau desktop mana pun. Prioritas menggunakan koneksi langsung P2P, ketika P2P tidak dapat digunakan, akan mengalokasikan node global terdekat untuk menyediakan layanan relay untuk Anda. Data ditransmisikan melalui SSL + WebRTC yang aman, Anda dapat menggunakannya dengan percaya diri.',
       'service_remote_access_guide_use_title':
           'Bagaimana cara menggunakan kode pencocokan?',
       'service_remote_access_guide_use_body':
           'Saat menambahkan server di aplikasi atau desktop, pilih "Tambahkan server menggunakan kode pencocokan", lalu masukkan atau pindai kode pencocokan.',
-      'service_nascab_title': 'Akun GNasCab',
+      'service_nascab_title': 'Akun WaterNasOS',
       'service_nascab_not_logged_in': 'Belum Login',
       'service_nascab_not_logged_in_hint':
-          'Login untuk menggunakan kemampuan layanan remote GNasCab',
-      'service_nascab_login': 'Login Akun GNasCab',
+          'Login untuk menggunakan kemampuan layanan remote WaterNasOS',
+      'service_nascab_login': 'Login Akun WaterNasOS',
       'service_nascab_logout': 'Keluar',
       'service_nascab_switch_account': 'Ganti Akun',
       'service_nascab_last_login': 'Login Terakhir: @time',
@@ -965,7 +965,7 @@ class IdId extends Translations {
       'service_nascab_login_cancelled': 'Login Dibatalkan',
       'service_nascab_app_not_supported':
           'Login tidak didukung di aplikasi. Silakan gunakan PC atau browser web untuk login.',
-      'service_nascab_login_title': 'Login Akun GNasCab',
+      'service_nascab_login_title': 'Login Akun WaterNasOS',
       'service_nascab_callback_success': 'Login Berhasil',
       'service_nascab_callback_success_hint':
           'Anda dapat menutup halaman ini dan kembali ke aplikasi untuk melanjutkan',
@@ -995,9 +995,9 @@ class IdId extends Translations {
       'service_nascab_membership_vip_diff': 'Bandingkan paket',
       'service_nascab_membership_my_devices': 'Perangkat saya',
       'service_nascab_membership_user_center': 'Pusat pengguna',
-      'service_nascab_promotion_title': 'Promosikan GNasCab',
+      'service_nascab_promotion_title': 'Promosikan WaterNasOS',
       'service_nascab_promotion_subtitle':
-          'Promosikan GNasCab dan dapatkan komisi',
+          'Promosikan WaterNasOS dan dapatkan komisi',
       'service_nascab_promotion_action': 'Promosikan sekarang',
 
       'service_menu_contact_us': 'Hubungi Kami',
@@ -1360,6 +1360,10 @@ class IdId extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Cari Nama',
       'video_list_cover_size': 'Ukuran sampul',
+      'video_list_image_poster': 'Poster',
+      'video_list_image_fanart': 'Thumbnail',
+      'video_list_waterfall': 'Air terjun',
+      'video_list_grid': 'Kisi',
       'filter': 'Filter',
       'video_list_filter_years': 'Tahun',
       'video_list_filter_genres': 'Genre',
@@ -1621,7 +1625,7 @@ class IdId extends Translations {
       'photo_source_delete_confirm':
           'Yakin ingin menghapus direktori sumber: @path?',
       'photo_source_help_scan_when_start':
-          'Setelah diaktifkan, akan otomatis memindai direktori ini saat GNasCab dimulai',
+          'Setelah diaktifkan, akan otomatis memindai direktori ini saat WaterNasOS dimulai',
       'photo_source_help_scan_when_change':
           'Setelah diaktifkan, akan otomatis mendeteksi saat direktori berubah, beberapa platform tidak didukung (seperti Docker di Windows)',
       'photo_source_help_scan_interval':
@@ -1640,7 +1644,7 @@ class IdId extends Translations {
       'book_source_delete_confirm':
           'Yakin ingin menghapus direktori sumber: @path?',
       'book_source_help_scan_when_start':
-          'Setelah diaktifkan, akan otomatis memindai direktori ini saat GNasCab dimulai',
+          'Setelah diaktifkan, akan otomatis memindai direktori ini saat WaterNasOS dimulai',
       'book_source_help_scan_when_change':
           'Setelah diaktifkan, akan otomatis mendeteksi saat direktori berubah, beberapa platform tidak didukung (seperti Docker di Windows)',
       'book_source_help_scan_interval':
@@ -1661,7 +1665,7 @@ class IdId extends Translations {
       'music_source_delete_confirm':
           'Yakin ingin menghapus direktori sumber: @path?',
       'music_source_help_scan_when_start':
-          'Setelah diaktifkan, akan otomatis memindai direktori ini saat GNasCab dimulai',
+          'Setelah diaktifkan, akan otomatis memindai direktori ini saat WaterNasOS dimulai',
       'music_source_help_scan_when_change':
           'Setelah diaktifkan, akan otomatis mendeteksi saat direktori berubah, beberapa platform tidak didukung (seperti Docker di Windows)',
       'music_source_help_scan_interval':
@@ -1942,7 +1946,7 @@ class IdId extends Translations {
       'video_source_delete_confirm':
           'Yakin ingin menghapus direktori sumber: @path?',
       'video_source_help_scan_when_start':
-          'Setelah diaktifkan, akan otomatis memindai direktori ini saat GNasCab dimulai',
+          'Setelah diaktifkan, akan otomatis memindai direktori ini saat WaterNasOS dimulai',
       'video_source_help_match_nfo':
           'Setelah diaktifkan, otomatis scraping info film dari TMDB',
       'video_source_help_scan_when_change':
@@ -1988,7 +1992,7 @@ class IdId extends Translations {
       'server_need_input_password_every_time':
           'Perlu memasukkan kata sandi setiap kali masuk',
       'server_add_invalid_server':
-          'Server ini bukan server GNasCab yang valid, silakan periksa apakah alamat server benar',
+          'Server ini bukan server WaterNasOS yang valid, silakan periksa apakah alamat server benar',
       'server_connecting': 'Sedang Menghubungkan...',
       'home_server_connecting': 'Server Sedang Menghubungkan...',
       'server_connect_fail':
@@ -2068,7 +2072,7 @@ class IdId extends Translations {
       'auth_token_refresh_failure': 'Gagal refresh token',
       'auth_token_refresh_error':
           'Terjadi kesalahan selama proses refresh token',
-      'auth_welcome_title': 'Selamat Datang di GNasCab',
+      'auth_welcome_title': 'Selamat Datang di WaterNasOS',
       'auth_pair_code_label': 'Kode Pencocokan',
       'auth_pair_code_connect': 'Hubungkan',
       'auth_connected_host': 'Host Terhubung: @host',
@@ -2116,7 +2120,7 @@ class IdId extends Translations {
       'admin_create_button': 'Buat Administrator',
       'admin_create_success': 'Akun Administrator Berhasil Dibuat',
       'admin_create_success_message':
-          'Berhasil dibuat, akun ini disimpan di disk server GNasCab Anda, bukan akun jaringan, harap diingat.',
+          'Berhasil dibuat, akun ini disimpan di disk server WaterNasOS Anda, bukan akun jaringan, harap diingat.',
       'admin_create_failure': 'Gagal Membuat',
       'admin_create_username_exists': 'Nama pengguna sudah ada',
 
@@ -2216,7 +2220,7 @@ class IdId extends Translations {
       'logout_transfer_running_title': 'Tugas Transfer Belum Selesai',
       'logout_transfer_running_content':
           'Anda masih memiliki tugas unggah/download yang belum selesai, setelah logout tugas akan dihentikan dan dihapus.',
-      'home_status_restart': 'Restart GNasCab',
+      'home_status_restart': 'Restart WaterNasOS',
       'home_status_monitor': 'Pemantauan',
       'home_status_message': 'Pesan',
       'home_status_bg_tasks': 'Tugas Latar Belakang',
@@ -2636,7 +2640,7 @@ class IdId extends Translations {
       'home_apps': 'Aplikasi',
       'home_no_message': 'Tidak Ada Pesan Terbaru',
       'monitor_click_to_view': 'Klik untuk Lihat Detail',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Pusat Tugas',
       'recycle_bin_empty': 'Tidak Ada File di Tempat Sampah',
 
@@ -2818,7 +2822,7 @@ class IdId extends Translations {
       'transmission_no_files': 'Tidak ada file',
       'transmission_select_all_files': 'Pilih semua',
       'transmission_deselect_all_files': 'Batalkan semua',
-      'transmission_auto_start': 'Mulai otomatis dengan GNasCab',
+      'transmission_auto_start': 'Mulai otomatis dengan WaterNasOS',
       'transmission_dht_enabled': 'Aktifkan DHT',
       'transmission_pex_enabled': 'Aktifkan PEX',
       'transmission_utp_enabled': 'Aktifkan uTP',

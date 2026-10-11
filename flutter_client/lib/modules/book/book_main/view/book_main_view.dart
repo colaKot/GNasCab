@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import '../controller/book_main_controller.dart';
 import 'home_parts/book_left_menu.dart';
 import '../../book_list/view/book_custom_list_list_view.dart';

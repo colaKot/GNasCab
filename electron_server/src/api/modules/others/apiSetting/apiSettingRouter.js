@@ -8,6 +8,8 @@ router.get('/loginConfig', (req, res) => apiSettingController.loginConfig(req, r
 router.get('/get', authenticateJWT, requireSuperAdmin, (req, res) => apiSettingController.get(req, res));
 router.post('/save', authenticateJWT, requireSuperAdmin, (req, res) => apiSettingController.save(req, res));
 router.post('/saveWelcome', authenticateJWT, requireSuperAdmin, (req, res) => apiSettingController.saveWelcome(req, res));
+router.post('/saveProxy', authenticateJWT, requireSuperAdmin, (req, res) => apiSettingController.saveProxy(req, res));
+router.post('/saveJavFallback', authenticateJWT, requireSuperAdmin, (req, res) => apiSettingController.saveJavFallback(req, res));
 router.post('/restart', authenticateJWT, requireAdmin, (req, res) => apiSettingController.restartService(req, res));
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:GNasCab/utils/dialog_util.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../transfer/controllers/download_controller.dart';

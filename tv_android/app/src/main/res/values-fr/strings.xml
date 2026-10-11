@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GNasCab TV</string>
-    <string name="app_display_name">GNasCab TV</string>
+    <string name="app_name">WaterNasOS TV</string>
+    <string name="app_display_name">WaterNasOS TV</string>
 
     <string name="server_list_title">Serveurs</string>
     <string name="server_discovered_section">Découverts</string>
@@ -350,7 +350,7 @@
     <string name="error_twofa_too_many_attempts">Trop de tentatives, réessayez plus tard</string>
     <string name="error_twofa_invalid_token">Le jeton 2FA est invalide, veuillez vous reconnecter</string>
     <string name="error_network_failed">Échec de la requête réseau</string>
-    <string name="error_not_nascab_server">Ce n\'est pas un serveur GNasCab</string>
+    <string name="error_not_nascab_server">Ce n\'est pas un serveur WaterNasOS</string>
     <string name="error_not_logged_in">Veuillez d\'abord vous connecter</string>
     <string name="error_server_unreachable">Serveur injoignable, veuillez vérifier l\'état du serveur</string>
     <string name="error_no_direct_url">Aucune URL directe disponible</string>

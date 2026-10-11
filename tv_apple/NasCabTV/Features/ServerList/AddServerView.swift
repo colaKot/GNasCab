@@ -148,7 +148,7 @@ struct AddServerView: View {
     private func populateFields() {
         guard let server else {
             // 新增服务器时设置默认名称
-            serverName = "GNasCabServer"
+            serverName = "WaterNasOSServer"
             return
         }
         serverUrl = server.userInputUrl ?? server.serverUrl

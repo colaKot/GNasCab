@@ -290,14 +290,14 @@ class EsEs extends Translations {
       'api_code_notes_notebook_not_found':
           "La carpeta del cuaderno no existe o fue movida",
       'api_code_notes_notebook_invalid':
-          "La carpeta seleccionada no es un cuaderno de GNasCab válido",
+          "La carpeta seleccionada no es un cuaderno de WaterNasOS válido",
       'api_code_notes_notebook_folder_not_empty':
           "La carpeta seleccionada no está vacía y no puede inicializarse como un cuaderno nuevo",
       'api_code_notes_group_not_empty':
           "El grupo todavía contiene notas y no se puede eliminar",
       'notes_notebook_choose_title': "Elegir o crear cuaderno",
       'notes_notebook_choose_desc':
-          "La primera vez, seleccione una carpeta vacía o una carpeta de cuaderno de GNasCab existente.",
+          "La primera vez, seleccione una carpeta vacía o una carpeta de cuaderno de WaterNasOS existente.",
       'notes_choose_folder': "Elegir carpeta de cuaderno",
       'notes_original_path_missing':
           "La ruta original del cuaderno ya no existe: ",
@@ -747,7 +747,7 @@ class EsEs extends Translations {
           'Proceso base del API; si se detiene, la aplicación deja de ser accesible',
       'process.worker.expressBroadcast.name': 'Difusión LAN del API',
       'process.worker.expressBroadcast.purpose':
-          'Permite que los clientes descubran servidores GNasCab en la LAN',
+          'Permite que los clientes descubran servidores WaterNasOS en la LAN',
       'process.worker.ffmpegHwTest.name': 'Detección de aceleración FFmpeg',
       'process.worker.ffmpegHwTest.purpose':
           'Comprueba el soporte de aceleración por hardware de FFmpeg en el equipo',
@@ -893,12 +893,12 @@ class EsEs extends Translations {
       'terminal_cursor_blink': 'Parpadeo de cursor',
       'terminal_click_to_pick_color': 'Toca para elegir color',
       'service_menu_account': 'Cuenta',
-      'service_menu_account_nascab': 'Cuenta GNasCab',
+      'service_menu_account_nascab': 'Cuenta WaterNasOS',
       'service_menu_remote_access': 'Acceso remoto',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'NAT Traversal',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -927,7 +927,7 @@ class EsEs extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'Habilitar acceso remoto',
       'service_remote_access_toggle_hint':
-          'Una vez habilitado, tu servicio GNasCab puede ser accedido de forma segura en un entorno remoto.',
+          'Una vez habilitado, tu servicio WaterNasOS puede ser accedido de forma segura en un entorno remoto.',
       'service_remote_access_pair_code_label': 'Código de emparejamiento',
       'service_remote_access_pair_code_empty': 'Sin código de emparejamiento',
       'service_remote_access_custom_pair_code_title':
@@ -965,7 +965,7 @@ class EsEs extends Translations {
       'P2P_TOO_MANY_REQUESTS':
           'Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde.',
       'service_p2p_device_not_bind_message':
-          'Debe vincular el dispositivo actual a su cuenta GNasCab para poder usar esta función. Puede desvincularlo cuando ya no lo necesite.',
+          'Debe vincular el dispositivo actual a su cuenta WaterNasOS para poder usar esta función. Puede desvincularlo cuando ya no lo necesite.',
       'service_p2p_bind_device_button': 'Vincular',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Formato de código de emparejamiento inválido (6-30, solo letras/números)',
@@ -986,16 +986,16 @@ class EsEs extends Translations {
       'service_remote_access_guide_title': 'Guía de acceso remoto',
       'service_remote_access_guide_how_title': '¿Cómo funciona?',
       'service_remote_access_guide_how_body':
-          'Después de habilitar el acceso remoto, GNasCab asigna un código de emparejamiento aleatorio. Con él, puedes conectarte a tu host desde cualquier aplicación GNasCab o cliente de escritorio. Prefiere conexión directa P2P; si P2P no está disponible, se usará un nodo de relay global cercano. Los datos se transmiten de forma segura vía SSL + WebRTC.',
+          'Después de habilitar el acceso remoto, WaterNasOS asigna un código de emparejamiento aleatorio. Con él, puedes conectarte a tu host desde cualquier aplicación WaterNasOS o cliente de escritorio. Prefiere conexión directa P2P; si P2P no está disponible, se usará un nodo de relay global cercano. Los datos se transmiten de forma segura vía SSL + WebRTC.',
       'service_remote_access_guide_use_title':
           '¿Cómo usar el código de emparejamiento?',
       'service_remote_access_guide_use_body':
           'Al agregar un servidor en la aplicación o cliente de escritorio, elige "Agregar con código de emparejamiento", luego ingresa o escanea el código de emparejamiento.',
-      'service_nascab_title': 'Cuenta GNasCab',
+      'service_nascab_title': 'Cuenta WaterNasOS',
       'service_nascab_not_logged_in': 'No has iniciado sesión',
       'service_nascab_not_logged_in_hint':
-          'Inicia sesión para usar las características del servicio remoto de GNasCab',
-      'service_nascab_login': 'Iniciar sesión en GNasCab',
+          'Inicia sesión para usar las características del servicio remoto de WaterNasOS',
+      'service_nascab_login': 'Iniciar sesión en WaterNasOS',
       'service_nascab_logout': 'Cerrar sesión',
       'service_nascab_switch_account': 'Cambiar cuenta',
       'service_nascab_last_login': 'Último inicio de sesión: @time',
@@ -1009,7 +1009,7 @@ class EsEs extends Translations {
       'service_nascab_login_cancelled': 'Inicio de sesión cancelado',
       'service_nascab_app_not_supported':
           'El inicio de sesión no es compatible con la aplicación. Por favor, use el PC o navegador web para iniciar sesión.',
-      'service_nascab_login_title': 'Iniciar sesión en GNasCab',
+      'service_nascab_login_title': 'Iniciar sesión en WaterNasOS',
       'service_nascab_callback_success': 'Inicio de sesión exitoso',
       'service_nascab_callback_success_hint':
           'Puedes cerrar esta página y volver a la aplicación',
@@ -1038,9 +1038,9 @@ class EsEs extends Translations {
       'service_nascab_membership_vip_diff': 'Comparar planes',
       'service_nascab_membership_my_devices': 'Mis dispositivos',
       'service_nascab_membership_user_center': 'Centro de usuario',
-      'service_nascab_promotion_title': 'Promocionar GNasCab',
+      'service_nascab_promotion_title': 'Promocionar WaterNasOS',
       'service_nascab_promotion_subtitle':
-          'Promociona GNasCab y gana comisión',
+          'Promociona WaterNasOS y gana comisión',
       'service_nascab_promotion_action': 'Promocionar ahora',
 
       'service_menu_contact_us': 'Contáctanos',
@@ -1404,6 +1404,10 @@ class EsEs extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Buscar título',
       'video_list_cover_size': 'Tamaño de portada',
+      'video_list_image_poster': 'Póster',
+      'video_list_image_fanart': 'Miniatura',
+      'video_list_waterfall': 'Cascada',
+      'video_list_grid': 'Cuadrícula',
       'filter': 'Filtrar',
       'video_list_filter_years': 'Año',
       'video_list_filter_genres': 'Géneros',
@@ -1604,7 +1608,7 @@ class EsEs extends Translations {
           'Si tu carpeta de origen se ha movido, puedes usar esta característica para actualizar índices para evitar volver a escanear. Por favor asegúrate de que la carpeta reubicada tenga la misma estructura que la original.',
       'photo_source_delete_confirm': '¿Eliminar carpeta de origen: @path?',
       'photo_source_help_scan_when_start':
-          'Cuando está habilitado, esta carpeta se escaneará cuando GNasCab se inicie.',
+          'Cuando está habilitado, esta carpeta se escaneará cuando WaterNasOS se inicie.',
       'photo_source_help_scan_when_change':
           'Cuando está habilitado, los cambios en la carpeta se detectarán automáticamente. Algunas plataformas no son compatibles (por ejemplo, Docker en Windows).',
       'photo_source_help_scan_interval':
@@ -1622,7 +1626,7 @@ class EsEs extends Translations {
       'book_source_unavailable': 'No disponible',
       'book_source_delete_confirm': '¿Eliminar carpeta de origen: @path?',
       'book_source_help_scan_when_start':
-          'Cuando está habilitado, esta carpeta se escaneará cuando GNasCab se inicie.',
+          'Cuando está habilitado, esta carpeta se escaneará cuando WaterNasOS se inicie.',
       'book_source_help_scan_when_change':
           'Cuando está habilitado, los cambios en la carpeta se detectarán automáticamente. Algunas plataformas no son compatibles (por ejemplo, Docker en Windows).',
       'book_source_help_scan_interval':
@@ -1642,7 +1646,7 @@ class EsEs extends Translations {
       'music_source_unavailable': 'No disponible',
       'music_source_delete_confirm': '¿Eliminar carpeta de origen: @path?',
       'music_source_help_scan_when_start':
-          'Cuando está habilitado, esta carpeta se escaneará cuando GNasCab se inicie.',
+          'Cuando está habilitado, esta carpeta se escaneará cuando WaterNasOS se inicie.',
       'music_source_help_scan_when_change':
           'Cuando está habilitado, los cambios en la carpeta se detectarán automáticamente. Algunas plataformas no son compatibles (por ejemplo, Docker en Windows).',
       'music_source_help_scan_interval':
@@ -1917,7 +1921,7 @@ class EsEs extends Translations {
       'video_source_unavailable': 'No disponible',
       'video_source_delete_confirm': '¿Eliminar carpeta de origen: @path?',
       'video_source_help_scan_when_start':
-          'Cuando está habilitado, esta carpeta se escaneará cuando GNasCab se inicie.',
+          'Cuando está habilitado, esta carpeta se escaneará cuando WaterNasOS se inicie.',
       'video_source_help_match_nfo':
           'Cuando está habilitado, scrapea automáticamente información de películas de TMDB.',
       'video_source_help_scan_when_change':
@@ -1940,7 +1944,7 @@ class EsEs extends Translations {
       'server_menu_select_channel': 'Seleccionar canal',
       'server_menu_edit_pair_code': 'Editar código de emparejamiento',
       'server_saved': 'Servidores guardados',
-      'server_listTitle': 'Seleccionar servidor GNasCab para iniciar sesión',
+      'server_listTitle': 'Seleccionar servidor WaterNasOS para iniciar sesión',
       'server_add': 'Agregar servidor',
       'server_localServer': 'Local',
       'server_scanned': 'Servidor escaneado',
@@ -1962,7 +1966,7 @@ class EsEs extends Translations {
       'server_need_input_password_every_time':
           'Se requiere contraseña en cada inicio de sesión',
       'server_add_invalid_server':
-          'Este servidor no es un servidor GNasCab válido, por favor verifica si la dirección del servidor es correcta',
+          'Este servidor no es un servidor WaterNasOS válido, por favor verifica si la dirección del servidor es correcta',
       'server_connect_timeout':
           'Tiempo de espera de conexión agotado, por favor reintenta más tarde',
       'server_connect_failed_with_error': 'Conexión fallida: @error',
@@ -1985,7 +1989,7 @@ class EsEs extends Translations {
       'server_pair_code_how_title':
           '¿Cómo obtener un código de emparejamiento?',
       'server_pair_code_how_content':
-          'Habilítalo en GNasCab: Servicio -> Acceso remoto. Luego puedes obtener el código de emparejamiento. El código de emparejamiento te permite alcanzar tu host desde cualquier lugar.',
+          'Habilítalo en WaterNasOS: Servicio -> Acceso remoto. Luego puedes obtener el código de emparejamiento. El código de emparejamiento te permite alcanzar tu host desde cualquier lugar.',
       'server_pair_code_scan_qr': 'Escanear QR',
       'server_pair_code_scan_invalid': 'Código de emparejamiento inválido',
       'server_edit_pair_code_title': 'Editar código de emparejamiento',
@@ -2045,7 +2049,7 @@ class EsEs extends Translations {
       'auth_token_refresh_failure': 'Error al actualizar token',
       'auth_token_refresh_error':
           'Error ocurrido durante el proceso de actualización de token',
-      'auth_welcome_title': 'Bienvenido a GNasCab',
+      'auth_welcome_title': 'Bienvenido a WaterNasOS',
       'auth_pair_code_label': 'Código de emparejamiento',
       'auth_pair_code_connect': 'Conectar',
       'auth_connected_host': 'Host conectado: @host',
@@ -2094,7 +2098,7 @@ class EsEs extends Translations {
       'admin_create_button': 'Crear administrador',
       'admin_create_success': 'Creación exitosa',
       'admin_create_success_message':
-          'Creación exitosa. Esta cuenta se almacena en el disco de tu servidor GNasCab, no es una cuenta en línea. Por favor recuérdala.',
+          'Creación exitosa. Esta cuenta se almacena en el disco de tu servidor WaterNasOS, no es una cuenta en línea. Por favor recuérdala.',
       'admin_create_failure': 'Creación fallida',
       'admin_create_username_exists': 'El nombre de usuario ya existe',
       'auth_2fa_title': 'Autenticación de dos factores',
@@ -2192,7 +2196,7 @@ class EsEs extends Translations {
       'logout_transfer_running_title': 'Tareas de transferencia inacabadas',
       'logout_transfer_running_content':
           'Aún tienes tareas de carga/descarga inacabadas. Cerrar sesión detendrá y eliminará las mismas.',
-      'home_status_restart': 'Reiniciar GNasCab',
+      'home_status_restart': 'Reiniciar WaterNasOS',
       'home_status_monitor': 'Monitor',
       'home_status_message': 'Mensajes',
       'home_status_bg_tasks': 'Tareas en segundo plano',
@@ -2605,7 +2609,7 @@ class EsEs extends Translations {
       'home_apps': 'Aplicaciones',
       'home_no_message': 'Sin último mensaje',
       'monitor_click_to_view': 'Haz clic para ver detalles',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Centro de tareas',
       'recycle_bin_empty': 'Sin archivos en la papelera',
       'no_messages': 'Sin mensajes',
@@ -2813,7 +2817,7 @@ class EsEs extends Translations {
       'transmission_no_files': 'Sin archivos',
       'transmission_select_all_files': 'Seleccionar todo',
       'transmission_deselect_all_files': 'Deseleccionar todo',
-      'transmission_auto_start': 'Iniciar automaticamente con GNasCab',
+      'transmission_auto_start': 'Iniciar automaticamente con WaterNasOS',
       'transmission_dht_enabled': 'Habilitar DHT',
       'transmission_pex_enabled': 'Habilitar PEX',
       'transmission_utp_enabled': 'Habilitar uTP',

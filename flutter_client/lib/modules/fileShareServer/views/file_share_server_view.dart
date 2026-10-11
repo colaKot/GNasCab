@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
 import '../../../utils/device_utils.dart';
 import '../../base/components.dart';
 import '../../base/components/custom_glass_card.dart';
@@ -341,7 +341,6 @@ class _FileShareLeftMenu extends StatelessWidget {
       onToggleCollapse: onToggleCollapse,
       toggleExpandTooltip: 'sidebar_expand'.tr,
       toggleCollapseTooltip: 'sidebar_collapse'.tr,
-      topPlaceholderHeight: 45,
     );
   }
 }

@@ -1,8 +1,8 @@
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/music/list/models/music_list_models.dart';
-import 'package:GNasCab/modules/music/play_service/controller/music_play_service_controller.dart';
-import 'package:GNasCab/modules/music/play_service/play_ctrl_fullscreen/parts/music_play_ctrl_fullscreen_playlist_drawer.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/music/list/models/music_list_models.dart';
+import 'package:WaterNasOS/modules/music/play_service/controller/music_play_service_controller.dart';
+import 'package:WaterNasOS/modules/music/play_service/play_ctrl_fullscreen/parts/music_play_ctrl_fullscreen_playlist_drawer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

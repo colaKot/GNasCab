@@ -68,7 +68,7 @@
   "transmission_no_files": "ไม่มีไฟล์",
   "transmission_select_all_files": "เลือกทั้งหมด",
   "transmission_deselect_all_files": "ไม่เลือกทั้งหมด",
-  "transmission_auto_start": "เริ่มอัตโนมัติเมื่อ GNasCab เปิด",
+  "transmission_auto_start": "เริ่มอัตโนมัติเมื่อ WaterNasOS เปิด",
   "transmission_dht_enabled": "เปิด DHT",
   "transmission_pex_enabled": "เปิด PEX",
   "transmission_utp_enabled": "เปิด uTP",

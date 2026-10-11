@@ -5,12 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/modules/book/list/service/book_local_cache_service_stub.dart'
-    if (dart.library.io) 'package:GNasCab/modules/book/list/service/book_local_cache_service_io.dart';
-import 'package:GNasCab/modules/files/views/file_pdf_rx_viewer_page.dart';
-import 'package:GNasCab/utils/toast_util.dart';
-import 'package:GNasCab/utils/web_p2p_pdf_load_dialog.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/modules/book/list/service/book_local_cache_service_stub.dart'
+    if (dart.library.io) 'package:WaterNasOS/modules/book/list/service/book_local_cache_service_io.dart';
+import 'package:WaterNasOS/modules/files/views/file_pdf_rx_viewer_page.dart';
+import 'package:WaterNasOS/utils/toast_util.dart';
+import 'package:WaterNasOS/utils/web_p2p_pdf_load_dialog.dart';
 
 /// 文件浏览、图书等模块共用的 PDF 打开（pdfrx）。
 ///

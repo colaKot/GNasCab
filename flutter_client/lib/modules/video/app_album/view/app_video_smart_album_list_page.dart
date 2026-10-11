@@ -1,12 +1,12 @@
-import 'package:GNasCab/modules/base/components/app_custom_search_dialog.dart';
-import 'package:GNasCab/modules/base/components/custom_no_data.dart';
-import 'package:GNasCab/modules/video/app_album/view/app_video_album_card.dart';
-import 'package:GNasCab/modules/video/app_album/view/app_video_album_videos_page.dart';
-import 'package:GNasCab/modules/video/base/beans/video_item_bean.dart';
-import 'package:GNasCab/modules/video/base/video_utils/video_utils.dart';
-import 'package:GNasCab/modules/video/smart_album/controller/video_smart_album_controller.dart';
-import 'package:GNasCab/modules/video/smart_album/models/video_smart_album_model.dart';
-import 'package:GNasCab/utils/dialog_util.dart';
+import 'package:WaterNasOS/modules/base/components/app_custom_search_dialog.dart';
+import 'package:WaterNasOS/modules/base/components/custom_no_data.dart';
+import 'package:WaterNasOS/modules/video/app_album/view/app_video_album_card.dart';
+import 'package:WaterNasOS/modules/video/app_album/view/app_video_album_videos_page.dart';
+import 'package:WaterNasOS/modules/video/base/beans/video_item_bean.dart';
+import 'package:WaterNasOS/modules/video/base/video_utils/video_utils.dart';
+import 'package:WaterNasOS/modules/video/smart_album/controller/video_smart_album_controller.dart';
+import 'package:WaterNasOS/modules/video/smart_album/models/video_smart_album_model.dart';
+import 'package:WaterNasOS/utils/dialog_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

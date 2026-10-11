@@ -1,4 +1,4 @@
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import 'package:flutter/material.dart';
 
 /// 画廊底部文件名组件；当为 Live Photo 时可显示 LIVE 标识与播放入口。

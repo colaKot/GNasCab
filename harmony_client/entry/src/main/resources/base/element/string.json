@@ -10,11 +10,11 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "GNasCab"
+      "value": "WaterNasOS"
     },
     {
       "name": "permission_internet_reason",
-      "value": "连接 GNasCab 服务器与 P2P 信令需要网络访问"
+      "value": "连接 WaterNasOS 服务器与 P2P 信令需要网络访问"
     },
     {
       "name": "permission_network_info_reason",

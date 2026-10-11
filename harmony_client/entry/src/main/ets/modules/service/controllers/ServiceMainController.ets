@@ -264,7 +264,7 @@ export class ServiceMainController {
     }
   }
 
-  /** 绑定当前设备到 GNasCab 账号（用于 P2P 远程连接） */
+  /** 绑定当前设备到 WaterNasOS 账号（用于 P2P 远程连接） */
   async bindP2pDevice(): Promise<BindP2pDeviceResult> {
     if (this.remoteAccessLoading) {
       return BindP2pDeviceResult.fail();

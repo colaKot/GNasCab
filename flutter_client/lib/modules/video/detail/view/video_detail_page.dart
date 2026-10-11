@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../home/views/pc_components/pc_app_window.dart';
 import '../../../base/components/custom_icon_button.dart';
 import '../../base/beans/video_item_bean.dart';
 import '../../base/video_utils/video_utils.dart';
@@ -133,15 +134,19 @@ class _VideoDetailPageState extends State<VideoDetailPage> {
                               ),
                             ),
                           const Spacer(),
-                          CustomIconButton(
-                            icon: Icons.close,
-                            onPressed: widget.onClose ?? AppRoutes.back,
-                            backgroundColor: Colors.black.withValues(
-                              alpha: 0.35,
+                          // ⭐ PC 虚拟窗口内，右上角的「返回」由窗口标题栏提供
+                          // （二级页只显示一个返回按钮，2026-10-10）——
+                          // 这里只在没有窗口标题栏的环境（手机端）保留关闭按钮。
+                          if (PcWindowScope.of(context) == null)
+                            CustomIconButton(
+                              icon: Icons.close,
+                              onPressed: widget.onClose ?? AppRoutes.back,
+                              backgroundColor: Colors.black.withValues(
+                                alpha: 0.35,
+                              ),
+                              iconColor: Colors.white,
+                              tooltip: 'close'.tr,
                             ),
-                            iconColor: Colors.white,
-                            tooltip: 'close'.tr,
-                          ),
                         ],
                       ),
                     ),

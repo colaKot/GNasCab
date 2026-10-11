@@ -167,6 +167,18 @@ async function getSourceTypePaths(req, sourceType) {
   if (!activeSourceType) return null;
 
   const knex = req[activeSourceType.db];
+
+  // 相册源目录按 owner 隔离：文件视图只列当前用户自己添加的源，口径与相册时间轴一致
+  if (sourceTypeStr === 'photo') {
+    const uid = req.user && req.user.id ? Number(req.user.id) : 0;
+    if (!uid) return [];
+    const ownRows = await knex(activeSourceType.table).select('path').where({ uid });
+    const ownPaths = await filterAccessibleDirPaths(
+      (ownRows || []).map(item => (item && item.path ? String(item.path) : '')).filter(Boolean)
+    );
+    return await trimParentPaths(ownPaths);
+  }
+
   const sources = await knex(activeSourceType.table).select('path');
   let sourcePaths = await filterAccessibleDirPaths(
     (sources || []).map(item => (item && item.path ? String(item.path) : '')).filter(Boolean)

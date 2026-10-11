@@ -1,6 +1,6 @@
 name: nascab_sync_core
 description: >-
-  GNasCab 目录同步核心：模型 / 本地扫描 / 基线库 / 调度器 / 同步引擎 / 协议定义。
+  WaterNasOS 目录同步核心：模型 / 本地扫描 / 基线库 / 调度器 / 同步引擎 / 协议定义。
   由 PC 主客户端（flutter_client）与 Windows 独立同步客户端（sync_client）共用。
 version: 1.0.0
 publish_to: 'none'

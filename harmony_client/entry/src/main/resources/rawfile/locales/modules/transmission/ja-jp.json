@@ -68,7 +68,7 @@
   "transmission_no_files": "ファイルがありません",
   "transmission_select_all_files": "すべて選択",
   "transmission_deselect_all_files": "すべて解除",
-  "transmission_auto_start": "GNasCab 起動時に自動実行",
+  "transmission_auto_start": "WaterNasOS 起動時に自動実行",
   "transmission_dht_enabled": "DHT を有効化",
   "transmission_pex_enabled": "PEX を有効化",
   "transmission_utp_enabled": "uTP を有効化",

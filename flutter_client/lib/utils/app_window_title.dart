@@ -8,7 +8,7 @@ import 'app_window_title_impl_stub.dart'
 class AppWindowTitle {
   AppWindowTitle._();
 
-  /// 默认标题：完整版为 `GNasCab`，独立端为 `GNasCab 相册` / `GNasCab 音乐`。
+  /// 默认标题：完整版为 `WaterNasOS`，独立端为 `WaterNasOS 相册` / `WaterNasOS 音乐`。
   static String get defaultTitle => AppLaunch.appTitle;
 
   static void setTitle(String title) {

@@ -294,14 +294,14 @@ class DeDe extends Translations {
       'api_code_notes_notebook_not_found':
           "Der Notizbuchordner existiert nicht oder wurde verschoben",
       'api_code_notes_notebook_invalid':
-          "Der ausgewählte Ordner ist kein gültiges GNasCab-Notizbuch",
+          "Der ausgewählte Ordner ist kein gültiges WaterNasOS-Notizbuch",
       'api_code_notes_notebook_folder_not_empty':
           "Der ausgewählte Ordner ist nicht leer und kann nicht als neues Notizbuch initialisiert werden",
       'api_code_notes_group_not_empty':
           "Die Gruppe enthält noch Notizen und kann nicht gelöscht werden",
       'notes_notebook_choose_title': "Notizbuch auswählen oder erstellen",
       'notes_notebook_choose_desc':
-          "Beim ersten Öffnen wählen Sie bitte einen leeren Ordner oder einen vorhandenen GNasCab-Notizbuchordner aus.",
+          "Beim ersten Öffnen wählen Sie bitte einen leeren Ordner oder einen vorhandenen WaterNasOS-Notizbuchordner aus.",
       'notes_choose_folder': "Notizbuchordner auswählen",
       'notes_original_path_missing':
           "Der ursprüngliche Notizbuchpfad existiert nicht mehr: ",
@@ -750,7 +750,7 @@ class DeDe extends Translations {
           'Basisprozess für den API-Dienst; bei Beendigung ist die App nicht erreichbar',
       'process.worker.expressBroadcast.name': 'API-LAN-Broadcast',
       'process.worker.expressBroadcast.purpose':
-          'Ermöglicht Clients die automatische Erkennung von GNasCab-Servern im LAN',
+          'Ermöglicht Clients die automatische Erkennung von WaterNasOS-Servern im LAN',
       'process.worker.ffmpegHwTest.name': 'FFmpeg-Hardwarebeschleunigungstest',
       'process.worker.ffmpegHwTest.purpose':
           'Prüft die FFmpeg-Hardwarebeschleunigung auf diesem Host',
@@ -894,12 +894,12 @@ class DeDe extends Translations {
       'terminal_cursor_blink': 'Cursor blinken',
       'terminal_click_to_pick_color': 'Tippen zum Farbauswahl',
       'service_menu_account': 'Konto',
-      'service_menu_account_nascab': 'GNasCab Konto',
+      'service_menu_account_nascab': 'WaterNasOS Konto',
       'service_menu_remote_access': 'Fernzugriff',
       'service_menu_remote_access_ddns': 'DDNS',
       'service_menu_remote_access_tunnel': 'NAT Traversal',
       'service_ddns_intro':
-          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. GNasCab remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
+          'DDNS maps your dynamic public IP to a fixed, dedicated domain for exposing local services. WaterNasOS remote access uses a pair code and is not inherently related to DDNS. If you do not have a public IP, you do not need DDNS.',
       'service_ddns_toggle': 'Enable DDNS',
       'service_ddns_toggle_hint':
           'Checks public IP changes periodically and updates DNS records automatically',
@@ -928,7 +928,7 @@ class DeDe extends Translations {
           'Unable to obtain an IPv6 public address in current network',
       'service_remote_access_toggle': 'Fernzugriff aktivieren',
       'service_remote_access_toggle_hint':
-          'Nach dem Aktivieren kann Ihr GNasCab-Dienst sicher in einer Remote-Umgebung verwendet werden.',
+          'Nach dem Aktivieren kann Ihr WaterNasOS-Dienst sicher in einer Remote-Umgebung verwendet werden.',
       'service_remote_access_pair_code_label': 'Pairing-Code',
       'service_remote_access_pair_code_empty': 'Kein Pairing-Code',
       'service_remote_access_custom_pair_code_title':
@@ -966,7 +966,7 @@ class DeDe extends Translations {
       'P2P_TOO_MANY_REQUESTS':
           'Zu viele Anfragen. Bitte versuchen Sie es später erneut.',
       'service_p2p_device_not_bind_message':
-          'Sie müssen das aktuelle Gerät mit Ihrem GNasCab-Konto verbinden, um diese Funktion zu nutzen. Sie können die Bindung aufheben, wenn Sie sie nicht mehr benötigen.',
+          'Sie müssen das aktuelle Gerät mit Ihrem WaterNasOS-Konto verbinden, um diese Funktion zu nutzen. Sie können die Bindung aufheben, wenn Sie sie nicht mehr benötigen.',
       'service_p2p_bind_device_button': 'Verbinden',
       'P2P_CUSTOM_PAIR_CODE_INVALID_FORMAT':
           'Ungültiges Pairing-Code-Format (6-30, nur Buchstaben/Zahlen)',
@@ -986,16 +986,16 @@ class DeDe extends Translations {
       'service_remote_access_guide_title': 'Fernzugriff-Anleitung',
       'service_remote_access_guide_how_title': 'Wie funktioniert es?',
       'service_remote_access_guide_how_body':
-          'Nach dem Aktivieren der Fernzugriff-Funktion weist GNasCab Ihnen einen zufälligen Pairing-Code zu. Über diesen Code können Sie sich von jeder GNasCab App oder jedem Desktop-Client mit Ihrem Host verbinden. Priorität hat P2P-Direktverbindung; wenn P2P nicht verfügbar ist, wird ein globaler Knoten für Relay-Dienste zugewiesen. Die Daten werden über sichere SSL + WebRTC-Übertragung geschützt, sodass Sie es sorglos verwenden können.',
+          'Nach dem Aktivieren der Fernzugriff-Funktion weist WaterNasOS Ihnen einen zufälligen Pairing-Code zu. Über diesen Code können Sie sich von jeder WaterNasOS App oder jedem Desktop-Client mit Ihrem Host verbinden. Priorität hat P2P-Direktverbindung; wenn P2P nicht verfügbar ist, wird ein globaler Knoten für Relay-Dienste zugewiesen. Die Daten werden über sichere SSL + WebRTC-Übertragung geschützt, sodass Sie es sorglos verwenden können.',
       'service_remote_access_guide_use_title':
           'Wie verwendet man den Pairing-Code?',
       'service_remote_access_guide_use_body':
           'Wenn Sie in der App oder im Desktop-Client einen Server hinzufügen, wählen Sie "Mit Pairing-Code hinzufügen" und geben Sie den Code ein oder scannen Sie ihn.',
-      'service_nascab_title': 'GNasCab Konto',
+      'service_nascab_title': 'WaterNasOS Konto',
       'service_nascab_not_logged_in': 'Nicht angemeldet',
       'service_nascab_not_logged_in_hint':
-          'Anmelden, um GNasCab-Remote-Dienste zu verwenden',
-      'service_nascab_login': 'Bei GNasCab anmelden',
+          'Anmelden, um WaterNasOS-Remote-Dienste zu verwenden',
+      'service_nascab_login': 'Bei WaterNasOS anmelden',
       'service_nascab_logout': 'Abmelden',
       'service_nascab_switch_account': 'Konto wechseln',
       'service_nascab_last_login': 'Letzter Login: @time',
@@ -1009,7 +1009,7 @@ class DeDe extends Translations {
       'service_nascab_login_cancelled': 'Anmeldung abgebrochen',
       'service_nascab_app_not_supported':
           'Die Anmeldung wird in der App nicht unterstützt. Bitte melden Sie sich über den PC oder die Webseite an.',
-      'service_nascab_login_title': 'Bei GNasCab anmelden',
+      'service_nascab_login_title': 'Bei WaterNasOS anmelden',
       'service_nascab_callback_success': 'Anmeldung erfolgreich',
       'service_nascab_callback_success_hint':
           'Sie können diese Seite schließen und zur App zurückkehren',
@@ -1038,9 +1038,9 @@ class DeDe extends Translations {
       'service_nascab_membership_vip_diff': 'Tarifvergleich',
       'service_nascab_membership_my_devices': 'Meine Geräte',
       'service_nascab_membership_user_center': 'Persönliches Zentrum',
-      'service_nascab_promotion_title': 'GNasCab bewerben',
+      'service_nascab_promotion_title': 'WaterNasOS bewerben',
       'service_nascab_promotion_subtitle':
-          'GNasCab bewerben und Provision verdienen',
+          'WaterNasOS bewerben und Provision verdienen',
       'service_nascab_promotion_action': 'Jetzt bewerben',
 
       'service_menu_contact_us': 'Kontakt',
@@ -1399,6 +1399,10 @@ class DeDe extends Translations {
       'file_share_server_https': 'HTTPS',
       'video_list_search_hint': 'Titel suchen',
       'video_list_cover_size': 'Covergröße',
+      'video_list_image_poster': 'Poster',
+      'video_list_image_fanart': 'Vorschaubild',
+      'video_list_waterfall': 'Wasserfall',
+      'video_list_grid': 'Raster',
       'filter': 'Filter',
       'video_list_filter_years': 'Jahr',
       'video_list_filter_genres': 'Genres',
@@ -1604,7 +1608,7 @@ class DeDe extends Translations {
           'Wenn Ihr Quellordner verschoben wurde, können Sie diese Funktion verwenden. Bitte stellen Sie sicher, dass die Struktur des neuen Ordners mit dem ursprünglichen Ordner übereinstimmt, um ein erneutes Scannen zu vermeiden.',
       'photo_source_delete_confirm': 'Quellordner löschen: @path?',
       'photo_source_help_scan_when_start':
-          'Wenn aktiviert, wird dieser Ordner beim Start von GNasCab gescannt.',
+          'Wenn aktiviert, wird dieser Ordner beim Start von WaterNasOS gescannt.',
       'photo_source_help_scan_when_change':
           'Wenn aktiviert, werden Ordneränderungen automatisch erkannt. Einige Plattformen werden nicht unterstützt (z.B. Docker unter Windows).',
       'photo_source_help_scan_interval':
@@ -1622,7 +1626,7 @@ class DeDe extends Translations {
       'book_source_unavailable': 'Nicht verfügbar',
       'book_source_delete_confirm': 'Quellordner löschen: @path?',
       'book_source_help_scan_when_start':
-          'Wenn aktiviert, wird dieser Ordner beim Start von GNasCab gescannt.',
+          'Wenn aktiviert, wird dieser Ordner beim Start von WaterNasOS gescannt.',
       'book_source_help_scan_when_change':
           'Wenn aktiviert, werden Ordneränderungen automatisch erkannt. Einige Plattformen werden nicht unterstützt (z.B. Docker unter Windows).',
       'book_source_help_scan_interval':
@@ -1642,7 +1646,7 @@ class DeDe extends Translations {
       'music_source_unavailable': 'Nicht verfügbar',
       'music_source_delete_confirm': 'Quellordner löschen: @path?',
       'music_source_help_scan_when_start':
-          'Wenn aktiviert, wird dieser Ordner beim Start von GNasCab gescannt.',
+          'Wenn aktiviert, wird dieser Ordner beim Start von WaterNasOS gescannt.',
       'music_source_help_scan_when_change':
           'Wenn aktiviert, werden Ordneränderungen automatisch erkannt. Einige Plattformen werden nicht unterstützt (z.B. Docker unter Windows).',
       'music_source_help_scan_interval':
@@ -1925,7 +1929,7 @@ class DeDe extends Translations {
       'video_source_unavailable': 'Nicht verfügbar',
       'video_source_delete_confirm': 'Quellordner löschen: @path?',
       'video_source_help_scan_when_start':
-          'Wenn aktiviert, wird dieser Ordner beim Start von GNasCab gescannt.',
+          'Wenn aktiviert, wird dieser Ordner beim Start von WaterNasOS gescannt.',
       'video_source_help_match_nfo':
           'Wenn aktiviert, Filminfo automatisch von TMDB scrapen.',
       'video_source_help_scan_when_change':
@@ -1950,7 +1954,7 @@ class DeDe extends Translations {
       'server_menu_select_channel': 'Kanal auswählen',
       'server_menu_edit_pair_code': 'Pairing-Code bearbeiten',
       'server_saved': 'Gespeicherte Server',
-      'server_listTitle': 'GNasCab-Server zum Login auswählen',
+      'server_listTitle': 'WaterNasOS-Server zum Login auswählen',
       'server_add': 'Server hinzufügen',
       'server_localServer': 'Lokal',
       'server_scanned': 'Gescannter Server',
@@ -1971,7 +1975,7 @@ class DeDe extends Translations {
       'server_need_input_password_every_time':
           'Bei jeder Anmeldung Passwort eingeben',
       'server_add_invalid_server':
-          'Dieser Server ist kein gültiger GNasCab-Server',
+          'Dieser Server ist kein gültiger WaterNasOS-Server',
       'server_connect_timeout':
           'Verbindungs-Timeout, bitte später erneut versuchen',
       'server_connect_failed_with_error': 'Verbindung fehlgeschlagen: @error',
@@ -1989,7 +1993,7 @@ class DeDe extends Translations {
       'server_pair_code_how_link': 'Wie erhält man einen Pairing-Code?',
       'server_pair_code_how_title': 'Wie erhält man einen Pairing-Code?',
       'server_pair_code_how_content':
-          'Aktivieren Sie es auf GNasCab: Dienst -> Fernzugriff.',
+          'Aktivieren Sie es auf WaterNasOS: Dienst -> Fernzugriff.',
       'server_pair_code_scan_qr': 'QR scannen',
       'server_pair_code_scan_invalid': 'Ungültiger Pairing-Code',
       'server_edit_pair_code_title': 'Pairing-Code bearbeiten',
@@ -2047,7 +2051,7 @@ class DeDe extends Translations {
       'auth_login_error': 'Fehler während des Login-Prozesses',
       'auth_token_refresh_failure': 'Token-Aktualisierung fehlgeschlagen',
       'auth_token_refresh_error': 'Fehler während der Token-Aktualisierung',
-      'auth_welcome_title': 'Willkommen bei GNasCab',
+      'auth_welcome_title': 'Willkommen bei WaterNasOS',
       'auth_pair_code_label': 'Pairing-Code',
       'auth_pair_code_connect': 'Verbinden',
       'auth_connected_host': 'Verbundener Host: @host',
@@ -2097,7 +2101,7 @@ class DeDe extends Translations {
       'admin_create_button': 'Administrator erstellen',
       'admin_create_success': 'Erstellung erfolgreich',
       'admin_create_success_message':
-          'Erstellung erfolgreich. Dieses Konto wird auf Ihrem GNasCab-Server gespeichert, es ist kein Online-Konto. Bitte merken Sie es sich gut.',
+          'Erstellung erfolgreich. Dieses Konto wird auf Ihrem WaterNasOS-Server gespeichert, es ist kein Online-Konto. Bitte merken Sie es sich gut.',
       'admin_create_failure': 'Erstellung fehlgeschlagen',
       'admin_create_username_exists': 'Benutzername existiert bereits',
 
@@ -2195,7 +2199,7 @@ class DeDe extends Translations {
       'logout_transfer_running_title': 'Unvollendete Übertragungsaufgaben',
       'logout_transfer_running_content':
           'Sie haben noch unvollendete Upload/Download-Aufgaben. Nach dem Ausloggen werden die Aufgaben beendet und gelöscht.',
-      'home_status_restart': 'GNasCab neu starten',
+      'home_status_restart': 'WaterNasOS neu starten',
       'home_status_monitor': 'Monitor',
       'home_status_message': 'Nachrichten',
       'home_status_bg_tasks': 'Hintergrundaufgaben',
@@ -2616,7 +2620,7 @@ class DeDe extends Translations {
       'home_apps': 'Anwendungen',
       'home_no_message': 'Keine neuesten Nachrichten',
       'monitor_click_to_view': 'Klicken zum Anzeigen der Details',
-      'home_title': 'GNasCab',
+      'home_title': 'WaterNasOS',
       'home_task_center': 'Task-Center',
       'recycle_bin_empty': 'Keine Dateien im Papierkorb',
 
@@ -2813,7 +2817,7 @@ class DeDe extends Translations {
       'transmission_no_files': 'Keine Dateien',
       'transmission_select_all_files': 'Alle auswahlen',
       'transmission_deselect_all_files': 'Alle abwahlen',
-      'transmission_auto_start': 'Automatisch mit GNasCab starten',
+      'transmission_auto_start': 'Automatisch mit WaterNasOS starten',
       'transmission_dht_enabled': 'DHT aktivieren',
       'transmission_pex_enabled': 'PEX aktivieren',
       'transmission_utp_enabled': 'uTP aktivieren',

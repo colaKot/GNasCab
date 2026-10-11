@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:GNasCab/utils/device_utils.dart';
+import 'package:WaterNasOS/utils/device_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';

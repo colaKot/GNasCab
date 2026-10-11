@@ -2,6 +2,11 @@ const os = require('os');
 const tableConfig = require('../../../../db/table/tableConfig');
 const config = require('../../../../config/config');
 const ResponseUtil = require('../../../apiUtils/responseUtil');
+const networkProxyUtil = require('../../../../utils/networkProxyUtil');
+
+function _parseBoolTo01(v) {
+  return v === 1 || v === '1' || v === true ? 1 : 0;
+}
 
 class ApiSettingController {
   async get(req, res) {
@@ -11,6 +16,9 @@ class ApiSettingController {
       const rawCount = await tableConfig.getConfigByKey(tableConfig.KEY_EXPRESS_API_COUNT, 0);
       const rawWelcomeText = await tableConfig.getConfigByKey(tableConfig.KEY_LOGIN_WELCOME_TEXT, 0);
       const rawCustomHostname = await tableConfig.getConfigByKey(tableConfig.KEY_CUSTOM_HOSTNAME, 0);
+      const rawProxyEnable = await tableConfig.getConfigByKey(tableConfig.KEY_GLOBAL_PROXY_ENABLE, 0);
+      const rawProxyUrl = await tableConfig.getConfigByKey(tableConfig.KEY_GLOBAL_PROXY_URL, 0);
+      const rawJavFallback = await tableConfig.getConfigByKey(tableConfig.KEY_JAV_FALLBACK_ENABLE, 0);
 
       const httpPort = this._toNullablePort(rawHttp) ?? this._toNullablePort(config?.app?.port) ?? 9000;
       const httpsPort = this._toNullablePort(rawHttps) ?? this._toNullablePort(config?.app?.httpsPort) ?? 9443;
@@ -23,11 +31,24 @@ class ApiSettingController {
         typeof rawCustomHostname === 'string' && rawCustomHostname.trim().length > 0
           ? rawCustomHostname.trim()
           : null;
+      const globalProxyEnable = _parseBoolTo01(rawProxyEnable);
+      const globalProxyUrl = typeof rawProxyUrl === 'string' ? rawProxyUrl.trim() : '';
+      const javFallbackEnable = _parseBoolTo01(rawJavFallback);
 
       return ResponseUtil.success(
         req,
         res,
-        { httpPort, httpsPort, expressApiCount, cpuCores, welcomeText, customHostname },
+        {
+          httpPort,
+          httpsPort,
+          expressApiCount,
+          cpuCores,
+          welcomeText,
+          customHostname,
+          globalProxyEnable,
+          globalProxyUrl,
+          javFallbackEnable,
+        },
         'apiSetting.FETCH_SUCCESS'
       );
     } catch (e) {
@@ -42,6 +63,51 @@ class ApiSettingController {
       return ResponseUtil.success(req, res, { welcomeText }, 'apiSetting.FETCH_SUCCESS');
     } catch (e) {
       return ResponseUtil.error(req, res, 'apiSetting.FETCH_FAILED', 500, e);
+    }
+  }
+
+  /**
+   * 保存全局网络代理。开启时必须给出一个合法的 http/https 代理地址。
+   */
+  async saveProxy(req, res) {
+    try {
+      const body = req.body || {};
+      const enable = _parseBoolTo01(body.enable ?? body.globalProxyEnable ?? body.proxyEnable);
+      const rawUrl = typeof (body.proxyUrl ?? body.globalProxyUrl) === 'string'
+        ? String(body.proxyUrl ?? body.globalProxyUrl).trim()
+        : '';
+
+      // 关闭时也保留一份合法地址，方便用户之后直接再开启；非法地址一律存空串。
+      const proxyUrl = networkProxyUtil.parseHttpProxyUrlOrEmpty(rawUrl);
+      if (enable === 1 && !proxyUrl) {
+        return ResponseUtil.error(req, res, 'video.TMDB_PROXY_INVALID', 400);
+      }
+
+      const okEnable = await tableConfig.setConfigByKey(tableConfig.KEY_GLOBAL_PROXY_ENABLE, String(enable));
+      const okUrl = await tableConfig.setConfigByKey(tableConfig.KEY_GLOBAL_PROXY_URL, proxyUrl);
+      if (!okEnable || !okUrl) {
+        return ResponseUtil.error(req, res, 'apiSetting.SAVE_FAILED', 500);
+      }
+      return ResponseUtil.success(req, res, { globalProxyEnable: enable, globalProxyUrl: proxyUrl }, 'apiSetting.SAVE_SUCCESS');
+    } catch (e) {
+      return ResponseUtil.error(req, res, 'apiSetting.SAVE_FAILED', 500, e);
+    }
+  }
+
+  /**
+   * 保存「日本片识别兜底」开关。默认关闭（保守设计）。
+   */
+  async saveJavFallback(req, res) {
+    try {
+      const body = req.body || {};
+      const enable = _parseBoolTo01(body.enable ?? body.javFallbackEnable);
+      const ok = await tableConfig.setConfigByKey(tableConfig.KEY_JAV_FALLBACK_ENABLE, String(enable));
+      if (!ok) {
+        return ResponseUtil.error(req, res, 'apiSetting.SAVE_FAILED', 500);
+      }
+      return ResponseUtil.success(req, res, { javFallbackEnable: enable }, 'apiSetting.SAVE_SUCCESS');
+    } catch (e) {
+      return ResponseUtil.error(req, res, 'apiSetting.SAVE_FAILED', 500, e);
     }
   }
 

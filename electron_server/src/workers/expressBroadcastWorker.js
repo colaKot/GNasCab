@@ -99,7 +99,7 @@ class ExpressBroadcastWorker {
       // 优雅关闭处理
       this.setupGracefulShutdown();
     } catch (err) {
-      Logger.error(`❌ GNasCabAPI broadcast worker start error:`, err);
+      Logger.error(`❌ WaterNasOSAPI broadcast worker start error:`, err);
       this.isRunning = false;
     }
   }
@@ -188,7 +188,7 @@ class ExpressBroadcastWorker {
     }
 
     this.isRunning = false;
-    Logger.info(`🛑 GNasCabAPI broadcast worker stopped`);
+    Logger.info(`🛑 WaterNasOSAPI broadcast worker stopped`);
 
     // 发送停止消息
     process.send({ type: 'broadcastWorkerStopped' });

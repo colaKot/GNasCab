@@ -1,4 +1,4 @@
-import 'package:GNasCab/core/bootstrap/app_launch.dart';
+import 'package:WaterNasOS/core/bootstrap/app_launch.dart';
 
 /// 构建与平台形态相关的全局配置。
 class AppBuildConfig {

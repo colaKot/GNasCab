@@ -1,7 +1,7 @@
 import '../../home/views/pc_components/pc_app_window.dart';
 import 'dart:async';
 
-import 'package:GNasCab/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_context_menu/flutter_context_menu.dart';
 import 'package:get/get.dart';

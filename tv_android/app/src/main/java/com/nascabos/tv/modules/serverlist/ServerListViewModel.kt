@@ -125,7 +125,7 @@ class ServerListViewModel(
                     lanIpv4 = packet.address?.hostAddress.orEmpty(),
                     lanHttpPort = port,
                     lanHttpsPort = httpsPort,
-                    serverName = "GNasCabServer",
+                    serverName = "WaterNasOSServer",
                     serverHost = host,
                     serverPortHttp = port,
                     serverPortHttps = httpsPort,

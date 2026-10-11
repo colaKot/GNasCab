@@ -1,7 +1,7 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/modules/video/library_setting/view/video_library_settings_view.dart';
-import 'package:GNasCab/modules/video/other_setting/view/video_other_settings_view.dart';
-import 'package:GNasCab/modules/video/source_setting/view/video_source_settings_view.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/modules/video/library_setting/view/video_library_settings_view.dart';
+import 'package:WaterNasOS/modules/video/other_setting/view/video_other_settings_view.dart';
+import 'package:WaterNasOS/modules/video/source_setting/view/video_source_settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

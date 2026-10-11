@@ -44,7 +44,7 @@ function ensureCert() {
 
   const attrs = [
     { name: 'commonName', value: 'localhost' },
-    { name: 'organizationName', value: 'GNasCab Self-Signed' },
+    { name: 'organizationName', value: 'WaterNasOS Self-Signed' },
   ];
   cert.setSubject(attrs);
   cert.setIssuer(attrs);

@@ -1,5 +1,5 @@
-import 'package:GNasCab/core/theme/custom_colors.dart';
-import 'package:GNasCab/core/user/current_user_controller.dart';
+import 'package:WaterNasOS/core/theme/custom_colors.dart';
+import 'package:WaterNasOS/core/user/current_user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/api/api_controller.dart';

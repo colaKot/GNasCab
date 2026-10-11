@@ -68,7 +68,7 @@
   "transmission_no_files": "无文件",
   "transmission_select_all_files": "全选",
   "transmission_deselect_all_files": "全不选",
-  "transmission_auto_start": "GNasCab 启动时自动运行",
+  "transmission_auto_start": "WaterNasOS 启动时自动运行",
   "transmission_dht_enabled": "启用 DHT",
   "transmission_pex_enabled": "启用 PEX",
   "transmission_utp_enabled": "启用 uTP",

@@ -42,57 +42,57 @@ class NasCabDesktopOAuthCallbackI18n {
   static const Map<String, ({String title, String body})> _strings = {
     'zh_CN': (
       title: '登录成功',
-      body: '您可以关闭此页面并返回 GNasCab 客户端。',
+      body: '您可以关闭此页面并返回 WaterNasOS 客户端。',
     ),
     'en_US': (
       title: 'Sign-in successful',
-      body: 'You can close this page and return to the GNasCab app.',
+      body: 'You can close this page and return to the WaterNasOS app.',
     ),
     'fr_FR': (
       title: 'Connexion réussie',
       body:
-          'Vous pouvez fermer cette page et revenir à l’application GNasCab.',
+          'Vous pouvez fermer cette page et revenir à l’application WaterNasOS.',
     ),
     'de_DE': (
       title: 'Anmeldung erfolgreich',
       body:
-          'Sie können diese Seite schließen und zur GNasCab-App zurückkehren.',
+          'Sie können diese Seite schließen und zur WaterNasOS-App zurückkehren.',
     ),
     'pt_BR': (
       title: 'Login concluído',
-      body: 'Você pode fechar esta página e voltar ao aplicativo GNasCab.',
+      body: 'Você pode fechar esta página e voltar ao aplicativo WaterNasOS.',
     ),
     'ja_JP': (
       title: 'ログインしました',
-      body: 'このページを閉じて GNasCab アプリに戻ってください。',
+      body: 'このページを閉じて WaterNasOS アプリに戻ってください。',
     ),
     'ru_RU': (
       title: 'Вход выполнен',
-      body: 'Закройте эту страницу и вернитесь в приложение GNasCab.',
+      body: 'Закройте эту страницу и вернитесь в приложение WaterNasOS.',
     ),
     'th_TH': (
       title: 'เข้าสู่ระบบสำเร็จ',
-      body: 'คุณสามารถปิดหน้านี้และกลับไปที่แอป GNasCab',
+      body: 'คุณสามารถปิดหน้านี้และกลับไปที่แอป WaterNasOS',
     ),
     'ko_KR': (
       title: '로그인되었습니다',
-      body: '이 페이지를 닫고 GNasCab 앱으로 돌아가세요.',
+      body: '이 페이지를 닫고 WaterNasOS 앱으로 돌아가세요.',
     ),
     'es_ES': (
       title: 'Sesión iniciada',
-      body: 'Puede cerrar esta página y volver a la aplicación GNasCab.',
+      body: 'Puede cerrar esta página y volver a la aplicación WaterNasOS.',
     ),
     'ar_AR': (
       title: 'تم تسجيل الدخول',
-      body: 'يمكنك إغلاق هذه الصفحة والعودة إلى تطبيق GNasCab.',
+      body: 'يمكنك إغلاق هذه الصفحة والعودة إلى تطبيق WaterNasOS.',
     ),
     'vi_VN': (
       title: 'Đăng nhập thành công',
-      body: 'Bạn có thể đóng trang này và quay lại ứng dụng GNasCab.',
+      body: 'Bạn có thể đóng trang này và quay lại ứng dụng WaterNasOS.',
     ),
     'id_ID': (
       title: 'Login berhasil',
-      body: 'Anda dapat menutup halaman ini dan kembali ke aplikasi GNasCab.',
+      body: 'Anda dapat menutup halaman ini dan kembali ke aplikasi WaterNasOS.',
     ),
   };
 
@@ -110,7 +110,7 @@ class NasCabDesktopOAuthCallbackI18n {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="dark"/>
-  <title>${_escapeHtml(s.title)} · GNasCab</title>
+  <title>${_escapeHtml(s.title)} · WaterNasOS</title>
   <style>
     * { box-sizing: border-box; }
     body {

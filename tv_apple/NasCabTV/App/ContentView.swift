@@ -145,7 +145,7 @@ struct HomeView: View {
                     )
                 )
             VStack(alignment: .leading, spacing: 4) {
-                Text("GNasCab TV")
+                Text("WaterNasOS TV")
                     .font(.title)
                     .fontWeight(.bold)
                 Text(channelDisplayText)

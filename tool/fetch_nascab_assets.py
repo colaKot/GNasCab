@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-从 GNasCab 官方资源清单下载开发环境所需的运行时资源。
+从 WaterNasOS 官方资源清单下载开发环境所需的运行时资源。
 
 清单里每条的 path 是「相对于应用根目录」的路径，例如
     onnx_models/faces/insightFace/model.onnx

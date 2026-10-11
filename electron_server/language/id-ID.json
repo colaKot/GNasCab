@@ -304,7 +304,7 @@
       "NETWORK_TIMEOUT": "Permintaan jaringan habis waktu",
       "NETWORK_ERROR": "Permintaan jaringan gagal",
       "REMOTE_AUTH_FAILED": "Autentikasi jarak jauh gagal",
-      "NASCAB_LOGIN_REQUIRED": "Belum login ke akun GNasCab, tidak dapat mengaktifkan akses jarak jauh",
+      "NASCAB_LOGIN_REQUIRED": "Belum login ke akun WaterNasOS, tidak dapat mengaktifkan akses jarak jauh",
       "NASCAB_SESSION_EXPIRED": "Sesi Anda telah kadaluarsa. Silakan login ulang.",
       "PAIR_CODE_RESET_FAILED": "Gagal mengatur ulang kode pasangan",
       "USER_SERIALIZE_FAILED": "Gagal serialisasi info pengguna",

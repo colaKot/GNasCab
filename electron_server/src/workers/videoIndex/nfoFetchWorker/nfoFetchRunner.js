@@ -12,6 +12,7 @@ const tableConfig = require('../../../db/table/tableConfig');
 const tableVideoSource = require('../../../db/table/tableVideoSource');
 const config = require('../../../config/config');
 const nascabAccountUtil = require('../../../api/modules/service/utils/nascabAccountUtil');
+const networkProxyUtil = require('../../../utils/networkProxyUtil');
 
 const { TmdbClient } = require('./tmdbClient');
 const { buildMovieNfo, buildTvShowNfo, buildSeasonNfo, buildEpisodeNfo, writeTextIfChanged } = require('./jellyfinNfo');
@@ -19,6 +20,7 @@ const videoIndexIndexUtil = require('../videoIndexIndexUtil');
 const { readAndParseNfo, hasValidNfo } = require('../nfoParser');
 const { parseSeasonNumberFromName, parseEpisodeFromName, normalizeNameForNfoGuess } = require('../videoIndexUtil');
 const tmdbUtil = require('./tmdbUtil');
+const javNfoFallback = require('../javFetchWorker/javNfoFallback');
 function _pickYearFromText(s) {
   const m = String(s || '').match(/\b(19|20)\d{2}\b/);
   const y = m ? Number(m[0]) : 0;
@@ -381,6 +383,8 @@ class NfoFetchRunner {
   constructor() {
     this.knexVideo = null;
     this.tmdb = null;
+    this.proxyUrl = '';
+    this.javFallbackEnabled = false;
   }
 
   async init() {
@@ -389,7 +393,7 @@ class NfoFetchRunner {
     this.knexVideo = knexUtil.getInstance(dbUtil.DB_PATHS.VIDEO_DB);
 
     const knex = knexUtil.getInstance(dbUtil.DB_PATHS.MAIN_DB);
-    const [tmdbApiTokenDec, tmdbApiTokenDefaultDec, tmdbApiUrlDec, tmdbProxyEnable, tmdbProxyUrl, tmdbLanguage, uiLanguage] = await Promise.all([
+    const [tmdbApiTokenDec, tmdbApiTokenDefaultDec, tmdbApiUrlDec, tmdbProxyEnable, tmdbProxyUrl, tmdbLanguage, uiLanguage, javFallbackEnable] = await Promise.all([
       nascabAccountUtil.getDecryptedConfigValue(knex, tableConfig, 'tmdbApiToken'),
       nascabAccountUtil.getDecryptedConfigValue(knex, tableConfig, 'tmdbApiTokenDefault'),
       nascabAccountUtil.getDecryptedConfigValue(knex, tableConfig, 'tmdbApiUrl'),
@@ -397,12 +401,20 @@ class NfoFetchRunner {
       tableConfig.getConfigByKey('tmdbProxyUrl'),
       tableConfig.getConfigByKey('tmdbLanguage'),
       tableConfig.getConfigByKey(tableConfig.KEY_SERVER_UI_LANGUAGE),
+      tableConfig.getConfigByKey(tableConfig.KEY_JAV_FALLBACK_ENABLE),
     ]);
     let apiToken = tmdbApiTokenDec ? String(tmdbApiTokenDec).trim() : '';
     if (!apiToken && tmdbApiTokenDefaultDec) apiToken = String(tmdbApiTokenDefaultDec).trim();
     let apiUrl = tmdbApiUrlDec ? String(tmdbApiUrlDec).trim() : '';
-    const proxyEnabled = tmdbProxyEnable === '1' || tmdbProxyEnable === 1;
-    const proxyUrl = proxyEnabled && tmdbProxyUrl ? String(tmdbProxyUrl).trim() : '';
+    // 代理优先级：影视设置里单独配的 TMDB 代理 > 整体设置里的全局代理。
+    // 全局代理是新增入口，让「影视刮削」这类出站请求在未单独配 TMDB 代理时也能走代理。
+    const tmdbProxyEnabled = tmdbProxyEnable === '1' || tmdbProxyEnable === 1;
+    let proxyUrl = tmdbProxyEnabled && tmdbProxyUrl ? String(tmdbProxyUrl).trim() : '';
+    if (!proxyUrl) {
+      proxyUrl = await networkProxyUtil.resolveGlobalProxyUrl();
+    }
+    this.proxyUrl = proxyUrl || '';
+    this.javFallbackEnabled = javFallbackEnable === '1' || javFallbackEnable === 1 || javFallbackEnable === true;
     const preferred = tmdbLanguage ? String(tmdbLanguage).trim() : '';
     const effectiveLanguage = _normalizeToTmdbLanguage(preferred) || _normalizeToTmdbLanguage(uiLanguage) || _normalizeToTmdbLanguage(_getSystemLocale()) || 'en-US';
 
@@ -506,7 +518,10 @@ class NfoFetchRunner {
         break;
       }
     }
-    if (!tmdbId) return false;
+    if (!tmdbId) {
+      // TMDB 匹配不到时，如果用户开启了「日本片兜底识别」，再尝试按番号抓取。
+      return await this._tryJavFallback(row, { dirPath, filename, isDiscFolderMovie, movieFolder });
+    }
 
     const details = await this.tmdb.getMovieDetails(tmdbId);
     if (!details) return false;
@@ -538,6 +553,60 @@ class NfoFetchRunner {
       seasonNumber: 0,
     });
 
+    return true;
+  }
+
+  /**
+   * 日本片兜底识别：从番号抓取日文站点信息，写 NFO + 封面并回填索引。
+   * 仅在用户开启 javFallbackEnable 且 TMDB 匹配失败时调用。
+   * @returns {Promise<boolean>} 是否成功
+   */
+  async _tryJavFallback(row, { dirPath, filename, isDiscFolderMovie, movieFolder }) {
+    if (!this.javFallbackEnabled) return false;
+
+    let meta = null;
+    try {
+      meta = await javNfoFallback.fetchJavMeta({
+        filename,
+        folderName: dirPath,
+        nfoName: row && row.nfo_name ? String(row.nfo_name) : '',
+        proxyUrl: this.proxyUrl || '',
+      });
+    } catch (err) {
+      Logger.error('❌ JAV fallback fetch failed', err && err.message ? err.message : err);
+      return false;
+    }
+    if (!meta) return false;
+
+    const nfoData = javNfoFallback.buildJavNfoData(meta);
+    if (!nfoData.title) nfoData.title = String(meta.dvdid || '').trim();
+    if (!nfoData.title && !meta.coverUrl) return false;
+
+    const baseName = path.parse(filename).name;
+    const searchDir = isDiscFolderMovie ? movieFolder : dirPath;
+    const nfoPath = isDiscFolderMovie ? path.join(movieFolder, 'movie.nfo') : path.join(dirPath, `${baseName}.nfo`);
+    await writeTextIfChanged(nfoPath, buildMovieNfo(nfoData));
+
+    if (meta.coverUrl) {
+      await javNfoFallback.downloadCoverToJpeg({
+        url: meta.coverUrl,
+        targetPath: path.join(searchDir, isDiscFolderMovie ? 'poster.jpg' : `${baseName}-post.jpg`),
+        proxyUrl: this.proxyUrl || '',
+      });
+    }
+
+    await _updateIndexFromNfoAndArtwork({
+      knex: this.knexVideo,
+      row,
+      baseDir: dirPath,
+      searchDir,
+      nfoPath,
+      videoBaseName: isDiscFolderMovie ? '' : baseName,
+      onlyVideoBase: false,
+      seasonNumber: 0,
+    });
+
+    Logger.info(`✅ JAV fallback matched: ${meta.dvdid || ''} (${meta.source || ''}) <- ${filename}`);
     return true;
   }
 

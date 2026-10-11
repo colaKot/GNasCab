@@ -1,16 +1,17 @@
-import 'package:GNasCab/core/api/api_controller.dart';
-import 'package:GNasCab/modules/base/components/custom_extended_image.dart';
-import 'package:GNasCab/modules/base/components/custom_icon_button.dart';
-import 'package:GNasCab/modules/gallery/views/live_photo_inline_player.dart';
-import 'package:GNasCab/modules/video/base/beans/video_item_bean.dart';
-import 'package:GNasCab/modules/video/base/video_utils/video_utils.dart';
-import 'package:GNasCab/modules/video/list/controller/video_list_controller.dart';
+import 'package:WaterNasOS/core/api/api_controller.dart';
+import 'package:WaterNasOS/core/routes/app_routes.dart';
+import 'package:WaterNasOS/modules/base/components/custom_extended_image.dart';
+import 'package:WaterNasOS/modules/base/components/custom_icon_button.dart';
+import 'package:WaterNasOS/modules/video/base/beans/video_item_bean.dart';
+import 'package:WaterNasOS/modules/video/base/video_utils/video_utils.dart';
+import 'package:WaterNasOS/modules/video/list/controller/video_list_controller.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 图片库 / 混合库的全屏浏览：竖向翻页，上滑进入下一个媒体。
-/// 图片支持双击放大与手势缩放；视频点击后原地全屏播放。
+/// 图片支持双击放大与手势缩放；视频点击后进入完整播放器（与普通影视一致，
+/// 带进度条 / 画质切换 / 音轨字幕等全套控件）。
 class VideoMediaViewerPage extends StatefulWidget {
   final VideoListController controller;
   final int initialIndex;
@@ -28,9 +29,6 @@ class VideoMediaViewerPage extends StatefulWidget {
 class _VideoMediaViewerPageState extends State<VideoMediaViewerPage> {
   late final PageController _pageController;
   late int _index;
-
-  /// 当前正在原地播放的视频下标；-1 表示没有播放中的视频
-  int _playingIndex = -1;
 
   /// 各图片的当前缩放比例（与画廊一致，默认 1.0）
   final Map<int, double> _scales = <int, double>{};
@@ -54,8 +52,6 @@ class _VideoMediaViewerPageState extends State<VideoMediaViewerPage> {
     if (mounted) {
       setState(() {
         _index = index;
-        // 滑走即停播，避免后台继续播放
-        _playingIndex = -1;
       });
     }
     // 快到底部时预取下一页，保证上滑能继续翻
@@ -97,7 +93,7 @@ class _VideoMediaViewerPageState extends State<VideoMediaViewerPage> {
                     if (item.isImage) {
                       return _buildImagePage(item, index);
                     }
-                    return _buildVideoPage(item, index);
+                    return _buildVideoPage(item);
                   },
                 ),
               ),
@@ -223,32 +219,39 @@ class _VideoMediaViewerPageState extends State<VideoMediaViewerPage> {
     );
   }
 
-  Widget _buildVideoPage(VideoHomeItemBean item, int index) {
-    final playing = _playingIndex == index;
-    if (playing) {
-      final url = ApiController.instance.getRawFileUrl(
-        item.playFilePath.isNotEmpty ? item.playFilePath : item.fullPath,
-      );
-      // LivePhotoInlinePlayer 内部是 Positioned.fill，必须放在 Stack 里
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          LivePhotoInlinePlayer(
-            videoUrl: url,
-            onClose: () {
-              if (mounted) setState(() => _playingIndex = -1);
-            },
-          ),
-        ],
-      );
+  /// 点击视频：进入完整播放器（与普通影视同一套播放页，带进度条 / 画质 /
+  /// 音轨字幕等全部控件），并把当前库里**所有视频**作为播放列表，
+  /// 以便在播放器里直接切上一个/下一个。
+  ///
+  /// 视频项的播放地址取 `playFilePath`（分片/光盘文件夹场景），为空时退回
+  /// `fullPath`；与旧的原地播放器口径保持一致。
+  Future<void> _openVideoPlayer(VideoHomeItemBean tapped) async {
+    final items = widget.controller.items;
+    final playlist = <Map<String, dynamic>>[];
+    var initialIndex = -1;
+    for (final it in items) {
+      if (it.isImage) continue;
+      final playPath = (it.playFilePath.isNotEmpty ? it.playFilePath : it.fullPath)
+          .trim();
+      if (playPath.isEmpty) continue;
+      if (identical(it, tapped) || it.id == tapped.id) {
+        initialIndex = playlist.length;
+      }
+      playlist.add(<String, dynamic>{
+        'path': playPath,
+        'name': it.nfoName.isNotEmpty ? it.nfoName : it.filename,
+      });
     }
+    if (playlist.isEmpty) return;
+    if (initialIndex < 0) initialIndex = 0;
+    await AppRoutes.toVideoPlayer(playlist: playlist, initialIndex: initialIndex);
+  }
 
+  Widget _buildVideoPage(VideoHomeItemBean item) {
     final cover = VideoUtils.getPosterUrl(item, size: 800);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () {
-        if (mounted) setState(() => _playingIndex = index);
-      },
+      onTap: () => _openVideoPlayer(item),
       child: Stack(
         fit: StackFit.expand,
         children: [

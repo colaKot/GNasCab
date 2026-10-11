@@ -173,7 +173,7 @@ class BackgroundTaskWorker {
           });
         }
       } catch (error) {
-        Logger.error('❌  refresh GNasCab token failed:', error);
+        Logger.error('❌  refresh WaterNasOS token failed:', error);
       }
     };
     run();

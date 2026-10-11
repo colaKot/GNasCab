@@ -135,7 +135,7 @@ if (!loaded) loaded = await buildSessions(['cpu']);
 
 | 产物 | 状态 |
 |---|---|
-| 服务端 `dist_v3/win-unpacked/GNasCabServer.exe` | ✅ 12:57 / 204.5 MB |
+| 服务端 `dist_v3/win-unpacked/WaterNasOSServer.exe` | ✅ 12:57 / 204.5 MB |
 | ABI 验证 | ✅ ABI=136 / Electron 37.9.0，10 个 native 全通过，better-sqlite3 与 sharp 真调用成功 |
 | web `main.dart.js` | ✅ 13:00 / 13008525 bytes（比旧包 +2692）/ SW 0 字节 |
 | 两处 web 拷贝 | ✅ `electron_server/web/main/` 与 `dist_v3/win-unpacked/web/main/`，均 13008525 / 30 文件 |
@@ -148,7 +148,7 @@ if (!loaded) loaded = await buildSessions(['cpu']);
 
 ## 五、需要你验证（三件事）
 
-**手动启动** `electron_server/dist_v3/win-unpacked/GNasCabServer.exe`
+**手动启动** `electron_server/dist_v3/win-unpacked/WaterNasOSServer.exe`
 （沙箱里起不了 Electron GUI 服务端），然后：
 
 1. **影视详情** —— 点开任意影片，看是否还报「加载失败」

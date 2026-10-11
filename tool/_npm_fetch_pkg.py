@@ -29,7 +29,7 @@ import sys
 import tarfile
 import urllib.request
 
-UA = "GNasCab-dep-fix/1.0"
+UA = "WaterNasOS-dep-fix/1.0"
 
 
 def load_lock_entry(project, name):
